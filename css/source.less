@@ -1,3 +1,40 @@
-test {
-  width: 50%;
+.filters {
+  border: 2px dashed #333;
+  border-radius: 5px;
+  padding-bottom: 20px;
+
+  fieldset {
+    float: left;
+    margin-right: 20px;
+
+    legend {
+      margin-bottom: 5px;
+    }
+
+    label {
+      padding-left: 20px;
+    }
+
+    select {
+      margin-top: 7px;
+    }
+
+    &.inline {
+      label {
+        margin: 0 10px 0 0; // space out consecutive inline controls
+      }
+
+      &.quality {
+        width: 100px;
+      }
+
+      &.attributes {
+        width: 280px;
+
+        label {
+          width: 105px;
+        }
+      }
+    }
+  }
 }

@@ -1,6 +1,7 @@
 {
   "require": {
     "twig/twig": "1.*",
-    "twbs/bootstrap": "3.3.7"
+    "twbs/bootstrap": "3.3.7",
+    "phpunit/phpunit": "4.8.*"
   }
 }
