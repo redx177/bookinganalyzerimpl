@@ -1,37 +1,16 @@
 <?php
 
+/**
+ * Iterator for CSV file.
+ * First line will be treatened as header line with names and will never be returned.
+ */
 class CsvIterator implements Iterator {
-    /**
-     * File pointer to the csv file.
-     * @var resource
-     */
     private $filePointer;
-
-    /**
-     * Current row number the iterator points to.
-     * @var int
-     */
-    private $currentRowNumber;
-
-    /**
-     * Field deliminiter of the csv file.
-     * @var string
-     */
-    private $deliminiter;
-
-
-    /**
-     * Field enclosure of the csv file.
-     * @var string
-     */
-    private $enclosure;
-
-
-    /**
-     * Contains the current line data.
-     * @var
-     */
+    private $currentRowNumber = 0;
     private $currentLine = false;
+    private $deliminiter;
+    private $enclosure;
+    private $fieldNames;
 
     /**
      * CsvIterator constructor.
@@ -48,6 +27,8 @@ class CsvIterator implements Iterator {
         $this->currentRowNumber = 0;
         $this->deliminiter = $deliminiter;
         $this->enclosure = $enclosure;
+
+        $this->fieldNames = $this->getFieldNames();
     }
 
     /**
@@ -70,7 +51,8 @@ class CsvIterator implements Iterator {
     public function next()
     {
         $this->currentRowNumber++;
-        $this->currentLine = fgetcsv($this->filePointer, 0, $this->deliminiter, $this->enclosure);
+        $currentLine = fgetcsv($this->filePointer, 0, $this->deliminiter, $this->enclosure);
+        $this->currentLine = $this->getAssociativeArray($this->fieldNames, $currentLine);
     }
 
     /**
@@ -94,13 +76,6 @@ class CsvIterator implements Iterator {
     public function valid()
     {
         return is_array($this->currentLine);
-
-        return !feof($this->filePointer);
-        if (!$this->next()) {
-            fclose($this->filePointer);
-            return false;
-        }
-        return true;
     }
 
     /**
@@ -111,8 +86,28 @@ class CsvIterator implements Iterator {
      */
     public function rewind()
     {
-        $this->currentLine = false;
         $this->currentRowNumber = 0;
         rewind($this->filePointer);
+        $this->next();
+        $this->currentLine = false;
+    }
+
+    private function getFieldNames()
+    {
+        rewind($this->filePointer);
+        return fgetcsv($this->filePointer, 0, $this->deliminiter, $this->enclosure);
+    }
+
+    public function getAssociativeArray($fieldNames, $currentLine)
+    {
+        if ($currentLine === false) {
+            return false;
+        }
+        
+        $associativeArray = array();
+        for ($i = 0; $i < count($currentLine); $i++) {
+            $associativeArray[$fieldNames[$i]] = $currentLine[$i];
+        }
+        return $associativeArray;
     }
 }

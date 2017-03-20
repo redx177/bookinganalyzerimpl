@@ -27,7 +27,7 @@ class CsvIteratorTest extends TestCase
         $sut = new CsvIterator($this->testfile);
         $sut->next();
         $line = $sut->current();
-        $this->assertEquals(array('1','2','3'), $line);
+        $this->assertEquals(array('first' => '1','second' => '2','third' => '3'), $line);
     }
 
     public function testGettingSecondLineShouldReturnCorrectData() {
@@ -35,7 +35,7 @@ class CsvIteratorTest extends TestCase
         $sut->next();
         $sut->next();
         $line = $sut->current();
-        $this->assertEquals(array('2','3','4'), $line);
+        $this->assertEquals(array('first' => '2','second' => '3','third' => '4'), $line);
     }
 
     public function testGettingThirdLineShouldReturnFalse() {
@@ -75,5 +75,23 @@ class CsvIteratorTest extends TestCase
         $sut = new CsvIterator($this->testfile);
         $line = $sut->current();
         $this->assertFalse($line);
+    }
+
+    public function afterARewindItShouldReturnFalse() {
+        $sut = new CsvIterator($this->testfile);
+        $sut->next();
+        $sut->rewind();
+        $line = $sut->current();
+        $this->assertFalse($line);
+    }
+
+    public function afterARewindAndANextItShouldReturnTheFirstElement() {
+        $sut = new CsvIterator($this->testfile);
+        $sut->next();
+        $sut->next();
+        $sut->rewind();
+        $sut->next();
+        $line = $sut->current();
+        $this->assertEquals(array('first' => '1','second' => '2','third' => '3'), $line);
     }
 }
