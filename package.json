@@ -1,0 +1,16 @@
+{
+  "name": "bookinganalyzerimpl",
+  "version": "0.0.0",
+  "description": "",
+  "main": "index.php",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/soultemptation/bookinganalyzerimpl.git"
+  },
+  "author": "Simon Lang",
+  "devDependencies": {
+    "grunt": "~1.0.1",
+    "grunt-contrib-less": "~1.4.1",
+    "grunt-contrib-watch": "~1.0.0"
+  }
+}
