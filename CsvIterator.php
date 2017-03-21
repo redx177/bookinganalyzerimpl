@@ -103,7 +103,7 @@ class CsvIterator implements Iterator {
         if ($currentLine === false) {
             return false;
         }
-        
+
         $associativeArray = array();
         for ($i = 0; $i < count($currentLine); $i++) {
             $associativeArray[$fieldNames[$i]] = $currentLine[$i];

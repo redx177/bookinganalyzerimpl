@@ -8,7 +8,7 @@ class CsvIteratorTest extends TestCase
 
     protected function setUp()
     {
-        $this->testfile = dirname(__DIR__) . "/Tests/test.csv";
+        $this->testfile = __DIR__ . "/test.csv";
     }
 
     public function testValidFileCanBeOpened() {
