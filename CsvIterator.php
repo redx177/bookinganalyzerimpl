@@ -15,10 +15,12 @@ class CsvIterator implements Iterator {
     /**
      * CsvIterator constructor.
      * @param $file File (incl. path) to load.
+     * @param $lineOffset Number of line to skip at the beginning.
      * @param string $deliminiter The optional delimiter parameter sets the field delimiter (one character only).
      * @param string $enclosure The optional enclosure parameter sets the field enclosure character (one character only).
+     * @throws Exception
      */
-    public function __construct($file, $deliminiter=';', $enclosure = '"')
+    public function __construct($file, $lineOffset = 0, $deliminiter=';', $enclosure = '"')
     {
         if (!file_exists($file)) {
             throw new Exception('File ['. $file. '] not found');
@@ -29,6 +31,9 @@ class CsvIterator implements Iterator {
         $this->enclosure = $enclosure;
 
         $this->fieldNames = $this->getFieldNames();
+        for ($i = 0; $i < $lineOffset; $i++) {
+            $this->next();
+        }
     }
 
     /**
