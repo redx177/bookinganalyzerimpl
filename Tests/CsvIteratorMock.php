@@ -1,77 +1,81 @@
 <?php
+use \PHPUnit\Framework\TestCase;
 
 class CsvIteratorMock {
     /**
      * Setup methods required to mock an iterator
      *
-     * @param PHPUnit_Framework_MockObject_MockObject $iteratorMock The mock to attach the iterator methods to
-     * @param array $items The mock data we're going to use with the iterator
-     * @return PHPUnit_Framework_MockObject_MockObject The iterator mock
+     * @param TestCase $testCase Test case to create the mock.
+     * @param array $items The mock data we're going to use with the iterator.
+     * @return PHPUnit_Framework_MockObject_MockObject The iterator mock.
      */
-    static public function get(TestCase $test, array $items)
+    static public function get(TestCase $testCase, array $items)
     {
-        $csvIteratorMock = $test->createMock(CsvIterator::class);
+
+        $csvIteratorMock = $testCase->getMockBuilder(CsvIterator::class)
+            ->disableOriginalConstructor()
+            ->getMock('');
 
         $iteratorData = new \stdClass();
         $iteratorData->array = $items;
         $iteratorData->position = 0;
 
-        $csvIteratorMock->expects($csvIteratorMock->any())
+        $csvIteratorMock->expects($testCase->any())
             ->method('rewind')
             ->will(
-                $test->returnCallback(
+                $testCase->returnCallback(
                     function() use ($iteratorData) {
                         $iteratorData->position = 0;
                     }
                 )
             );
 
-        $csvIteratorMock->expects($test->any())
+        $csvIteratorMock->expects($testCase->any())
             ->method('current')
             ->will(
-                $test->returnCallback(
+                $testCase->returnCallback(
                     function() use ($iteratorData) {
                         return $iteratorData->array[$iteratorData->position];
                     }
                 )
             );
 
-        $csvIteratorMock->expects($test->any())
+        $csvIteratorMock->expects($testCase->any())
             ->method('key')
             ->will(
-                $test->returnCallback(
+                $testCase->returnCallback(
                     function() use ($iteratorData) {
                         return $iteratorData->position;
                     }
                 )
             );
 
-        $csvIteratorMock->expects($test->any())
+        $csvIteratorMock->expects($testCase->any())
             ->method('next')
             ->will(
-                $test->returnCallback(
+                $testCase->returnCallback(
                     function() use ($iteratorData) {
                         $iteratorData->position++;
                     }
                 )
             );
 
-        $csvIteratorMock->expects($test->any())
+        $csvIteratorMock->expects($testCase->any())
             ->method('valid')
             ->will(
-                $test->returnCallback(
+                $testCase->returnCallback(
                     function() use ($iteratorData) {
                         return isset($iteratorData->array[$iteratorData->position]);
                     }
                 )
             );
 
-        $csvIteratorMock->expects($test->any())
-            ->method('count')
+        $csvIteratorMock->expects($testCase->any())
+            ->method('skip')
             ->will(
-                $test->returnCallback(
-                    function() use ($iteratorData) {
-                        return sizeof($iteratorData->array);
+                $testCase->returnCallback(
+                    function($from) use ($iteratorData) {
+                        $iteratorData->position = $from;
                     }
                 )
             );

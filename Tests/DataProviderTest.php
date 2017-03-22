@@ -49,7 +49,7 @@ class DataProviderTest extends TestCase
         $data = $sut->getSubset(1,2);
 
         $this->assertEquals(2, count($data));
-        $this->assertEquals([1,2,3], $data[0]);
-        $this->assertEquals([2,3,4], $data[1]);
+        $this->assertEquals([2,3,4], $data[0]);
+        $this->assertEquals([3,4,5], $data[1]);
     }
 }
