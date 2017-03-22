@@ -15,12 +15,11 @@ class CsvIterator implements Iterator {
     /**
      * CsvIterator constructor.
      * @param $file File (incl. path) to load.
-     * @param $lineOffset Number of line to skip at the beginning.
      * @param string $deliminiter The optional delimiter parameter sets the field delimiter (one character only).
      * @param string $enclosure The optional enclosure parameter sets the field enclosure character (one character only).
      * @throws Exception
      */
-    public function __construct($file, $lineOffset = 0, $deliminiter=';', $enclosure = '"')
+    public function __construct($file, $deliminiter=';', $enclosure = '"')
     {
         if (!file_exists($file)) {
             throw new Exception('File ['. $file. '] not found');
@@ -31,9 +30,9 @@ class CsvIterator implements Iterator {
         $this->enclosure = $enclosure;
 
         $this->fieldNames = $this->getFieldNames();
-        for ($i = 0; $i < $lineOffset; $i++) {
-            $this->next();
-        }
+
+        // Loading first line.
+        $this->next();
     }
 
     /**
@@ -57,7 +56,14 @@ class CsvIterator implements Iterator {
     {
         $this->currentRowNumber++;
         $currentLine = fgetcsv($this->filePointer, 0, $this->deliminiter, $this->enclosure);
-        $this->currentLine = $this->getAssociativeArray($this->fieldNames, $currentLine);
+
+
+        if ($currentLine === false) {
+            $this->currentLine = false;
+        } else {
+            // Combine fieldNames and currentLine to an associative array.
+            $this->currentLine = array_combine($this->fieldNames, $currentLine);
+        }
     }
 
     /**
@@ -93,8 +99,12 @@ class CsvIterator implements Iterator {
     {
         $this->currentRowNumber = 0;
         rewind($this->filePointer);
+
+        // Skipping field name line.
         $this->next();
-        $this->currentLine = false;
+
+        // Loading first line.
+        $this->next();
     }
 
     private function getFieldNames()
@@ -103,16 +113,14 @@ class CsvIterator implements Iterator {
         return fgetcsv($this->filePointer, 0, $this->deliminiter, $this->enclosure);
     }
 
-    public function getAssociativeArray($fieldNames, $currentLine)
+    /**
+     * Skips a given amount of lines.
+     * @param $count Number of line to skip.
+     */
+    public function skip($count)
     {
-        if ($currentLine === false) {
-            return false;
+        for($i = 0; $i < $count; $i++) {
+            $this->next();
         }
-
-        $associativeArray = array();
-        for ($i = 0; $i < count($currentLine); $i++) {
-            $associativeArray[$fieldNames[$i]] = $currentLine[$i];
-        }
-        return $associativeArray;
     }
 }

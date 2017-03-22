@@ -1,0 +1,19 @@
+{
+  "name": "interhome/bookinganalyzerimpl",
+  "description": "Booking Analyzer",
+  "minimum-stability": "stable",
+  "license": "proprietary",
+  "authors": [
+    {
+      "name": "Simon Lang",
+      "email": "email@example.com"
+    }
+  ],
+  "require": {
+    "twig/twig": "2.2.*",
+    "twbs/bootstrap": "3.3.7",
+    "phpunit/phpunit": "6.0.0",
+    "php-di/php-di": "5.4.*",
+    "mikey179/vfsStream": "1.6.*"
+  }
+}
