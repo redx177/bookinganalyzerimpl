@@ -19,16 +19,15 @@ class DataTypeClustererTest extends TestCase
                 'strA' => 'CH12.12.12', 'strB' => 'aaabbbccc', 'strC' => '',
                 'boolA' => '1.0', 'boolB' => '1', 'boolC' => 1, 'boolD' => true,
                     'boolE' => '0.0', 'boolF' => '0', 'boolG' => 0, 'boolH' => false,
-                'intA' => '5', 'intB' => 5, 'intC' => '-3',  'intD' => -3,
+                'intA' => '5', 'intB' => 5, 'intC' => '-3',  'intD' => -3, 'intE[]' => array(1,2,3),
                 'distA' => '', 'distB' => 'close', 'distC' => 'invalid value',
                 'priA' => '', 'priB' => 'luxury', 'priC' => 'budget', 'priD' => 'invalid value',
             ];
         $parameterMap = [
-            ['idField','id'],
             ['floatFields',['floatA','floatB']],
             ['stringFields',['strA','strB','strC']],
             ['booleanFields',['boolA','boolB','boolC','boolD','boolE','boolF','boolG','boolH']],
-            ['integerFields',['intA','intB','intC','intD']],
+            ['integerFields',['id','intA','intB','intC','intD','intE']],
             ['distanceFields',['distA','distB','distC']],
             ['priceFields',['priA','priB','priC','priD']],
         ];
@@ -41,12 +40,11 @@ class DataTypeClustererTest extends TestCase
 
         $data = $sut->get($rawData);
 
-        $this->assertEquals(34, $data->getId());
         $this->assertEquals(['floatA' => 33.22, 'floatB' => 22.33], $data->getFloatFields());
         $this->assertEquals(['strA' => 'CH12.12.12', 'strB' => 'aaabbbccc', 'strC' => ''], $data->getStringFields());
         $this->assertEquals(['boolA' => true, 'boolB' => true, 'boolC' => true, 'boolD' => true,
             'boolE' => false, 'boolF' => false, 'boolG' => false, 'boolH' => false], $data->getBooleanFields());
-        $this->assertEquals(['intA' => 5, 'intB' => 5, 'intC' => -3, 'intD' => -3], $data->getIntegerFields());
+        $this->assertEquals(['id' => 34, 'intA' => 5, 'intB' => 5, 'intC' => -3, 'intD' => -3, 'intE' => [1,2,3]], $data->getIntegerFields());
         $this->assertEquals(['distA' => Distance::Empty, 'distB' => Distance::Close, 'distC' => Distance::Empty], $data->getDistanceFields());
         $this->assertEquals(['priA' => Price::Empty, 'priB' => Price::Luxury, 'priC' => Price::Budget, 'priD' => Price::Empty], $data->getPriceFields());
     }

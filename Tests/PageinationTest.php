@@ -1,6 +1,6 @@
 <?php
 require_once dirname(__DIR__) . '/Business/Pagination.php';
-require_once dirname(__DIR__) . '/Business/DataProvider.php';
+require_once dirname(__DIR__) . '/Business/BookingsProvider.php';
 require_once dirname(__DIR__) . '/Utilities/ConfigProvider.php';
 use PHPUnit\Framework\TestCase;
 
@@ -15,7 +15,7 @@ class PageinationTest extends TestCase
         $this->configMock->method('get')
             ->willReturn(4);
 
-        $this->dataProviderMock = $this->createMock(DataProvider::class);
+        $this->dataProviderMock = $this->createMock(BookingsProvider::class);
         $this->dataProviderMock->method('getItemCount')
             ->willReturn(22);
     }

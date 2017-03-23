@@ -22,11 +22,11 @@
       * ExploreController constructor.
       * @param Twig_Environment $twig Twig environment for loading templates.
       * @param Pagination $pagination Pagination provider.
-      * @param DataProvider $dataProvider Provider for the data to display.
+      * @param BookingsProvider $dataProvider Provider for the data to display.
       * @param ConfigProvider $config Configuration provider.
       * @internal param ConfigProvider $config Configuration provider.
       */
-     public function __construct(Twig_Environment $twig, Pagination $pagination, DataProvider $dataProvider, ConfigProvider $config)
+     public function __construct(Twig_Environment $twig, Pagination $pagination, BookingsProvider $dataProvider, ConfigProvider $config)
      {
          $this->twig = $twig;
          $this->dataProvider = $dataProvider;

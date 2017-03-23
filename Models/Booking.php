@@ -1,20 +1,21 @@
 <?php
 class Booking
 {
-    private $dataTypeCluster;
-
+    private $id;
     /**
      * Booking constructor.
-     * @param DataTypeCluster $dataTypeCluster Data type cluster which contains the booking data.
+     * @param $id int ID of the booking
+     * @param $dataTypeCluster DataTypeCluster Data type cluster of  the booking data.
      */
-    public function __construct(DataTypeCluster $dataTypeCluster)
+    public function __construct($id, $dataTypeCluster)
     {
+        $this->id = $id;
         $this->dataTypeCluster = $dataTypeCluster;
     }
 
     public function getId() : int
     {
-        return $this->dataTypeCluster->getId();
+        return $this->id;
     }
 
     public function getIntegerFields() : array
@@ -24,7 +25,7 @@ class Booking
 
     public function getBooleanFields() : array
     {
-        return $this->dataTypeCluster->getbbooleanFields();
+        return $this->dataTypeCluster->getBooleanFields();
     }
 
     public function getFloatFields() : array

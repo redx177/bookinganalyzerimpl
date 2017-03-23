@@ -22,6 +22,7 @@ $configContent = array(
         'DISEA' => 'Close to sea',
         'DILAKE' => 'Close to lake',
         'DIPUBT' => 'Close to public transport',
+        'CAIRCOND' => 'Aircondition',
         'CPOOL' => 'Pool',
         'CBBQ' => 'BBQ',
         'CSAUNA' => 'Sauna',

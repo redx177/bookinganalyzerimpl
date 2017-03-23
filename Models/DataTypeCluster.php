@@ -2,7 +2,6 @@
 
 class DataTypeCluster
 {
-    private $id;
     private $integerFields;
     private $booleanFields;
     private $floatFields;
@@ -12,28 +11,21 @@ class DataTypeCluster
 
     /**
      * DataTypeCluster constructor.
-     * @param $id int ID of the booking
      * @param $integerFields array Integer typed fields.
-     * @param $booleanFields array Booleand typed fields.
+     * @param $booleanFields array Boolean typed fields.
      * @param $floatFields array Float typed fields.
      * @param $stringFields array String typed fields.
      * @param $priceFields array Price fields.
      * @param $distanceFields array Distance fields.
      */
-    public function __construct($id, $integerFields, $booleanFields, $floatFields, $stringFields, $priceFields, $distanceFields)
+    public function __construct($integerFields, $booleanFields, $floatFields, $stringFields, $priceFields, $distanceFields)
     {
-        $this->id = $id;
         $this->integerFields = $integerFields;
         $this->booleanFields = $booleanFields;
         $this->floatFields = $floatFields;
         $this->stringFields = $stringFields;
         $this->priceFields = $priceFields;
         $this->distanceFields = $distanceFields;
-    }
-
-    public function getId(): int
-    {
-        return $this->id;
     }
 
     public function getIntegerFields(): array

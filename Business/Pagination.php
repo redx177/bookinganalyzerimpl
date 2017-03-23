@@ -7,9 +7,9 @@ class Pagination {
     /**
      * Pagination constructor.
      * @param ConfigProvider $config Configuration provider.
-     * @param DataProvider $dataProvider Data provider to paginate.
+     * @param BookingsProvider $dataProvider Data provider to paginate.
      */
-    public function __construct(ConfigProvider $config, DataProvider $dataProvider)
+    public function __construct(ConfigProvider $config, BookingsProvider $dataProvider)
     {
         $this->dataProvider = $dataProvider;
         $this->pageSize = $config->get('pageSize');

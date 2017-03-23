@@ -1,21 +1,20 @@
 <?php
-class DataProvider {
+class BookingsProvider {
     private $csvIterator;
-    /**
-     * @var DataTypeClusterer
-     */
     private $dataTypeClusterer;
+    private $idField;
 
     /**
      * DataProvider constructor.
      * @param CsvIterator $csvIterator Iterator to access data.
      * @param DataTypeClusterer $dataTypeClusterer Data type clusterer to group raw booking data.
-     * @internal param ConfigProvider $config Configuration provider.
+     * @param ConfigProvider $config Configuration provider.
      */
-    public function __construct(CsvIterator $csvIterator, DataTypeClusterer $dataTypeClusterer)
+    public function __construct(CsvIterator $csvIterator, DataTypeClusterer $dataTypeClusterer, ConfigProvider $config)
     {
         $this->csvIterator = $csvIterator;
         $this->dataTypeClusterer = $dataTypeClusterer;
+        $this->idField = $config->get('idField');
     }
 
     /**
@@ -35,7 +34,10 @@ class DataProvider {
             }
             $rawBooking = $this->csvIterator->current();
             $dataTypeCluster = $this->dataTypeClusterer->get($rawBooking);
-            array_push($data, new Booking($dataTypeCluster));
+            $id = $rawBooking[$this->idField];
+
+            $booking = new Booking($id, $dataTypeCluster);
+            array_push($data, $booking);
             $this->csvIterator->next();
         }
         return $data;

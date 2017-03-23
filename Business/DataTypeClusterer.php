@@ -2,6 +2,12 @@
 
 class DataTypeClusterer
 {
+    private $integerFields;
+    private $booleanFields;
+    private $floatFields;
+    private $stringFields;
+    private $priceFields;
+    private $distanceFields;
 
     /**
      * DataTypeClusterer constructor.
@@ -15,12 +21,10 @@ class DataTypeClusterer
         $this->stringFields = $config->get('stringFields');
         $this->priceFields = $config->get('priceFields');
         $this->distanceFields = $config->get('distanceFields');
-        $this->idField = $config->get('idField');
     }
 
     public function get($rawData)
     {
-
         $floatFields = [];
         $booleanFields = [];
         $integerFields = [];
@@ -38,7 +42,12 @@ class DataTypeClusterer
             }
         }
         foreach ($this->integerFields as $fieldName) {
-            if (array_key_exists($fieldName, $rawData)) {
+            if (array_key_exists($fieldName . '[]', $rawData)) {
+                $integerFields[$fieldName] = [];
+                foreach ($rawData[$fieldName . '[]'] as $value) {
+                    array_push($integerFields[$fieldName], (int)$value);
+                }
+            } elseif (array_key_exists($fieldName, $rawData)) {
                 $integerFields[$fieldName] = (int)$rawData[$fieldName];
             }
         }
@@ -57,8 +66,7 @@ class DataTypeClusterer
                 $distanceFields[$fieldName] = $this->getDistance($rawData[$fieldName]);
             }
         }
-        $idField = $rawData[$this->idField];
-        return new DataTypeCluster($idField, $integerFields, $booleanFields, $floatFields, $stringFields, $priceFields, $distanceFields);
+        return new DataTypeCluster($integerFields, $booleanFields, $floatFields, $stringFields, $priceFields, $distanceFields);
     }
 
     private function getPrice($value)
