@@ -45,9 +45,13 @@
          $template = $this->twig->load('explore.twig');
          return $template->render(array(
              'bookings' => $data,
+             'view' => 'explore',
              'currentPage' => $this->pagination->getCurrentPage(),
              'pageCount' => $this->pagination->getPageCount(),
              'paginationWindow' => $this->config->get('paginationWindow'),
-             'fieldTitels' => $this->config->get('fieldNameMapping')));
+             'fieldTitels' => $this->config->get('fieldNameMapping'),
+             'buttonConfigs' => [new ButtonConfig($this->config->get('filterButtonTitle'), 'apply')],
+             '_GET' => $_GET,
+            ));
      }
  }

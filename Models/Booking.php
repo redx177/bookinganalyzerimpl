@@ -1,67 +1,49 @@
 <?php
 class Booking
 {
-    private $id;
-    private $integerFields;
-    private $booleanFields;
-    private $floatFields;
-    private $stringFields;
-    private $priceFields;
-    private $distanceFields;
+    private $dataTypeCluster;
 
     /**
      * Booking constructor.
-     * @param $id int ID of the booking
-     * @param $integerFields array Integer typed fields.
-     * @param $booleanFields array Booleand typed fields.
-     * @param $floatFields array Float typed fields.
-     * @param $stringFields array String typed fields.
-     * @param $priceFields array Price fields.
-     * @param $distanceFields array Distance fields.
+     * @param DataTypeCluster $dataTypeCluster Data type cluster which contains the booking data.
      */
-    public function __construct($id, $integerFields, $booleanFields, $floatFields, $stringFields, $priceFields, $distanceFields)
+    public function __construct(DataTypeCluster $dataTypeCluster)
     {
-        $this->id = $id;
-        $this->integerFields = $integerFields;
-        $this->booleanFields = $booleanFields;
-        $this->floatFields = $floatFields;
-        $this->stringFields = $stringFields;
-        $this->priceFields = $priceFields;
-        $this->distanceFields = $distanceFields;
+        $this->dataTypeCluster = $dataTypeCluster;
     }
 
     public function getId() : int
     {
-        return $this->id;
+        return $this->dataTypeCluster->getId();
     }
 
     public function getIntegerFields() : array
     {
-        return $this->integerFields;
+        return $this->dataTypeCluster->getIntegerFields();
     }
 
     public function getBooleanFields() : array
     {
-        return $this->booleanFields;
+        return $this->dataTypeCluster->getbbooleanFields();
     }
 
     public function getFloatFields() : array
     {
-        return $this->floatFields;
+        return $this->dataTypeCluster->getFloatFields();
     }
 
     public function getStringFields(): array
     {
-        return $this->stringFields;
+        return $this->dataTypeCluster->getStringFields();
     }
 
     public function getPriceFields(): array
     {
-        return $this->priceFields;
+        return $this->dataTypeCluster->getPriceFields();
     }
 
     public function getDistanceFields(): array
     {
-        return $this->distanceFields;
+        return $this->dataTypeCluster->getDistanceFields();
     }
 }

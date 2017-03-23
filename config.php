@@ -3,7 +3,7 @@ $configContent = array(
     'dataSource' => './rapidminerdata.csv',
     'pageSize' => 10,
     'paginationWindow' => 3,
-    'booleanFields' => ['CPOOL','CBBQ','CSAUNA','CJACUZZI','CWASHMACHI','CPARKING','CDISHWASHE','CFIREPLACE','SCTV','SCBALCONY','SCBALCONY','SCNOSMOKE','INTERNET'],
+    'booleanFields' => ['CAIRCOND','CPOOL','CBBQ','CSAUNA','CJACUZZI','CWASHMACHI','CPARKING','CDISHWASHE','CFIREPLACE','SCTV','SCBALCONY','SCBALCONY','SCNOSMOKE','INTERNET'],
     'integerFields' => ['QUAL','ROOMS','BEDROOMS'],
     'floatFields' => ['longitude', 'latitude'],
     'stringFields' => ['NREF'],
@@ -36,5 +36,6 @@ $configContent = array(
         'INTERNET' => 'Internet',
         'longitude' => 'Longitude',
         'latitude' => 'Latitude',
-    ]
+    ],
+    'filterButtonTitle' => 'Apply Fiters'
 );
