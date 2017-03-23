@@ -1,10 +1,11 @@
 <?php
 require_once __DIR__ . '/vendor/autoload.php';
-require_once __DIR__ . '/Utilities/ConfigProvider.php';
-require_once __DIR__ . '/Utilities/CsvIterator.php';
-require_once __DIR__ . '/Interfaces/Controller.php';
-require_once __DIR__ . '/Controllers/ExploreController.php';
-require_once __DIR__ . '/Business/DataProvider.php';
+require_once __DIR__ . '/config.php';
+require_once __DIR__ . '/Utilities/Autoloader.php';
+
+spl_autoload_register(function ($classname) {
+    Autoloader::load($classname);
+});
 
 $config = new ConfigProvider();
 
@@ -20,8 +21,6 @@ $builder->addDefinitions(array(
 ));
 $container = $builder->build();
 
-
 $controller = $container->get('ExploreController');
-
 
 echo $controller->render();

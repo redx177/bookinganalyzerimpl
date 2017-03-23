@@ -9,18 +9,29 @@
      private $twig;
      private $dataProvider;
      private $pageSize;
+     /**
+      * @var Pagination
+      */
+     private $pagination;
+     /**
+      * @var ConfigProvider
+      */
+     private $config;
 
      /**
       * ExploreController constructor.
       * @param Twig_Environment $twig Twig environment for loading templates.
-      * @param ConfigProvider $config Configuration provider.
+      * @param Pagination $pagination Pagination provider.
       * @param DataProvider $dataProvider Provider for the data to display.
+      * @param ConfigProvider $config Configuration provider.
+      * @internal param ConfigProvider $config Configuration provider.
       */
-     public function __construct(Twig_Environment $twig, ConfigProvider $config, DataProvider $dataProvider)
+     public function __construct(Twig_Environment $twig, Pagination $pagination, DataProvider $dataProvider, ConfigProvider $config)
      {
          $this->twig = $twig;
          $this->dataProvider = $dataProvider;
-         $this->pageSize = $config->get('pageSize') ? $config->get('pageSize') : 5;
+         $this->pagination = $pagination;
+         $this->config = $config;
      }
 
 
@@ -30,9 +41,12 @@
       */
      public function render()
      {
-         $page = array_key_exists('page', $_GET) ? $_GET['page'] : 1;
-         $data = $this->dataProvider->getSubset($page * $this->pageSize, $this->pageSize);
-         $template = $this->twig->load('explore.twig', array('pageName' => "Attributanalysis"));
-         return $template->render();
+         $data = $this->dataProvider->getSubset($this->pagination->getCurrentPageFirstItemIndex(), $this->pagination->getPageSize());
+         $template = $this->twig->load('explore.twig');
+         return $template->render(array(
+             'bookings' => $data,
+             'currentPage' => $this->pagination->getCurrentPage(),
+             'pageCount' => $this->pagination->getPageCount(),
+             'paginationWindow' => $this->config->get('paginationWindow')));
      }
  }

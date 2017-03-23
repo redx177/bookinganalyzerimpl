@@ -20,32 +20,45 @@ class CsvIteratorTest extends TestCase
 2;3;4');
     }
 
-    public function testValidFileShouldBeOpened() {
+    /**
+     * @test
+     */
+    public function validFileShouldBeOpened() {
         new CsvIterator($this->testfile);
         $this->assertTrue(true);
     }
 
     /**
+     * @test
      * @expectedException Exception
      */
-    public function testInvalidFileShouldThrowException() {
+    public function invalidFileShouldThrowException() {
         new CsvIterator("invalidFile");
     }
 
-    public function testGettingFirstLineShouldReturnCorrectData() {
+    /**
+     * @test
+     */
+    public function gettingFirstLineShouldReturnCorrectData() {
         $sut = new CsvIterator($this->testfile);
         $line = $sut->current();
         $this->assertEquals(array('first' => '1','second' => '2','third' => '3'), $line);
     }
 
-    public function testGettingSecondLineShouldReturnCorrectData() {
+    /**
+     * @test
+     */
+    public function gettingSecondLineShouldReturnCorrectData() {
         $sut = new CsvIterator($this->testfile);
         $sut->next();
         $line = $sut->current();
         $this->assertEquals(array('first' => '2','second' => '3','third' => '4'), $line);
     }
 
-    public function testGettingThirdLineShouldReturnFalse() {
+    /**
+     * @test
+     */
+    public function gettingThirdLineShouldReturnFalse() {
         $sut = new CsvIterator($this->testfile);
         $sut->next();
         $sut->next();
@@ -53,20 +66,29 @@ class CsvIteratorTest extends TestCase
         $this->assertFalse($line);
     }
 
-    public function testValidFieldOnFirstLineShouldReturnTrue() {
+    /**
+     * @test
+     */
+    public function validFieldOnFirstLineShouldReturnTrue() {
         $sut = new CsvIterator($this->testfile);
         $valid = $sut->valid();
         $this->assertTrue($valid);
     }
 
-    public function testValidFieldForSecondLineShouldReturnTrue() {
+    /**
+     * @test
+     */
+    public function validFieldForSecondLineShouldReturnTrue() {
         $sut = new CsvIterator($this->testfile);
         $sut->next();
         $valid = $sut->valid();
         $this->assertTrue($valid);
     }
 
-    public function testValidFieldForThirdLineShouldReturnFalse() {
+    /**
+     * @test
+     */
+    public function validFieldForThirdLineShouldReturnFalse() {
         $sut = new CsvIterator($this->testfile);
         $sut->next();
         $sut->next();
@@ -74,7 +96,10 @@ class CsvIteratorTest extends TestCase
         $this->assertFalse($valid);
     }
 
-    public function testAfterARewindItShouldReturnFirstLine() {
+    /**
+     * @test
+     */
+    public function afterARewindItShouldReturnFirstLine() {
         $sut = new CsvIterator($this->testfile);
         $sut->next();
         $sut->rewind();
@@ -82,7 +107,10 @@ class CsvIteratorTest extends TestCase
         $this->assertEquals(array('first' => '1','second' => '2','third' => '3'), $line);
     }
 
-    public function testAfterARewindAndANextItShouldReturnTheSecondElement() {
+    /**
+     * @test
+     */
+    public function afterARewindAndANextItShouldReturnTheSecondElement() {
         $sut = new CsvIterator($this->testfile);
         $sut->next();
         $sut->next();
@@ -92,13 +120,19 @@ class CsvIteratorTest extends TestCase
         $this->assertEquals(array('first' => '2','second' => '3','third' => '4'), $line);
     }
 
-    public function testProvidingDiffernentDeliminiterShouldReturnSingleString() {
+    /**
+     * @test
+     */
+    public function providingDiffernentDeliminiterShouldReturnSingleString() {
         $sut = new CsvIterator($this->testfile, 0, ',');
         $line = $sut->current();
         $this->assertEquals(array('first;second;third' => '1;2;3'), $line);
     }
 
-    public function testLoopingThroughShouldReturnAllElements() {
+    /**
+     * @test
+     */
+    public function loopingThroughShouldReturnAllElements() {
         $sut = new CsvIterator($this->testfile);
 
         $result = array();

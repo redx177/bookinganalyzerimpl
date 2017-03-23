@@ -8,28 +8,22 @@ class DataProviderTest extends TestCase
 {
     private $csvIteratorMock;
 
+    private $mockData = [
+        [1, 2, 3],
+        [2, 3, 4],
+        [3, 4, 5],
+        ['33.22', 'CH12.12.12', 'blabla'],
+        ['5', 6, '12.12.12']];
+
     protected function setUp()
     {
-//        $this->csvIteratorMock = $this->createMock(CsvIterator::class);
-//        $this->csvIteratorMock
-//            ->method('current')
-//            ->will($this->onConsecutiveCalls(
-//                [1,2,3],
-//                [2,3,4],
-//                [3,4,5],
-//                [4,5,6],
-//                [5,6,7]
-//            ));
-
-        $this->csvIteratorMock = CsvIteratorMock::get($this, [
-            [1,2,3],
-            [2,3,4],
-            [3,4,5],
-            [4,5,6],
-            [5,6,7]]);
+        $this->csvIteratorMock = CsvIteratorMock::get($this, $this->mockData);
     }
 
-    public function testStartingFromTheBeginningReturnsTheCorrectElements() {
+    /**
+     * @test
+     */
+    public function from0AndCount2ShouldReturnTheFirst2Items() {
         $sut = new DataProvider($this->csvIteratorMock);
         $data = $sut->getSubset(0,2);
 
@@ -38,8 +32,10 @@ class DataProviderTest extends TestCase
         $this->assertEquals([2,3,4], $data[1]);
     }
 
-    public function testOffsetOfOneReturnsTheCorrectElements() {
-
+    /**
+     * @test
+     */
+    public function from1AndCount2ShouldReturn2ItemsAndSkipping1() {
         $this->csvIteratorMock
             ->expects($this->once())
             ->method('skip')
@@ -51,5 +47,25 @@ class DataProviderTest extends TestCase
         $this->assertEquals(2, count($data));
         $this->assertEquals([2,3,4], $data[0]);
         $this->assertEquals([3,4,5], $data[1]);
+    }
+
+    /**
+     * @test
+     */
+    public function getItemCountShouldReturn5() {
+        $sut = new DataProvider($this->csvIteratorMock);
+
+        $this->assertEquals(5, $sut->getItemCount());
+    }
+
+    /**
+     * @test
+     */
+    public function dataShouldBeTyped() {
+        $sut = new DataProvider($this->csvIteratorMock);
+        $data = $sut->getSubset(3,2);
+
+        $this->assertEquals([33.22, 'CH12.12.12', 'blabla'], $data[0]);
+        $this->assertEquals([5,6,'12.12.12'], $data[1]);
     }
 }

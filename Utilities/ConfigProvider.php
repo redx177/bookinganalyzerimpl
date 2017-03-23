@@ -1,12 +1,8 @@
 <?php
 
-$configContent = array(
-    'dataSource' => './rapidminerdata.csv',
-    'pageSize' => 5,
-);
-
 /**
  * Provides application configuration.
+ * Loads data from $GLOBALS['configContent'].
  */
 class ConfigProvider {
     /**

@@ -1,0 +1,47 @@
+<ul class="pagination">
+
+    {# << #}
+    {% if currentPage > 1 %}
+    <li>
+        <a href="index.php?page={{ currentPage-1 }}" aria-label="Previous">
+            <span aria-hidden="true">&laquo;</span>
+        </a>
+    </li>
+    {% endif %}
+
+    {# |9999| #}
+    {% if currentPage > paginationWindow+1 %}
+        <li><a href="index.php?page=1">1</a></li>
+    {% endif %}
+
+    {# ... #}
+    {% if currentPage > paginationWindow+2 %}
+        <li><span>...</span></li>
+    {% endif %}
+
+    {# |2|3|4| #}
+    {% for i in range(currentPage-paginationWindow, currentPage+paginationWindow) %}
+        {% if i > 0 and i <= pageCount %}
+            <li><a href="index.php?page={{ i }}">{{ i }}</a></li>
+        {% endif %}
+    {% endfor %}
+
+    {# ... #}
+    {% if currentPage < pageCount-paginationWindow-1 %}
+        <li><span>...</span></li>
+    {% endif %}
+
+    {# |9999| #}
+    {% if currentPage < pageCount-paginationWindow %}
+        <li><a href="index.php?page={{ pageCount }}">{{ pageCount }}</a></li>
+    {% endif %}
+
+    {# >> #}
+    {% if currentPage < pageCount %}
+        <li>
+            <a href="index.php?page={{ currentPage+1 }}" aria-label="Next">
+                <span aria-hidden="true">&raquo;</span>
+            </a>
+        </li>
+    {% endif %}
+</ul>

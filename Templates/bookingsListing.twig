@@ -1,0 +1,18 @@
+<table class="table">
+    <thead>
+        <tr>
+            {% for key,value in bookings[0] %}
+                <th><div>{{ key }}</div></th>
+            {% endfor %}
+        </tr>
+    </thead>
+    <tbody>
+        {% for booking in bookings %}
+            <tr>
+            {% for value in booking %}
+                <td>{{ value }}</td>
+            {% endfor %}
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
