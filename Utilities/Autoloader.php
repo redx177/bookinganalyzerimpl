@@ -8,7 +8,7 @@
  */
 class Autoloader
 {
-    static private $folders = ['Business', 'Controllers', 'Utilities', 'Interfaces'];
+    static private $folders = ['Business', 'Controllers', 'Utilities', 'Interfaces', 'Models'];
     static public function load($classname) {
         $rootDir = dirname(__DIR__) . '/';
         foreach (self::$folders as $folder) {
