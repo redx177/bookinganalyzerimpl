@@ -178,7 +178,8 @@ class BookingsProviderTest extends TestCase
     /**
      * @test
      */
-    public function filteringDistanceValueShouldRemoveNonMatchingItems() {
+    public function filteringDistanceValueShouldRemoveNonMatchingItems()
+    {
         $filtersMock = $this->createMock(Filters::class);
         $filtersMock->method('getDistanceFields')
             ->willReturn(['dist' => 'f1']);
@@ -189,5 +190,19 @@ class BookingsProviderTest extends TestCase
         $this->assertEquals(2, count($data));
         $this->assertEquals(32, $data[0]->getId());
         $this->assertEquals(33, $data[1]->getId());
+    }
+
+    /**
+     * @test
+     */
+    public function filteringShouldAffectItemCount() {
+        $filtersMock = $this->createMock(Filters::class);
+        $filtersMock->method('getDistanceFields')
+            ->willReturn(['int' => 'a']);
+
+        $sut = new BookingsProvider($this->csvIteratorMock, $this->dataTypeClustererMock, $this->configMock);
+        $itemCount = $sut->getItemCount();
+
+        $this->assertEquals(1, $itemCount);
     }
 }

@@ -16,6 +16,7 @@ class FiltersProvider
     public function get($rawData)
     {
         $dataTypeCluster = $this->dataTypeClusterer->get($rawData);
-        return new Filters($rawData['action'], $dataTypeCluster);
+        $action = array_key_exists('action', $rawData) ? $rawData['action'] : '';
+        return new Filters($action, $dataTypeCluster);
     }
 }

@@ -2,23 +2,23 @@
     <thead>
         <tr>
             <th><div>ID</div></th>
-            {% for key,value in bookings[0].getStringValues() %}
-                <th><div>{{ fieldTitels[key] }}</div></th>
+            {% for key,value in bookings[0].getStringFields() %}
+                <th><div>{{ fieldTitles[key] }}</div></th>
             {% endfor %}
             {% for key,value in bookings[0].getPriceFields() %}
-                <th><div>{{ fieldTitels[key] }}</div></th>
+                <th><div>{{ fieldTitles[key] }}</div></th>
             {% endfor %}
             {% for key,value in bookings[0].getIntegerFields() %}
-                <th><div>{{ fieldTitels[key] }}</div></th>
+                <th><div>{{ fieldTitles[key] }}</div></th>
             {% endfor %}
             {% for key,value in bookings[0].getDistanceFields() %}
-                <th><div>{{ fieldTitels[key] }}</div></th>
+                <th><div>{{ fieldTitles[key] }}</div></th>
             {% endfor %}
             {% for key,value in bookings[0].getBooleanFields() %}
-                <th><div>{{ fieldTitels[key] }}</div></th>
+                <th><div>{{ fieldTitles[key] }}</div></th>
             {% endfor %}
             {% for key,value in bookings[0].getFloatFields() %}
-                <th><div>{{ fieldTitels[key] }}</div></th>
+                <th><div>{{ fieldTitles[key] }}</div></th>
             {% endfor %}
         </tr>
     </thead>
@@ -26,10 +26,10 @@
         {% for booking in bookings %}
             <tr>
                 <td>{{ booking.getId() }}</td>
-                {% for value in booking.getStringValues() %}
+                {% for value in booking.getStringFields() %}
                     <td>{{ value }}</td>
                 {% endfor %}
-                {% for value in booking.getPricefields() %}
+                {% for value in booking.getPriceFields() %}
                     <td>
                         {% if value == constant('Price::Budget') %}
                             <span class="glyphicon glyphicon-piggy-bank" aria-hidden="true"></span>

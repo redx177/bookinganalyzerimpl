@@ -7,7 +7,7 @@
  */
  class ExploreController implements Controller {
      private $twig;
-     private $dataProvider;
+     private $bookingsProvider;
      private $pageSize;
      /**
       * @var Pagination
@@ -26,7 +26,7 @@
       * ExploreController constructor.
       * @param Twig_Environment $twig Twig environment for loading templates.
       * @param Pagination $pagination Pagination provider.
-      * @param BookingsProvider $dataProvider Provider for the data to display.
+      * @param BookingsProvider $bookingsProvider Provider for the data to display.
       * @param ConfigProvider $config Configuration provider.
       * @param FiltersProvider $filtersProvider Filters provider to filter data to explore.
       * @internal param ConfigProvider $config Configuration provider.
@@ -34,12 +34,12 @@
      public function __construct(
          Twig_Environment $twig,
          Pagination $pagination,
-         BookingsProvider $dataProvider,
+         BookingsProvider $bookingsProvider,
          ConfigProvider $config,
          FiltersProvider $filtersProvider)
      {
          $this->twig = $twig;
-         $this->dataProvider = $dataProvider;
+         $this->bookingsProvider = $bookingsProvider;
          $this->pagination = $pagination;
          $this->config = $config;
          $this->filtersProvider = $filtersProvider;
@@ -53,7 +53,7 @@
      public function render()
      {
          $filters = $this->filtersProvider->get($_GET);
-         $data = $this->dataProvider->getSubset($this->pagination->getCurrentPageFirstItemIndex(), $this->pagination->getPageSize(), $filters);
+         $data = $this->bookingsProvider->getSubset($this->pagination->getCurrentPageFirstItemIndex(), $this->pagination->getPageSize(), $filters);
          $template = $this->twig->load('explore.twig');
          return $template->render(array(
              'bookings' => $data,
@@ -61,7 +61,7 @@
              'currentPage' => $this->pagination->getCurrentPage(),
              'pageCount' => $this->pagination->getPageCount(),
              'paginationWindow' => $this->config->get('paginationWindow'),
-             'fieldTitels' => $this->config->get('fieldNameMapping'),
+             'fieldTitles' => $this->config->get('fieldNameMapping'),
              'buttonConfigs' => [new ButtonConfig($this->config->get('filterButtonTitle'), 'apply')],
              '_GET' => $_GET,
             ));

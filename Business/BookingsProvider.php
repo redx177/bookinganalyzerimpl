@@ -3,6 +3,7 @@ class BookingsProvider {
     private $csvIterator;
     private $dataTypeClusterer;
     private $idField;
+    private $data;
 
     /**
      * DataProvider constructor.
@@ -29,10 +30,9 @@ class BookingsProvider {
         $this->csvIterator->rewind();
         $this->csvIterator->skip($from);
         $data = [];
-        for ($i = 0; $i < $count; $i++) {
+        for ($i = 0; $i < $count;) {
             if (!$this->csvIterator->valid()) {
-                $this->csvIterator->next();
-                continue;
+                break;
             }
 
             $rawBooking = $this->csvIterator->current();
@@ -45,6 +45,7 @@ class BookingsProvider {
 
             array_push($data, $booking);
             $this->csvIterator->next();
+            $i++;
         }
         return $data;
     }
@@ -98,6 +99,9 @@ class BookingsProvider {
 
     private function applyTypedFilters(array $bookingFields, array $filterFields) {
         foreach ($filterFields as $fieldName => $fieldValue) {
+            if (!$fieldValue) {
+                continue;
+            }
             if ($bookingFields[$fieldName] != $fieldValue) {
                 return false;
             }

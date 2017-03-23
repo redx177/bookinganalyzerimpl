@@ -12,6 +12,7 @@ $configContent = array(
     'idField' => 'id',
     'fieldNameMapping' => [
         'ID' => 'Id',
+        'NREF' => 'NREF',
         'PRICES' => 'Price',
         'QUAL' => 'Stars',
         'ROOMS' => 'Rooms',
