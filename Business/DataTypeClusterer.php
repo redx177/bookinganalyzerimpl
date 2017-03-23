@@ -42,13 +42,15 @@ class DataTypeClusterer
             }
         }
         foreach ($this->integerFields as $fieldName) {
-            if (array_key_exists($fieldName . '[]', $rawData)) {
-                $integerFields[$fieldName] = [];
-                foreach ($rawData[$fieldName . '[]'] as $value) {
-                    array_push($integerFields[$fieldName], (int)$value);
+            if (array_key_exists($fieldName, $rawData)) {
+                if (is_array($rawData[$fieldName])) {
+                    $integerFields[$fieldName] = [];
+                    foreach ($rawData[$fieldName] as $value) {
+                        array_push($integerFields[$fieldName], (int)$value);
+                    }
+                } else {
+                    $integerFields[$fieldName] = (int)$rawData[$fieldName];
                 }
-            } elseif (array_key_exists($fieldName, $rawData)) {
-                $integerFields[$fieldName] = (int)$rawData[$fieldName];
             }
         }
         foreach ($this->stringFields as $fieldName) {

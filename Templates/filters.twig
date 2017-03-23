@@ -15,12 +15,12 @@
         </fieldset>
         <fieldset>
             <legend>Distances</legend>
-            <label class="checkbox"><input type="checkbox" name="DISEA"{% if _GET['DISEA'] %} checked{% endif %}> Close to sea</label>
-            <label class="checkbox"><input type="checkbox" name="DIWATER"{% if _GET['DIWATER'] %} checked{% endif %}> Close to water</label>
-            <label class="checkbox"><input type="checkbox" name="DILAKE"{% if _GET['DILAKE'] %} checked{% endif %}> Close to lake</label>
-            <label class="checkbox"><input type="checkbox" name="DIPUBT"{% if _GET['DIPUBT'] %} checked{% endif %}> Close to public transport</label>
-            <label class="checkbox"><input type="checkbox" name="DICENTER"{% if _GET['DICENTER'] %} checked{% endif %}> Close to center</label>
-            <label class="checkbox"><input type="checkbox" name="DISKI"{% if _GET['DISKI'] %} checked{% endif %}> Close to ski</label>
+            <label class="checkbox"><input type="checkbox" name="DISEA" value="close"{% if _GET['DISEA'] %} checked{% endif %}> Close to sea</label>
+            <label class="checkbox"><input type="checkbox" name="DIWATER" value="close"{% if _GET['DIWATER'] %} checked{% endif %}> Close to water</label>
+            <label class="checkbox"><input type="checkbox" name="DILAKE" value="close"{% if _GET['DILAKE'] %} checked{% endif %}> Close to lake</label>
+            <label class="checkbox"><input type="checkbox" name="DIPUBT" value="close"{% if _GET['DIPUBT'] %} checked{% endif %}> Close to public transport</label>
+            <label class="checkbox"><input type="checkbox" name="DICENTER" value="close"{% if _GET['DICENTER'] %} checked{% endif %}> Close to center</label>
+            <label class="checkbox"><input type="checkbox" name="DISKI" value="close"{% if _GET['DISKI'] %} checked{% endif %}> Close to ski</label>
         </fieldset>
         <fieldset class="inline quality">
             <legend>Stars</legend>

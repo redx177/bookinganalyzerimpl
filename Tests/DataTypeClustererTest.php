@@ -19,7 +19,7 @@ class DataTypeClustererTest extends TestCase
                 'strA' => 'CH12.12.12', 'strB' => 'aaabbbccc', 'strC' => '',
                 'boolA' => '1.0', 'boolB' => '1', 'boolC' => 1, 'boolD' => true,
                     'boolE' => '0.0', 'boolF' => '0', 'boolG' => 0, 'boolH' => false,
-                'intA' => '5', 'intB' => 5, 'intC' => '-3',  'intD' => -3, 'intE[]' => array(1,2,3),
+                'intA' => '5', 'intB' => 5, 'intC' => '-3',  'intD' => -3, 'intE' => array(1,2,3),
                 'distA' => '', 'distB' => 'close', 'distC' => 'invalid value',
                 'priA' => '', 'priB' => 'luxury', 'priC' => 'budget', 'priD' => 'invalid value',
             ];
