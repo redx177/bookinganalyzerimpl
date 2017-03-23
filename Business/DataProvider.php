@@ -70,6 +70,7 @@ class DataProvider {
      */
     public function getSubset($from, $count)
     {
+        $this->csvIterator->rewind();
         $this->csvIterator->skip($from);
         $data = [];
         for ($i = 0; $i < $count; $i++) {

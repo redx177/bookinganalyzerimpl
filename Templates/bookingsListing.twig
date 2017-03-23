@@ -3,22 +3,22 @@
         <tr>
             <th><div>ID</div></th>
             {% for key,value in bookings[0].getStringValues() %}
-                <th><div>{{ key }}</div></th>
+                <th><div>{{ fieldTitels[key] }}</div></th>
             {% endfor %}
             {% for key,value in bookings[0].getPriceFields() %}
-                <th><div>{{ key }}</div></th>
+                <th><div>{{ fieldTitels[key] }}</div></th>
             {% endfor %}
             {% for key,value in bookings[0].getIntegerFields() %}
-                <th><div>{{ key }}</div></th>
+                <th><div>{{ fieldTitels[key] }}</div></th>
             {% endfor %}
             {% for key,value in bookings[0].getDistanceFields() %}
-                <th><div>{{ key }}</div></th>
+                <th><div>{{ fieldTitels[key] }}</div></th>
             {% endfor %}
             {% for key,value in bookings[0].getBooleanFields() %}
-                <th><div>{{ key }}</div></th>
+                <th><div>{{ fieldTitels[key] }}</div></th>
             {% endfor %}
             {% for key,value in bookings[0].getFloatFields() %}
-                <th><div>{{ key }}</div></th>
+                <th><div>{{ fieldTitels[key] }}</div></th>
             {% endfor %}
         </tr>
     </thead>
@@ -31,8 +31,11 @@
                 {% endfor %}
                 {% for value in booking.getPricefields() %}
                     <td>
-                        {% if value == constant('Price::Budget') %} Budget
-                        {% elseif value == constant('Price::Luxury') %} Luxury {% endif %}
+                        {% if value == constant('Price::Budget') %}
+                            <span class="glyphicon glyphicon-piggy-bank" aria-hidden="true"></span>
+                        {% elseif value == constant('Price::Luxury') %}
+                            <span class="glyphicon glyphicon-usd" aria-hidden="true"></span>
+                        {% endif %}
                     </td>
                 {% endfor %}
                 {% for value in booking.getIntegerFields() %}
@@ -40,7 +43,9 @@
                 {% endfor %}
                 {% for value in booking.getDistanceFields() %}
                     <td>
-                        {% if value == constant('Distance::Close') %} Close {% endif %}
+                        {% if value == constant('Distance::Close') %}
+                            <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
+                        {% endif %}
                     </td>
                 {% endfor %}
                 {% for value in booking.getBooleanFields() %}

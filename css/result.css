@@ -28,6 +28,12 @@
 .filters fieldset.inline.attributes label {
   width: 105px;
 }
+.pagination {
+  display: flex;
+  align-items: center;
+  min-width: 100%;
+  justify-content: center;
+}
 table th {
   height: 141px;
   white-space: nowrap;

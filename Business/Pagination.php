@@ -8,7 +8,6 @@ class Pagination {
      * Pagination constructor.
      * @param ConfigProvider $config Configuration provider.
      * @param DataProvider $dataProvider Data provider to paginate.
-     * @param int $currentPage Current page as provided by the frontend.
      */
     public function __construct(ConfigProvider $config, DataProvider $dataProvider)
     {
@@ -32,6 +31,8 @@ class Pagination {
     {
         if ($currentPage < 1) {
             return 1;
+        } elseif ($currentPage > $this->getPageCount()) {
+            return $this->getPageCount();
         }
         return $currentPage;
     }

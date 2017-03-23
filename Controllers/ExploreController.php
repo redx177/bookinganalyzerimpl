@@ -47,6 +47,7 @@
              'bookings' => $data,
              'currentPage' => $this->pagination->getCurrentPage(),
              'pageCount' => $this->pagination->getPageCount(),
-             'paginationWindow' => $this->config->get('paginationWindow')));
+             'paginationWindow' => $this->config->get('paginationWindow'),
+             'fieldTitels' => $this->config->get('fieldNameMapping')));
      }
  }
