@@ -8,19 +8,10 @@
  class ExploreController implements Controller {
      private $twig;
      private $bookingsProvider;
-     private $pageSize;
-     /**
-      * @var Pagination
-      */
      private $pagination;
-     /**
-      * @var ConfigProvider
-      */
      private $config;
-     /**
-      * @var FiltersProvider
-      */
      private $filtersProvider;
+     private $urlGenerator;
 
      /**
       * ExploreController constructor.
@@ -29,6 +20,7 @@
       * @param BookingsProvider $bookingsProvider Provider for the data to display.
       * @param ConfigProvider $config Configuration provider.
       * @param FiltersProvider $filtersProvider Filters provider to filter data to explore.
+      * @param UrlGenerator $urlGenerator Url generator to get parameters to pass to the template.
       * @internal param ConfigProvider $config Configuration provider.
       */
      public function __construct(
@@ -36,13 +28,15 @@
          Pagination $pagination,
          BookingsProvider $bookingsProvider,
          ConfigProvider $config,
-         FiltersProvider $filtersProvider)
+         FiltersProvider $filtersProvider,
+         UrlGenerator $urlGenerator)
      {
          $this->twig = $twig;
          $this->bookingsProvider = $bookingsProvider;
          $this->pagination = $pagination;
          $this->config = $config;
          $this->filtersProvider = $filtersProvider;
+         $this->urlGenerator = $urlGenerator;
      }
 
 
@@ -67,6 +61,7 @@
              'fieldTitles' => $this->config->get('fieldNameMapping'),
              'buttonConfigs' => [new ButtonConfig($this->config->get('filterButtonTitle'), 'apply')],
              '_GET' => $_GET,
+             'searchUrlParameters' => $this->urlGenerator->getParameters($filters),
             ));
      }
  }

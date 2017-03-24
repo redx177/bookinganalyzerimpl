@@ -13,7 +13,12 @@ class FiltersProvider
         $this->dataTypeClusterer = $dataTypeClusterer;
     }
 
-    public function get($rawData)
+    /**
+     * Gets the filters provided by $rawData parameter.
+     * @param array $rawData Filter raw data.
+     * @return Filters Filter data.
+     */
+    public function get(array $rawData)
     {
         $dataTypeCluster = $this->dataTypeClusterer->get($rawData);
         $action = array_key_exists('action', $rawData) ? $rawData['action'] : '';

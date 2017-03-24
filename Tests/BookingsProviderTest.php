@@ -111,7 +111,7 @@ class BookingsProviderTest extends TestCase
         $data = $sut->getSubset(0,1);
 
         $this->assertEquals(31, $data[0]->getId());
-        $this->assertEquals(['int' => 4], $data[0]->getIntegerFields());
+        $this->assertEquals(['int' => 4, 'int2' => 5], $data[0]->getIntegerFields());
         $this->assertEquals(['bool' => 'b'], $data[0]->getBooleanFields());
         $this->assertEquals(['float' => 'c'], $data[0]->getFloatFields());
         $this->assertEquals(['str' => 'd'], $data[0]->getStringFields());

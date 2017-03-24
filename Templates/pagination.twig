@@ -3,28 +3,28 @@
     {# << 1 | << 10 | << 100 | << 10000  #}
     {% if currentPage > 1000 %}
         <li>
-            <a href="index.php?page={{ currentPage-1000 }}" aria-label="Previous">
+            <a href="index.php?page={{ currentPage-1000 }}&{{ searchUrlParameters }}" aria-label="Previous">
                 <span aria-hidden="true">&laquo; 1000</span>
             </a>
         </li>
     {% endif %}
     {% if currentPage > 100 %}
         <li>
-            <a href="index.php?page={{ currentPage-100 }}" aria-label="Previous">
+            <a href="index.php?page={{ currentPage-100 }}&{{ searchUrlParameters }}" aria-label="Previous">
                 <span aria-hidden="true">&laquo; 100</span>
             </a>
         </li>
     {% endif %}
     {% if currentPage > 10 %}
         <li>
-            <a href="index.php?page={{ currentPage-10 }}" aria-label="Previous">
+            <a href="index.php?page={{ currentPage-10 }}&{{ searchUrlParameters }}" aria-label="Previous">
                 <span aria-hidden="true">&laquo; 10</span>
             </a>
         </li>
     {% endif %}
     {% if currentPage > 1 %}
     <li>
-        <a href="index.php?page={{ currentPage-1 }}" aria-label="Previous">
+        <a href="index.php?page={{ currentPage-1 }}&{{ searchUrlParameters }}" aria-label="Previous">
             <span aria-hidden="true">&laquo; 1</span>
         </a>
     </li>
@@ -32,7 +32,7 @@
 
     {# |1| #}
     {% if currentPage > paginationWindow+1 %}
-        <li><a href="index.php?page=1">1</a></li>
+        <li><a href="index.php?page=1&{{ searchUrlParameters }}">1</a></li>
     {% endif %}
 
     {# ... #}
@@ -53,7 +53,7 @@
                         {{ i }} <span class="sr-only">(current)</span>
                     </a></li>
                 {% else %}
-                    <li><a href="index.php?page={{ i }}">{{ i }}</a></li>
+                    <li><a href="index.php?page={{ i }}&{{ searchUrlParameters }}">{{ i }}</a></li>
                 {% endif %}
         {% endif %}
     {% endfor %}
@@ -63,22 +63,22 @@
         <li><span>Last page has been reached</span></li>
     {% else %}
         <li>
-            <a href="index.php?page={{ currentPage+1 }}" aria-label="Next">
+            <a href="index.php?page={{ currentPage+1 }}&{{ searchUrlParameters }}" aria-label="Next">
                 <span aria-hidden="true">1 &raquo;</span>
             </a>
         </li>
         <li>
-            <a href="index.php?page={{ currentPage+10 }}" aria-label="Next">
+            <a href="index.php?page={{ currentPage+10 }}&{{ searchUrlParameters }}" aria-label="Next">
                 <span aria-hidden="true">10 &raquo;</span>
             </a>
         </li>
         <li>
-            <a href="index.php?page={{ currentPage+100 }}" aria-label="Next">
+            <a href="index.php?page={{ currentPage+100 }}&{{ searchUrlParameters }}" aria-label="Next">
                 <span aria-hidden="true">100 &raquo;</span>
             </a>
         </li>
         <li>
-            <a href="index.php?page={{ currentPage+1000 }}" aria-label="Next">
+            <a href="index.php?page={{ currentPage+1000 }}&{{ searchUrlParameters }}" aria-label="Next">
                 <span aria-hidden="true">1000 &raquo;</span>
             </a>
         </li>

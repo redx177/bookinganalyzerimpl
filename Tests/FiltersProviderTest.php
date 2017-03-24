@@ -8,24 +8,29 @@ use PHPUnit\Framework\TestCase;
 
 class FiltersProviderTest extends TestCase
 {
+    private $dataTypeClustererMock;
+
+    protected function setUp()
+    {
+        $this->dataTypeClustererMock = $this->createMock(DataTypeClusterer::class);
+        $this->dataTypeClustererMock->method('get')
+            ->will($this->returnCallback(function () {
+                return new DataTypeCluster(['a1' => 'a1a', 'a2' => ['a2a', 'a2b']], ['b' => 'b'], ['c' => 'c'],
+                    ['d' => 'd'], ['e' => 'e'], ['f' => 'f']);
+            }));
+    }
+
     /**
      * @test
      */
     public function filtersDataShouldBeMappedToCorrectDataTypes() {
         $rawData = ['action' => 'actionValue'];
 
-        $dataTypeClustererMock = $this->createMock(DataTypeClusterer::class);
-        $dataTypeClustererMock->method('get')
-            ->will($this->returnCallback(function() {
-                return new DataTypeCluster(['a' => 'a'], ['b' => 'b'], ['c' => 'c'],
-                    ['d' => 'd'], ['e' => 'e'], ['f' => 'f']);
-            }));
-
-        $sut = new FiltersProvider($dataTypeClustererMock);
+        $sut = new FiltersProvider($this->dataTypeClustererMock);
 
         $filters = $sut->get($rawData);
         $this->assertEquals('actionValue', $filters->getAction());
-        $this->assertEquals(['a' => 'a'], $filters->getIntegerFields());
+        $this->assertEquals(['a1' => 'a1a', 'a2' => ['a2a', 'a2b']], $filters->getIntegerFields());
         $this->assertEquals(['b' => 'b'], $filters->getBooleanFields());
         $this->assertEquals(['c' => 'c'], $filters->getFloatFields());
         $this->assertEquals(['d' => 'd'], $filters->getStringFields());
