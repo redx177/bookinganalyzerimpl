@@ -1,11 +1,5 @@
 <?php
 
-/**
- * Created by PhpStorm.
- * User: slang
- * Date: 23.03.17
- * Time: 11:29
- */
 class Autoloader
 {
     static private $folders = ['Business', 'Controllers', 'Utilities', 'Interfaces', 'Models'];

@@ -24,7 +24,7 @@ class PageinationTest extends TestCase
      * @test
      */
     public function pageParameter0ShouldReturnCurrentPage1() {
-        $_GET['page'] = 0;
+        $_REQUEST['page'] = 0;
         $sut = new Pagination($this->configMock, $this->dataProviderMock);
 
         $this->assertEquals(1, $sut->getCurrentPage());
@@ -43,7 +43,7 @@ class PageinationTest extends TestCase
      * @test
      */
     public function negativePageParameterShouldReturnCurrentPage1() {
-        $_GET['page'] = -5;
+        $_REQUEST['page'] = -5;
         $sut = new Pagination($this->configMock, $this->dataProviderMock);
 
         $this->assertEquals(1, $sut->getCurrentPage());
@@ -53,17 +53,17 @@ class PageinationTest extends TestCase
      * @test
      */
     public function pageParameter2ShouldReturnCurrentPage2() {
-        $_GET['page'] = 2;
+        $_REQUEST['page'] = 2;
         $sut = new Pagination($this->configMock, $this->dataProviderMock);
 
-        $this->assertEquals($_GET['page'], $sut->getCurrentPage());
+        $this->assertEquals($_REQUEST['page'], $sut->getCurrentPage());
     }
 
 //    /**
 //     * @test
 //     */
 //    public function pageParameter99ShouldReturnCurrentPage6() {
-//        $_GET['page'] = 99;
+//        $_REQUEST['page'] = 99;
 //        $sut = new Pagination($this->configMock, $this->dataProviderMock);
 //
 //        $this->assertEquals(6, $sut->getCurrentPage());
@@ -91,7 +91,7 @@ class PageinationTest extends TestCase
      * @test
      */
     public function currentPage0WithPageSize4ShouldReturnCurrentPageFirstItemIndex0() {
-        $_GET['page'] = 0;
+        $_REQUEST['page'] = 0;
 
         $sut = new Pagination($this->configMock, $this->dataProviderMock);
 
@@ -102,7 +102,7 @@ class PageinationTest extends TestCase
      * @test
      */
     public function currentPage1WithPageSize4ShouldReturnCurrentPageFirstItemIndex0() {
-        $_GET['page'] = 1;
+        $_REQUEST['page'] = 1;
 
         $sut = new Pagination($this->configMock, $this->dataProviderMock);
 
@@ -113,7 +113,7 @@ class PageinationTest extends TestCase
      * @test
      */
     public function currentPage3WithPageSize4ShouldReturnCurrentPageFirstItemIndex6() {
-        $_GET['page'] = 3;
+        $_REQUEST['page'] = 3;
 
         $sut = new Pagination($this->configMock, $this->dataProviderMock);
 
@@ -124,7 +124,7 @@ class PageinationTest extends TestCase
      * @test
      */
     public function currentPageShouldBeFixedIfInvalidValueProvided() {
-        $_GET['page'] = 99;
+        $_REQUEST['page'] = 99;
         $currentFistIndexOnPage = 20;
         $sut = new Pagination($this->configMock, $this->dataProviderMock);
 
@@ -136,7 +136,7 @@ class PageinationTest extends TestCase
      * @test
      */
     public function ifOnPage1AndCurrentFirstIndexIs0ItShouldReturnFalseForLastPageReached() {
-        $_GET['page'] = 1;
+        $_REQUEST['page'] = 1;
         $currentFistIndexOnPage = 0;
         $sut = new Pagination($this->configMock, $this->dataProviderMock);
 
@@ -148,7 +148,7 @@ class PageinationTest extends TestCase
      * @test
      */
     public function ifOnPage2AndCurrentFirstIndexIs4ItShouldReturnFalseForLastPageReached() {
-        $_GET['page'] = 2;
+        $_REQUEST['page'] = 2;
         $currentFistIndexOnPage = 4;
         $sut = new Pagination($this->configMock, $this->dataProviderMock);
 
@@ -160,7 +160,7 @@ class PageinationTest extends TestCase
      * @test
      */
     public function ifProvidedPageIsBiggerThanPageCalculatedFromCurrentFirstIndexItShouldReturnTrueForLastPageReached() {
-        $_GET['page'] = 99;
+        $_REQUEST['page'] = 99;
         $currentFirstIndexOnPage = 20;
         $sut = new Pagination($this->configMock, $this->dataProviderMock);
 
@@ -172,7 +172,7 @@ class PageinationTest extends TestCase
      * @test
      */
     public function ifCountOfItemsOnCurrentPageIsNotEqualsToPageSizeItShouldReturnTrueForLastPageReached() {
-        $_GET['page'] = 99;
+        $_REQUEST['page'] = 99;
         $currentFirstIndexOnPage = 20;
         $currentPageItemCount = 3;
         $sut = new Pagination($this->configMock, $this->dataProviderMock);

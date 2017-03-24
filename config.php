@@ -41,5 +41,6 @@ $configContent = array(
         'longitude' => 'Longitude',
         'latitude' => 'Latitude',
     ],
-    'filterButtonTitle' => 'Apply Fiters'
+    'filterButtonTitle' => 'Apply Fiters',
+    'runButtonTitle' => 'Run analysis',
 );

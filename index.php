@@ -24,6 +24,16 @@ $builder->addDefinitions(array(
 ));
 $container = $builder->build();
 
-$controller = $container->get('ExploreController');
+$controller = null;
+$getKeys = array_keys($_REQUEST);
+if (in_array('attributanalysis', $getKeys)) {
+    $controller = $container->get('AttributanalysisController');
+} elseif (in_array('attributanalysiswithgrouping', $getKeys)) {
+    $controller = $container->get('AttributanalysisWithGroupingController');
+} elseif (in_array('settings', $getKeys)) {
+    $controller = $container->get('SettingsController');
+} else {
+    $controller = $container->get('ExploreController');
+}
 
 echo $controller->render();

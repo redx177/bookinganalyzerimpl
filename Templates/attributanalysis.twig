@@ -1,0 +1,15 @@
+{% extends "base.twig" %}
+
+{% block content %}
+    <div class="container">
+        <h1>Attributanalysis</h1>
+        <p>Search for frequent attributes in the all data or a filtered subset.
+        The result will show attributes with their frequencies.</p>
+    </div>
+
+    {{ include('filters.twig') }}
+
+    <div class="container">
+        {{ include('bookingsListing.twig') }}
+    </div>
+{% endblock %}

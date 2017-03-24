@@ -21,10 +21,10 @@ class Pagination {
      */
     public function getCurrentPage()
     {
-        if (!array_key_exists('page', $_GET)) {
+        if (!array_key_exists('page', $_REQUEST)) {
             return 1;
         }
-        return $this->validatePageNumber($_GET['page']);
+        return $this->validatePageNumber($_REQUEST['page']);
     }
 
     private function validatePageNumber($currentPage)

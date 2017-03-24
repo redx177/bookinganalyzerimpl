@@ -1,6 +1,6 @@
 <?php
 
- class ExploreController implements Controller {
+class AttributanalysisController implements Controller {
      private $twig;
      private $bookingsProvider;
      private $pagination;
@@ -41,22 +41,19 @@
       */
      public function render()
      {
+         if ($_REQUEST['action'] == 1) {
+
+         }
+
          $filters = $this->filtersProvider->get($_REQUEST);
          $data = $this->bookingsProvider->getSubset($this->pagination->getCurrentPageFirstItemIndex(), $this->pagination->getPageSize(), $filters);
 
-         $template = $this->twig->load('explore.twig');
-         $indices = array_keys($data);
-         $currentFirstIndexOnPage = reset($indices);
+         $template = $this->twig->load('attributanalysis.twig');
          return $template->render(array(
              'bookings' => $data,
-             'view' => 'explore',
-             'currentPage' => $this->pagination->fixPageValue($currentFirstIndexOnPage),
-             'lastPageReached' => $this->pagination->lastPageReached($currentFirstIndexOnPage, count($data)),
-             'paginationWindow' => $this->config->get('paginationWindow'),
+             'view' => 'attributanalysis',
              'fieldTitles' => $this->config->get('fieldNameMapping'),
-             'buttonConfigs' => [new ButtonConfig($this->config->get('filterButtonTitle'), 'apply')],
-             '_REQUEST' => $_REQUEST,
-             'searchUrlParameters' => $this->urlGenerator->getParameters($filters),
+             'buttonConfigs' => [new ButtonConfig($this->config->get('runButtonTitle'), 'run')],
             ));
      }
  }
