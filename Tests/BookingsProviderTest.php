@@ -20,7 +20,14 @@ class BookingsProviderTest extends TestCase
     private $mockData = [
         ['idField' => '31'],
         ['idField' => '32'],
-        ['idField' => '33']];
+        ['idField' => '33'],
+        ['idField' => '34'],
+        ['idField' => '35'],
+        ['idField' => '36'],
+        ['idField' => '37'],
+        ['idField' => '38'],
+        ['idField' => '39'],
+        ['idField' => '40']];
 
     protected function setUp()
     {
@@ -29,11 +36,11 @@ class BookingsProviderTest extends TestCase
         $this->dataTypeClustererMock = $this->createMock(DataTypeClusterer::class);
         $this->dataTypeClustererMock->method('get')
             ->will($this->returnCallback(function($rawData) {
-                return $rawData['idField'] == '31'
-                    // For first item...
-                    ? new DataTypeCluster(['int' => '4','int2' => '5'], ['bool' => 'b'], ['float' => 'c'], ['str' => 'd'], ['pri' => 'e'], ['dist' => 'f'])
-                    // For other items...
-                    : new DataTypeCluster(['int' => '20','int2' => '21'], ['bool' => 'b1'], ['float' => 'c1'], ['str' => 'd1'], ['pri' => 'e1'], ['dist' => 'f1']);
+                if ($rawData['idField'] % 3 == 1)
+                    return new DataTypeCluster(['int' => '4','int2' => '5'], ['bool' => 'b'], ['float' => 'c'], ['str' => 'd'], ['pri' => 'e'], ['dist' => 'f']);
+                if ($rawData['idField'] % 3 == 2)
+                    return new DataTypeCluster(['int' => '15','int2' => '17'], ['bool' => 'b1'], ['float' => 'c1'], ['str' => 'd1'], ['pri' => 'e1'], ['dist' => 'f1']);
+                return new DataTypeCluster(['int' => '20','int2' => '21'], ['bool' => 'b2'], ['float' => 'c2'], ['str' => 'd2'], ['pri' => 'e2'], ['dist' => 'f2']);
             }));
 
         $map = array(
@@ -74,24 +81,47 @@ class BookingsProviderTest extends TestCase
      */
     public function from2AndCount2ShouldReturn1ItemsAndSkipping2() {
         $sut = new BookingsProvider($this->csvIteratorMock, $this->dataTypeClustererMock, $this->configMock);
-        $data = $sut->getSubset(2,2);
+        $data = $sut->getSubset(9,2);
 
         $this->assertEquals(1, count($data));
-        $this->assertEquals(33, $data[2]->getId());
+        $this->assertEquals(40, $data[9]->getId());
     }
 
     /**
      * @test
      */
-    public function from6AndCount2ShouldReturn1ItemsAndSkipping2() {
+    public function from99999999AndCount2ShouldReturn1ItemsAndSkipping2() {
         $this->csvIteratorMock
-            ->expects($this->exactly(3))
+            ->expects($this->exactly(count($this->mockData)))
             ->method('next');
         $sut = new BookingsProvider($this->csvIteratorMock, $this->dataTypeClustererMock, $this->configMock);
-        $data = $sut->getSubset(6,2);
+        $data = $sut->getSubset(99999999,2);
 
         $this->assertEquals(1, count($data));
+        $this->assertEquals(40, $data[9]->getId());
+    }
+
+    /**
+     * @test
+     */
+    public function from0AndCount99999999ShouldReturn1ItemsAndSkipping2() {
+        $this->csvIteratorMock
+            ->expects($this->exactly(count($this->mockData)))
+            ->method('next');
+        $sut = new BookingsProvider($this->csvIteratorMock, $this->dataTypeClustererMock, $this->configMock);
+        $data = $sut->getSubset(0,99999999);
+
+        $this->assertEquals(10, count($data));
+        $this->assertEquals(31, $data[0]->getId());
+        $this->assertEquals(32, $data[1]->getId());
         $this->assertEquals(33, $data[2]->getId());
+        $this->assertEquals(34, $data[3]->getId());
+        $this->assertEquals(35, $data[4]->getId());
+        $this->assertEquals(36, $data[5]->getId());
+        $this->assertEquals(37, $data[6]->getId());
+        $this->assertEquals(38, $data[7]->getId());
+        $this->assertEquals(39, $data[8]->getId());
+        $this->assertEquals(40, $data[9]->getId());
     }
 
 //    /**
@@ -130,9 +160,10 @@ class BookingsProviderTest extends TestCase
         $sut = new BookingsProvider($this->csvIteratorMock, $this->dataTypeClustererMock, $this->configMock);
         $data = $sut->getSubset(0, 3, $filtersMock);
 
-        $this->assertEquals(2, count($data));
-        $this->assertEquals(32, $data[1]->getId());
-        $this->assertEquals(33, $data[2]->getId());
+        $this->assertEquals(3, count($data));
+        $this->assertEquals(33, $data[0]->getId());
+        $this->assertEquals(36, $data[1]->getId());
+        $this->assertEquals(39, $data[2]->getId());
     }
 
     /**
@@ -146,9 +177,10 @@ class BookingsProviderTest extends TestCase
         $sut = new BookingsProvider($this->csvIteratorMock, $this->dataTypeClustererMock, $this->configMock);
         $data = $sut->getSubset(0, 3, $filtersMock);
 
-        $this->assertEquals(2, count($data));
-        $this->assertEquals(32, $data[1]->getId());
-        $this->assertEquals(33, $data[2]->getId());
+        $this->assertEquals(3, count($data));
+        $this->assertEquals(32, $data[0]->getId());
+        $this->assertEquals(33, $data[1]->getId());
+        $this->assertEquals(35, $data[2]->getId());
     }
 
     /**
@@ -164,8 +196,8 @@ class BookingsProviderTest extends TestCase
 
         $this->assertEquals(3, count($data));
         $this->assertEquals(31, $data[0]->getId());
-        $this->assertEquals(32, $data[1]->getId());
-        $this->assertEquals(33, $data[2]->getId());
+        $this->assertEquals(33, $data[1]->getId());
+        $this->assertEquals(34, $data[2]->getId());
     }
 
     /**
@@ -179,9 +211,10 @@ class BookingsProviderTest extends TestCase
         $sut = new BookingsProvider($this->csvIteratorMock, $this->dataTypeClustererMock, $this->configMock);
         $data = $sut->getSubset(0, 3, $filtersMock);
 
-        $this->assertEquals(2, count($data));
-        $this->assertEquals(32, $data[1]->getId());
-        $this->assertEquals(33, $data[2]->getId());
+        $this->assertEquals(3, count($data));
+        $this->assertEquals(32, $data[0]->getId());
+        $this->assertEquals(35, $data[1]->getId());
+        $this->assertEquals(38, $data[2]->getId());
     }
 
     /**
@@ -195,9 +228,10 @@ class BookingsProviderTest extends TestCase
         $sut = new BookingsProvider($this->csvIteratorMock, $this->dataTypeClustererMock, $this->configMock);
         $data = $sut->getSubset(0, 3, $filtersMock);
 
-        $this->assertEquals(2, count($data));
-        $this->assertEquals(32, $data[1]->getId());
-        $this->assertEquals(33, $data[2]->getId());
+        $this->assertEquals(3, count($data));
+        $this->assertEquals(32, $data[0]->getId());
+        $this->assertEquals(35, $data[1]->getId());
+        $this->assertEquals(38, $data[2]->getId());
     }
 
     /**
@@ -211,9 +245,10 @@ class BookingsProviderTest extends TestCase
         $sut = new BookingsProvider($this->csvIteratorMock, $this->dataTypeClustererMock, $this->configMock);
         $data = $sut->getSubset(0, 3, $filtersMock);
 
-        $this->assertEquals(2, count($data));
-        $this->assertEquals(32, $data[1]->getId());
-        $this->assertEquals(33, $data[2]->getId());
+        $this->assertEquals(3, count($data));
+        $this->assertEquals(32, $data[0]->getId());
+        $this->assertEquals(35, $data[1]->getId());
+        $this->assertEquals(38, $data[2]->getId());
     }
 
     /**
@@ -227,9 +262,10 @@ class BookingsProviderTest extends TestCase
         $sut = new BookingsProvider($this->csvIteratorMock, $this->dataTypeClustererMock, $this->configMock);
         $data = $sut->getSubset(0, 3, $filtersMock);
 
-        $this->assertEquals(2, count($data));
-        $this->assertEquals(32, $data[1]->getId());
-        $this->assertEquals(33, $data[2]->getId());
+        $this->assertEquals(3, count($data));
+        $this->assertEquals(32, $data[0]->getId());
+        $this->assertEquals(35, $data[1]->getId());
+        $this->assertEquals(38, $data[2]->getId());
     }
 
     /**
@@ -244,9 +280,28 @@ class BookingsProviderTest extends TestCase
         $sut = new BookingsProvider($this->csvIteratorMock, $this->dataTypeClustererMock, $this->configMock);
         $data = $sut->getSubset(0, 3, $filtersMock);
 
-        $this->assertEquals(2, count($data));
-        $this->assertEquals(32, $data[1]->getId());
-        $this->assertEquals(33, $data[2]->getId());
+        $this->assertEquals(3, count($data));
+        $this->assertEquals(32, $data[0]->getId());
+        $this->assertEquals(35, $data[1]->getId());
+        $this->assertEquals(38, $data[2]->getId());
+    }
+
+    /**
+     * @test
+     */
+    public function whenOnPage2TheIndexesShouldStartAt3()
+    {
+        $filtersMock = $this->createMock(Filters::class);
+        $filtersMock->method('getIntegerFields')
+            ->willReturn(['int' => 10]);
+
+        $sut = new BookingsProvider($this->csvIteratorMock, $this->dataTypeClustererMock, $this->configMock);
+        $data = $sut->getSubset(3, 3, $filtersMock);
+
+        $this->assertEquals(3, count($data));
+        $this->assertEquals(36, $data[3]->getId());
+        $this->assertEquals(38, $data[4]->getId());
+        $this->assertEquals(39, $data[5]->getId());
     }
 
 //    /**

@@ -58,7 +58,7 @@ class BookingsProvider {
                 $bookingsQueue->dequeue();
             }
 
-            $bookingsQueue->enqueue(['line' => $currentIndex, 'booking' => $booking]);
+            $bookingsQueue->enqueue(['line' => $i, 'booking' => $booking]);
             $this->csvIterator->next();
             $currentIndex++;
             $i++;
