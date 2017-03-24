@@ -10,6 +10,7 @@ $configContent = array(
     'priceFields' => ['PRICES'],
     'distanceFields' => ['DIWATER','DISKI','DICENTER','DISEA','DILAKE', 'DIPUBT'],
     'idField' => 'id',
+    'atLeastFilterFields' => ['ROOMS','BEDROOMS'],
     'fieldNameMapping' => [
         'ID' => 'Id',
         'NREF' => 'NREF',

@@ -31,14 +31,18 @@ class BookingsProviderTest extends TestCase
             ->will($this->returnCallback(function($rawData) {
                 return $rawData['idField'] == '31'
                     // For first item...
-                    ? new DataTypeCluster(['int' => 'a'], ['bool' => 'b'], ['float' => 'c'], ['str' => 'd'], ['pri' => 'e'], ['dist' => 'f'])
+                    ? new DataTypeCluster(['int' => '4'], ['bool' => 'b'], ['float' => 'c'], ['str' => 'd'], ['pri' => 'e'], ['dist' => 'f'])
                     // For other items...
-                    : new DataTypeCluster(['int' => 'a1'], ['bool' => 'b1'], ['float' => 'c1'], ['str' => 'd1'], ['pri' => 'e1'], ['dist' => 'f1']);
+                    : new DataTypeCluster(['int' => '20'], ['bool' => 'b1'], ['float' => 'c1'], ['str' => 'd1'], ['pri' => 'e1'], ['dist' => 'f1']);
             }));
-        
+
+        $map = array(
+            array('idField', 'idField'),
+            array('atLeastFilterFields', ['int'])
+        );
         $this->configMock = $this->createMock(ConfigProvider::class);
         $this->configMock->method('get')
-            ->willReturn('idField');
+            ->will($this->returnValueMap($map));
     }
 
     /**
@@ -107,7 +111,7 @@ class BookingsProviderTest extends TestCase
         $data = $sut->getSubset(0,1);
 
         $this->assertEquals(31, $data[0]->getId());
-        $this->assertEquals(['int' => 'a'], $data[0]->getIntegerFields());
+        $this->assertEquals(['int' => 4], $data[0]->getIntegerFields());
         $this->assertEquals(['bool' => 'b'], $data[0]->getBooleanFields());
         $this->assertEquals(['float' => 'c'], $data[0]->getFloatFields());
         $this->assertEquals(['str' => 'd'], $data[0]->getStringFields());
@@ -121,7 +125,23 @@ class BookingsProviderTest extends TestCase
     public function filteringIntegerValueShouldRemoveNonMatchingItems() {
         $filtersMock = $this->createMock(Filters::class);
         $filtersMock->method('getIntegerFields')
-            ->willReturn(['int' => 'a1']);
+            ->willReturn(['int' => 20]);
+
+        $sut = new BookingsProvider($this->csvIteratorMock, $this->dataTypeClustererMock, $this->configMock);
+        $data = $sut->getSubset(0, 3, $filtersMock);
+
+        $this->assertEquals(2, count($data));
+        $this->assertEquals(32, $data[1]->getId());
+        $this->assertEquals(33, $data[2]->getId());
+    }
+
+    /**
+     * @test
+     */
+    public function filteringIntegerValueWithAtLeastConditionShouldRemoveNonMatchingItems() {
+        $filtersMock = $this->createMock(Filters::class);
+        $filtersMock->method('getIntegerFields')
+            ->willReturn(['int' => 5]);
 
         $sut = new BookingsProvider($this->csvIteratorMock, $this->dataTypeClustererMock, $this->configMock);
         $data = $sut->getSubset(0, 3, $filtersMock);
@@ -218,7 +238,7 @@ class BookingsProviderTest extends TestCase
 //    public function filteringShouldAffectItemCount() {
 //        $filtersMock = $this->createMock(Filters::class);
 //        $filtersMock->method('getDistanceFields')
-//            ->willReturn(['int' => 'a']);
+//            ->willReturn(['int' => 4]);
 //
 //        $sut = new BookingsProvider($this->csvIteratorMock, $this->dataTypeClustererMock, $this->configMock);
 //        $itemCount = $sut->getItemCount();

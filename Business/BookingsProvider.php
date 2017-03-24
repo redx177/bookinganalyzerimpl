@@ -3,6 +3,7 @@ class BookingsProvider {
     private $csvIterator;
     private $dataTypeClusterer;
     private $idField;
+    private $atLeastFilterFields;
 
     /**
      * DataProvider constructor.
@@ -15,6 +16,7 @@ class BookingsProvider {
         $this->csvIterator = $csvIterator;
         $this->dataTypeClusterer = $dataTypeClusterer;
         $this->idField = $config->get('idField');
+        $this->atLeastFilterFields = $config->get('atLeastFilterFields');
     }
 
     /**
@@ -122,6 +124,12 @@ class BookingsProvider {
     private function applyTypedFilters(array $bookingFields, array $filterFields) {
         foreach ($filterFields as $fieldName => $fieldValue) {
             if (!$fieldValue) {
+                continue;
+            }
+            if (in_array($fieldName, $this->atLeastFilterFields)) {
+                if ($bookingFields[$fieldName] < $fieldValue) {
+                    return false;
+                }
                 continue;
             }
             if ($bookingFields[$fieldName] != $fieldValue) {
