@@ -32,11 +32,14 @@
   clear: both;
   display: block;
 }
-.pagination {
+.paginationNavigation {
   display: flex;
   align-items: center;
   min-width: 100%;
   justify-content: center;
+}
+.paginationNavigation .pager {
+  padding: 0 5px;
 }
 .bookingListing th {
   height: 141px;
