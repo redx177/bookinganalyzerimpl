@@ -3,7 +3,6 @@ class BookingsProvider {
     private $csvIterator;
     private $dataTypeClusterer;
     private $idField;
-    private $data;
 
     /**
      * DataProvider constructor.
@@ -28,40 +27,63 @@ class BookingsProvider {
     public function getSubset($from, $count, Filters $filters = null)
     {
         $this->csvIterator->rewind();
-        $this->csvIterator->skip($from);
-        $data = [];
-        for ($i = 0; $i < $count;) {
+        $currentIndex = 0;
+
+        // Store the last bookings in case $from is higher than the total count of bookings
+        $bookingsQueue = new SplQueue();
+        for ($i = 0; $i < $from+$count;) {
+            // If end of bookings have been reached, exit for loop.
             if (!$this->csvIterator->valid()) {
                 break;
+            }
+
+            if (($i-$from) % $count === 0) {
+                $bookingsQueue = new SplQueue();
             }
 
             $rawBooking = $this->csvIterator->current();
             $booking = $this->getBooking($rawBooking);
 
+            // Check if the current $booking matches the provided filters.
             if (!$this->applyFilters($booking, $filters)) {
                 $this->csvIterator->next();
+                $currentIndex++;
                 continue;
             }
 
-            array_push($data, $booking);
+            // Check if queue limit has been reached.
+            if ($bookingsQueue->count() == $count) {
+                $bookingsQueue->dequeue();
+            }
+
+            $bookingsQueue->enqueue(['line' => $currentIndex, 'booking' => $booking]);
             $this->csvIterator->next();
+            $currentIndex++;
             $i++;
         }
+
+        $data = [];
+        $bookingsQueueCount = $bookingsQueue->count();
+        for ($i = 0; $i < $bookingsQueueCount; $i++) {
+            $lineNumberAndBooking = $bookingsQueue->dequeue();
+            $data[$lineNumberAndBooking['line']] = $lineNumberAndBooking['booking'];
+        }
+
         return $data;
     }
 
-    /**
-     * Gets the total item count.
-     * @return int
-     */
-    public function getItemCount()
-    {
-        $itemCount = 0;
-        for ($this->csvIterator->rewind();$this->csvIterator->valid();$this->csvIterator->next()) {
-            $itemCount++;
-        }
-        return $itemCount;
-    }
+//    /**
+//     * Gets the total item count.
+//     * @return int
+//     */
+//    public function getItemCount()
+//    {
+//        $itemCount = 0;
+//        for ($this->csvIterator->rewind();$this->csvIterator->valid();$this->csvIterator->next()) {
+//            $itemCount++;
+//        }
+//        return $itemCount;
+//    }
 
     private function getBooking(array $rawBooking): Booking
     {

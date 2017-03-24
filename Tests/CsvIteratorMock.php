@@ -35,7 +35,9 @@ class CsvIteratorMock {
             ->will(
                 $testCase->returnCallback(
                     function() use ($iteratorData) {
-                        return $iteratorData->array[$iteratorData->position];
+                        return isset($iteratorData->array[$iteratorData->position])
+                            ? $iteratorData->array[$iteratorData->position]
+                            : null;
                     }
                 )
             );

@@ -11,8 +11,10 @@ $config = new ConfigProvider($GLOBALS['configContent']);
 
 $loader = new Twig_Loader_Filesystem(__DIR__ . '/Templates');
 $twig = new Twig_Environment($loader, array(
+    'debug' => true,
     //'cache' => __DIR__ . '/compilation_cache',
 ));
+$twig->addExtension(new Twig_Extension_Debug());
 
 $builder = new DI\ContainerBuilder();
 $builder->addDefinitions(array(

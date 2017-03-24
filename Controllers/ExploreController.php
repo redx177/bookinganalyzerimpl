@@ -54,12 +54,15 @@
      {
          $filters = $this->filtersProvider->get($_GET);
          $data = $this->bookingsProvider->getSubset($this->pagination->getCurrentPageFirstItemIndex(), $this->pagination->getPageSize(), $filters);
+
          $template = $this->twig->load('explore.twig');
+         $indices = array_keys($data);
+         $currentFirstIndexOnPage = reset($indices);
          return $template->render(array(
              'bookings' => $data,
              'view' => 'explore',
-             'currentPage' => $this->pagination->getCurrentPage(),
-             'pageCount' => $this->pagination->getPageCount(),
+             'currentPage' => $this->pagination->fixPageValue($currentFirstIndexOnPage),
+             'lastPageReached' => $this->pagination->lastPageReached($currentFirstIndexOnPage, count($data)),
              'paginationWindow' => $this->config->get('paginationWindow'),
              'fieldTitles' => $this->config->get('fieldNameMapping'),
              'buttonConfigs' => [new ButtonConfig($this->config->get('filterButtonTitle'), 'apply')],

@@ -2,22 +2,23 @@
     <thead>
         <tr>
             <th><div>ID</div></th>
-            {% for key,value in bookings[0].getStringFields() %}
+            {% set firstBooking = bookings|first %}
+            {% for key,value in firstBooking.getStringFields() %}
                 <th><div>{{ fieldTitles[key] }}</div></th>
             {% endfor %}
-            {% for key,value in bookings[0].getPriceFields() %}
+            {% for key,value in firstBooking.getPriceFields() %}
                 <th><div>{{ fieldTitles[key] }}</div></th>
             {% endfor %}
-            {% for key,value in bookings[0].getIntegerFields() %}
+            {% for key,value in firstBooking.getIntegerFields() %}
                 <th><div>{{ fieldTitles[key] }}</div></th>
             {% endfor %}
-            {% for key,value in bookings[0].getDistanceFields() %}
+            {% for key,value in firstBooking.getDistanceFields() %}
                 <th><div>{{ fieldTitles[key] }}</div></th>
             {% endfor %}
-            {% for key,value in bookings[0].getBooleanFields() %}
+            {% for key,value in firstBooking.getBooleanFields() %}
                 <th><div>{{ fieldTitles[key] }}</div></th>
             {% endfor %}
-            {% for key,value in bookings[0].getFloatFields() %}
+            {% for key,value in firstBooking.getFloatFields() %}
                 <th><div>{{ fieldTitles[key] }}</div></th>
             {% endfor %}
         </tr>
