@@ -31,9 +31,9 @@ class BookingsProviderTest extends TestCase
             ->will($this->returnCallback(function($rawData) {
                 return $rawData['idField'] == '31'
                     // For first item...
-                    ? new DataTypeCluster(['int' => '4'], ['bool' => 'b'], ['float' => 'c'], ['str' => 'd'], ['pri' => 'e'], ['dist' => 'f'])
+                    ? new DataTypeCluster(['int' => '4','int2' => '5'], ['bool' => 'b'], ['float' => 'c'], ['str' => 'd'], ['pri' => 'e'], ['dist' => 'f'])
                     // For other items...
-                    : new DataTypeCluster(['int' => '20'], ['bool' => 'b1'], ['float' => 'c1'], ['str' => 'd1'], ['pri' => 'e1'], ['dist' => 'f1']);
+                    : new DataTypeCluster(['int' => '20','int2' => '21'], ['bool' => 'b1'], ['float' => 'c1'], ['str' => 'd1'], ['pri' => 'e1'], ['dist' => 'f1']);
             }));
 
         $map = array(
@@ -147,6 +147,23 @@ class BookingsProviderTest extends TestCase
         $data = $sut->getSubset(0, 3, $filtersMock);
 
         $this->assertEquals(2, count($data));
+        $this->assertEquals(32, $data[1]->getId());
+        $this->assertEquals(33, $data[2]->getId());
+    }
+
+    /**
+     * @test
+     */
+    public function filteringIntegerWithMultiSelectionShouldRemoveNonMatchingItems() {
+        $filtersMock = $this->createMock(Filters::class);
+        $filtersMock->method('getIntegerFields')
+            ->willReturn(['int2' => [5,21]]);
+
+        $sut = new BookingsProvider($this->csvIteratorMock, $this->dataTypeClustererMock, $this->configMock);
+        $data = $sut->getSubset(0, 3, $filtersMock);
+
+        $this->assertEquals(3, count($data));
+        $this->assertEquals(31, $data[0]->getId());
         $this->assertEquals(32, $data[1]->getId());
         $this->assertEquals(33, $data[2]->getId());
     }

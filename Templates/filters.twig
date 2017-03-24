@@ -24,11 +24,11 @@
         </fieldset>
         <fieldset class="inline quality">
             <legend>Stars</legend>
-            <label class="checkbox-inline"><input type="checkbox" name="QUAL[]" value="1"{% if _GET['QUAL']|keys %} checked{% endif %}> 1</label>
-            <label class="checkbox-inline"><input type="checkbox" name="QUAL[]" value="3"{% if _GET['QUAL']|keys %} checked{% endif %}> 3</label>
-            <label class="checkbox-inline"><input type="checkbox" name="QUAL[]" value="2"{% if _GET['QUAL']|keys %} checked{% endif %}> 2</label>
-            <label class="checkbox-inline"><input type="checkbox" name="QUAL[]" value="4"{% if _GET['QUAL']|keys %} checked{% endif %}> 4</label>
-            <label class="checkbox-inline"><input type="checkbox" name="QUAL[]" value="5"{% if _GET['QUAL']|keys %} checked{% endif %}> 5</label>
+            <label class="checkbox-inline"><input type="checkbox" name="QUAL[]" value="1"{% if 1 in _GET['QUAL'] %} checked{% endif %}> 1</label>
+            <label class="checkbox-inline"><input type="checkbox" name="QUAL[]" value="3"{% if 2 in _GET['QUAL'] %} checked{% endif %}> 3</label>
+            <label class="checkbox-inline"><input type="checkbox" name="QUAL[]" value="2"{% if 3 in _GET['QUAL'] %} checked{% endif %}> 2</label>
+            <label class="checkbox-inline"><input type="checkbox" name="QUAL[]" value="4"{% if 4 in _GET['QUAL'] %} checked{% endif %}> 4</label>
+            <label class="checkbox-inline"><input type="checkbox" name="QUAL[]" value="5"{% if 5 in _GET['QUAL'] %} checked{% endif %}> 5</label>
         </fieldset>
         <fieldset>
             <legend>Rooms</legend>

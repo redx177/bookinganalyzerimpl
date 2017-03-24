@@ -132,6 +132,12 @@ class BookingsProvider {
                 }
                 continue;
             }
+            if (is_array($fieldValue)) {
+                if (!in_array($bookingFields[$fieldName], $fieldValue)) {
+                    return false;
+                }
+                continue;
+            }
             if ($bookingFields[$fieldName] != $fieldValue) {
                 return false;
             }

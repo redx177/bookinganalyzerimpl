@@ -28,22 +28,26 @@
 .filters fieldset.inline.attributes label {
   width: 105px;
 }
+.filters button {
+  clear: both;
+  display: block;
+}
 .pagination {
   display: flex;
   align-items: center;
   min-width: 100%;
   justify-content: center;
 }
-table th {
+.bookingListing th {
   height: 141px;
   white-space: nowrap;
   padding: 0;
   text-align: -webkit-center;
 }
-table th div {
+.bookingListing th div {
   transform: translate(0, 10px) rotate(315deg);
   width: 9px;
 }
-table td {
+.bookingListing td {
   border: 1px solid #ccc;
 }
