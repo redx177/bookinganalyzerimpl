@@ -92,7 +92,7 @@ class BookingsProviderTest extends TestCase
      */
     public function from99999999AndCount2ShouldReturn1ItemsAndSkipping2() {
         $this->csvIteratorMock
-            ->expects($this->exactly(count($this->mockData)))
+            ->expects($this->exactly(count($this->mockData)+1))
             ->method('next');
         $sut = new BookingsProvider($this->csvIteratorMock, $this->dataTypeClustererMock, $this->configMock);
         $data = $sut->getSubset(99999999,2);
@@ -106,7 +106,7 @@ class BookingsProviderTest extends TestCase
      */
     public function from0AndCount99999999ShouldReturn1ItemsAndSkipping2() {
         $this->csvIteratorMock
-            ->expects($this->exactly(count($this->mockData)))
+            ->expects($this->exactly(count($this->mockData)+1))
             ->method('next');
         $sut = new BookingsProvider($this->csvIteratorMock, $this->dataTypeClustererMock, $this->configMock);
         $data = $sut->getSubset(0,99999999);
@@ -302,6 +302,83 @@ class BookingsProviderTest extends TestCase
         $this->assertEquals(36, $data[3]->getId());
         $this->assertEquals(38, $data[4]->getId());
         $this->assertEquals(39, $data[5]->getId());
+    }
+
+    /**
+     * @test
+     */
+    public function whenGetting5OutOf10ItemsThenHasBeenReachedShouldReturnFalse() {
+        $sut = new BookingsProvider($this->csvIteratorMock, $this->dataTypeClustererMock, $this->configMock);
+        $sut->getSubset(0, 5);
+
+        $this->assertFalse($sut->hasEndBeenReached());
+    }
+
+    /**
+     * @test
+     */
+    public function whenGettingAllItemsThenHasBeenReachedShouldReturnTrue() {
+        $sut = new BookingsProvider($this->csvIteratorMock, $this->dataTypeClustererMock, $this->configMock);
+        $sut->getSubset(0, 10);
+
+        $this->assertTrue($sut->hasEndBeenReached());
+    }
+
+    /**
+     * @test
+     */
+    public function whenGettingMoreItemThanThereAreThenHasBeenReachedShouldReturnTrue() {
+        $this->csvIteratorMock
+            ->expects($this->exactly(count($this->mockData)+1))
+            ->method('next');
+        $sut = new BookingsProvider($this->csvIteratorMock, $this->dataTypeClustererMock, $this->configMock);
+        $sut->getSubset(0, 9999999);
+
+        $this->assertTrue($sut->hasEndBeenReached());
+    }
+
+    /**
+     * @test
+     */
+    public function whenFilteringAndGetting5OutOf10ItemsThenHasBeenReachedShouldReturnFalse() {
+        $filtersMock = $this->createMock(Filters::class);
+        $filtersMock->method('getIntegerFields')
+            ->willReturn(['int' => 20]);
+
+        $sut = new BookingsProvider($this->csvIteratorMock, $this->dataTypeClustererMock, $this->configMock);
+        $sut->getSubset(0, 2, $filtersMock);
+
+        $this->assertFalse($sut->hasEndBeenReached());
+    }
+
+    /**
+     * @test
+     */
+    public function whenFilteringAndGettingAllItemsThenHasBeenReachedShouldReturnTrue() {
+        $filtersMock = $this->createMock(Filters::class);
+        $filtersMock->method('getIntegerFields')
+            ->willReturn(['int' => 20]);
+        $sut = new BookingsProvider($this->csvIteratorMock, $this->dataTypeClustererMock, $this->configMock);
+        $data = $sut->getSubset(0, 3, $filtersMock);
+
+        $this->assertTrue($sut->hasEndBeenReached());
+    }
+
+    /**
+     * @test
+     */
+    public function whenFilteringAndGettingMoreItemThanThereAreThenHasBeenReachedShouldReturnTrue() {
+        $this->csvIteratorMock
+            ->expects($this->exactly(count($this->mockData)+1))
+            ->method('next');
+        $filtersMock = $this->createMock(Filters::class);
+        $filtersMock->method('getIntegerFields')
+            ->willReturn(['int' => 20]);
+
+        $sut = new BookingsProvider($this->csvIteratorMock, $this->dataTypeClustererMock, $this->configMock);
+        $sut->getSubset(0, 9999999, $filtersMock);
+
+        $this->assertTrue($sut->hasEndBeenReached());
     }
 
 //    /**

@@ -4,6 +4,8 @@ class BookingsProvider {
     private $dataTypeClusterer;
     private $idField;
     private $atLeastFilterFields;
+    private $nextItem = null;
+    private $hasEndBeenReached = false;
 
     /**
      * DataProvider constructor.
@@ -29,11 +31,15 @@ class BookingsProvider {
     public function getSubset($from, $count, Filters $filters = null)
     {
         $this->csvIterator->rewind();
-        $currentIndex = 0;
 
         // Store the last bookings in case $from is higher than the total count of bookings
         $bookingsQueue = new SplQueue();
-        for ($i = 0; $i < $from+$count;) {
+        if ($this->nextItem != null) {
+            $bookingsQueue->enqueue($this->nextItem);
+            $from += 1;
+        }
+        $i = 0;
+        while ($i < $from+$count) {
             // If end of bookings have been reached, exit for loop.
             if (!$this->csvIterator->valid()) {
                 break;
@@ -49,7 +55,6 @@ class BookingsProvider {
             // Check if the current $booking matches the provided filters.
             if (!$this->applyFilters($booking, $filters)) {
                 $this->csvIterator->next();
-                $currentIndex++;
                 continue;
             }
 
@@ -60,7 +65,6 @@ class BookingsProvider {
 
             $bookingsQueue->enqueue(['line' => $i, 'booking' => $booking]);
             $this->csvIterator->next();
-            $currentIndex++;
             $i++;
         }
 
@@ -70,6 +74,28 @@ class BookingsProvider {
             $lineNumberAndBooking = $bookingsQueue->dequeue();
             $data[$lineNumberAndBooking['line']] = $lineNumberAndBooking['booking'];
         }
+
+        // Check next item to know if the end has been reached.
+        $this->nextItem = null;
+        do {
+            $this->csvIterator->next();
+
+            // Next item is invalid, so end has been reached.
+            if (!$this->csvIterator->valid()) {
+                $this->hasEndBeenReached = true;
+                break;
+            }
+
+            $rawBooking = $this->csvIterator->current();
+            $booking = $this->getBooking($rawBooking);
+
+            // If filters apply, store the item. Else continue with the next.
+            if ($this->applyFilters($booking, $filters)) {
+                $this->nextItem = ['line' => $i, 'booking' => $booking];
+                break;
+            }
+
+        } while (true);
 
         return $data;
     }
@@ -143,5 +169,14 @@ class BookingsProvider {
             }
         }
         return true;
+    }
+
+    /**
+     * Checks if end has been reached.
+     * @return bool TRUE = End has been reached. FALSE = End has not been reached.
+     */
+    public function hasEndBeenReached()
+    {
+        return $this->hasEndBeenReached;
     }
 }

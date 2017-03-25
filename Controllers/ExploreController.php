@@ -51,7 +51,7 @@
              'bookings' => $data,
              'view' => 'explore',
              'currentPage' => $this->pagination->fixPageValue($currentFirstIndexOnPage),
-             'lastPageReached' => $this->pagination->lastPageReached($currentFirstIndexOnPage, count($data)),
+             'lastPageReached' => $this->bookingsProvider->hasEndBeenReached(),
              'paginationWindow' => $this->config->get('paginationWindow'),
              'fieldTitles' => $this->config->get('fieldNameMapping'),
              'buttonConfigs' => [new ButtonConfig($this->config->get('filterButtonTitle'), 'apply')],

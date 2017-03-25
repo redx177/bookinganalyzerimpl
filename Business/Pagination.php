@@ -83,16 +83,4 @@ class Pagination {
         return (int)($currentFirstIndexOnPage / $this->getPageSize());
 
     }
-
-    /**
-     * Shows if last page has been reached.
-     * @param int $currentFirstIndexOnPage Index of the first item on the page.
-     * @param int $currentPageItemCount
-     * @return bool
-     */
-    public function lastPageReached(int $currentFirstIndexOnPage, int $currentPageItemCount)
-    {
-        $fixedCurrentPage = $this->fixPageValue($currentFirstIndexOnPage);
-        return $fixedCurrentPage !== $this->getCurrentPage() || $currentPageItemCount != $this->getPageSize();
-    }
 }
