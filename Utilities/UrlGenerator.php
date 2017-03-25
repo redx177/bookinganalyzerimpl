@@ -12,12 +12,12 @@ class UrlGenerator
     {
         $result = implode('&', [
             'action=' . $filters->getAction(),
-            http_build_query($filters->getIntegerFields()),
-            http_build_query($filters->getBooleanFields()),
-            http_build_query($filters->getFloatFields()),
-            http_build_query($filters->getStringFields()),
-            $this->getPriceParameters($filters->getPriceFields()),
-            $this->getDistanceParameters($filters->getDistanceFields()),
+            $this->getFilterParameter($filters->getFiltersByType(int::class)),
+            $this->getFilterParameter($filters->getFiltersByType(bool::class)),
+            $this->getFilterParameter($filters->getFiltersByType(float::class)),
+            $this->getFilterParameter($filters->getFiltersByType(string::class)),
+            $this->getPriceParameters($filters->getFiltersByType(Price::class)),
+            $this->getDistanceParameters($filters->getFiltersByType(Distance::class)),
         ]);
 
         // Remove multiple &&
@@ -27,25 +27,45 @@ class UrlGenerator
         return trim($result, '&');
     }
 
-    private function getPriceParameters($priceFields)
+    private function getPriceParameters($filters)
     {
-        return $this->getParamsForEnums($priceFields, 'Price');
+        return $this->getParamsForEnums($filters, 'Price');
     }
 
-    private function getDistanceParameters($priceFields)
+    private function getDistanceParameters($filters)
     {
-        return $this->getParamsForEnums($priceFields, 'Distance');
+        return $this->getParamsForEnums($filters, 'Distance');
     }
 
-    private function getParamsForEnums($priceFields, $className)
+    private function getParamsForEnums($filters, $className)
     {
         $params = [];
-        foreach ($priceFields as $fieldName => $rawValue) {
+        foreach ($filters as $filter) {
+            $filterName = $filter->getName();
+            $rawValue = $filter->getValue();
             $class = new ReflectionClass($className);
             foreach ($class->getConstants() as $name => $value) {
                 if ($value > 0 && $value === $rawValue) {
-                    array_push($params, $fieldName . '=' . strtolower($name));
+                    array_push($params, $filterName . '=' . strtolower($name));
                 }
+            }
+        }
+
+        return implode('&', $params);
+    }
+
+    private function getFilterParameter($fields)
+    {
+        $params = [];
+        foreach ($fields as $field) {
+            $value = $field->getValue();
+            $name = $field->getName();
+            if (is_array($value)) {
+                foreach ($value as $v) {
+                    array_push($params, $name . '[]=' . $v);
+                }
+            } else {
+                array_push($params, $name . '=' . $value);
             }
         }
 

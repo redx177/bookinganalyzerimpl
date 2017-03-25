@@ -126,45 +126,30 @@ class BookingsProvider {
         if ($filters === null) {
             return true;
         }
-        if (!$this->applyTypedFilters($booking->getIntegerFields(), $filters->getIntegerFields())) {
-            return false;
-        }
-        if (!$this->applyTypedFilters($booking->getBooleanFields(), $filters->getBooleanFields())) {
-            return false;
-        }
-        if (!$this->applyTypedFilters($booking->getFloatFields(), $filters->getFloatFields())) {
-            return false;
-        }
-        if (!$this->applyTypedFilters($booking->getStringFields(), $filters->getStringFields())) {
-            return false;
-        }
-        if (!$this->applyTypedFilters($booking->getDistanceFields(), $filters->getDistanceFields())) {
-            return false;
-        }
-        if (!$this->applyTypedFilters($booking->getPriceFields(), $filters->getPriceFields())) {
-            return false;
-        }
-        return true;
-    }
 
-    private function applyTypedFilters(array $bookingFields, array $filterFields) {
-        foreach ($filterFields as $fieldName => $fieldValue) {
-            if (!$fieldValue) {
+        foreach ($filters->getFilters() as $filter) {
+            $filterValue = $filter->getValue();
+            $filterName = $filter->getName();
+            if (!$filterValue) {
                 continue;
             }
-            if (in_array($fieldName, $this->atLeastFilterFields)) {
-                if ($bookingFields[$fieldName] < $fieldValue) {
+
+            $field = $booking->getFieldByName($filterName);
+            $bookingValue = $field->getValue();
+
+            if (in_array($filterName, $this->atLeastFilterFields)) {
+                if ($bookingValue < $filterValue) {
                     return false;
                 }
                 continue;
             }
-            if (is_array($fieldValue)) {
-                if (!in_array($bookingFields[$fieldName], $fieldValue)) {
+            if (is_array($filterValue)) {
+                if (!in_array($bookingValue, $filterValue)) {
                     return false;
                 }
                 continue;
             }
-            if ($bookingFields[$fieldName] != $fieldValue) {
+            if ($bookingValue != $filterValue) {
                 return false;
             }
         }

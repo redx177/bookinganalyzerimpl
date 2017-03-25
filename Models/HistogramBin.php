@@ -2,26 +2,19 @@
 
 class HistogramBin
 {
-    private $field;
-    private $value;
+    private $fields;
     private $count;
     private $total;
 
-    public function __construct($field, $value, $count, $total)
+    public function __construct($fields, $count, $total)
     {
-        $this->field = $field;
-        $this->value = $value;
+        $this->fields = $fields;
         $this->count = $count;
         $this->toxtal = $total;
     }
-    public function getField()
+    public function getFields()
     {
-        return $this->field;
-    }
-
-    public function getValue()
-    {
-        return $this->value;
+        return $this->fields;
     }
 
     public function getCount()

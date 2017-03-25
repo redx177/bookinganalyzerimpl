@@ -2,8 +2,8 @@
 
 class Filters
 {
-    private $dataTypeCluster;
     private $action;
+    private $filters = [];
 
     /**
      * FilterConfig constructor.
@@ -12,8 +12,25 @@ class Filters
      */
     public function __construct(string $action, DataTypeCluster $dataTypeCluster)
     {
-        $this->dataTypeCluster = $dataTypeCluster;
         $this->action = $action;
+        foreach ($dataTypeCluster->getIntegerFields() as $key => $value) {
+            array_push($this->filters, new Filter($key, $value, int::class));
+        }
+        foreach ($dataTypeCluster->getBooleanFields() as $key => $value) {
+            array_push($this->filters, new Filter($key, $value, bool::class));
+        }
+        foreach ($dataTypeCluster->getFloatFields() as $key => $value) {
+            array_push($this->filters, new Filter($key, $value, float::class));
+        }
+        foreach ($dataTypeCluster->getStringFields() as $key => $value) {
+            array_push($this->filters, new Filter($key, $value, string::class));
+        }
+        foreach ($dataTypeCluster->getPriceFields() as $key => $value) {
+            array_push($this->filters, new Filter($key, $value, Price::class));
+        }
+        foreach ($dataTypeCluster->getDistanceFields() as $key => $value) {
+            array_push($this->filters, new Filter($key, $value, Distance::class));
+        }
     }
 
     public function getAction() : string
@@ -21,33 +38,19 @@ class Filters
         return $this->action;
     }
 
-    public function getIntegerFields() : array
+    public function getFilters()
     {
-        return $this->dataTypeCluster->getIntegerFields();
+        return $this->filters;
     }
 
-    public function getBooleanFields() : array
+    public function getFiltersByType(string $type) : array
     {
-        return $this->dataTypeCluster->getBooleanFields();
-    }
-
-    public function getFloatFields() : array
-    {
-        return $this->dataTypeCluster->getFloatFields();
-    }
-
-    public function getStringFields() : array
-    {
-        return $this->dataTypeCluster->getStringFields();
-    }
-
-    public function getDistanceFields() : array
-    {
-        return $this->dataTypeCluster->getDistanceFields();
-    }
-
-    public function getPriceFields() : array
-    {
-        return $this->dataTypeCluster->getPriceFields();
+        $filters = [];
+        foreach ($this->filters as $filter) {
+            if ($type == $filter->getType()) {
+                array_push($filters, $filter);
+            }
+        }
+        return $filters;
     }
 }

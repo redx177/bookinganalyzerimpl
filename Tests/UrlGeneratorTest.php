@@ -21,7 +21,7 @@ class UrlGeneratorTest extends TestCase
         $sut = new UrlGenerator();
 
         $urlParams = $sut->getParameters($filters);
-        $this->assertEquals('action=myAction&a1=a1a&a2%5B0%5D=a2a&a2%5B1%5D=a2b&b=b&c=c&d=d&e1=budget&e2=luxury&f1=close', $urlParams);
+        $this->assertEquals('action=myAction&a1=a1a&a2[]=a2a&a2[]=a2b&b=b&c=c&d=d&e1=budget&e2=luxury&f1=close', $urlParams);
     }
 
     /**

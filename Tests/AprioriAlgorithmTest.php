@@ -8,6 +8,13 @@ require_once dirname(__DIR__) . '/Models/HistogramBin.php';
 require_once dirname(__DIR__) . '/Models/Price.php';
 require_once dirname(__DIR__) . '/Models/Distance.php';
 require_once dirname(__DIR__) . '/Models/DataTypeCluster.php';
+require_once dirname(__DIR__) . '/Models/Field.php';
+require_once dirname(__DIR__) . '/Models/IntegerField.php';
+require_once dirname(__DIR__) . '/Models/BooleanField.php';
+require_once dirname(__DIR__) . '/Models/FloatField.php';
+require_once dirname(__DIR__) . '/Models/StringField.php';
+require_once dirname(__DIR__) . '/Models/PriceField.php';
+require_once dirname(__DIR__) . '/Models/DistanceField.php';
 require_once dirname(__DIR__) . '/Utilities/ConfigProvider.php';
 
 use PHPUnit\Framework\TestCase;
@@ -42,24 +49,26 @@ class AprioriAlgorithmTest extends TestCase
      * @test
      */
     public function checkIntegerInSetSize1() {
+        $rooms = 7;
+
         $bookingsProviderMock = $this->createMock(BookingsProvider::class);
         $bookingsProviderMock->method('getSubset')
             ->will($this->onConsecutiveCalls([
                 $this->GetBooking(
-                    7, 1, 1,
+                    $rooms, 1, 1,
                     false, false, false, false, false,
                     40.45538, -3.79278,
                     Price::Empty,
                     Distance::Empty, Distance::Empty, Distance::Empty),
                 $this->GetBooking(
-                    7, 2, 2,
+                    $rooms, 2, 2,
                     false, false, false, false, false,
                     40.45538, -3.79278,
                     Price::Empty,
                     Distance::Close, Distance::Empty, Distance::Empty),
             ],[
                 $this->GetBooking(
-                    7, 3, 3,
+                    $rooms, 3, 3,
                     false, false, false, false, false,
                     40.45538, -3.79278,
                     Price::Empty,
@@ -74,8 +83,7 @@ class AprioriAlgorithmTest extends TestCase
         $histogramBins = $histogram->getHistogramBins();
 
         $this->assertEquals(1, count($histogramBins));
-        $this->assertEquals('ROOMS', $histogramBins[0]->getField());
-        $this->assertEquals(7, $histogramBins[0]->getValue());
+        $this->assertEquals(['ROOMS'=>$rooms], $histogramBins[0]->getFields());
         $this->assertEquals(3, $histogramBins[0]->getCount());
     }
 
@@ -83,25 +91,27 @@ class AprioriAlgorithmTest extends TestCase
      * @test
      */
     public function checkBooleansInSetSize1() {
+        $tv = true;
+
         $bookingsProviderMock = $this->createMock(BookingsProvider::class);
         $bookingsProviderMock->method('getSubset')
             ->will($this->onConsecutiveCalls([
                 $this->GetBooking(
                     1, 1, 1,
-                    true, false, false, false, false,
+                    $tv, false, false, false, false,
                     40.45538, -3.79278,
                     Price::Empty,
                     Distance::Empty, Distance::Empty, Distance::Empty),
                 $this->GetBooking(
                     2, 2, 2,
-                    true, false, false, false, false,
+                    $tv, false, false, false, false,
                     40.45538, -3.79278,
                     Price::Empty,
                     Distance::Empty, Distance::Empty, Distance::Empty),
             ],[
                 $this->GetBooking(
                     3, 3, 3,
-                    true, false, false, false, false,
+                    $tv, false, false, false, false,
                     40.45538, -3.79278,
                     Price::Empty,
                     Distance::Empty, Distance::Empty, Distance::Empty),
@@ -115,8 +125,7 @@ class AprioriAlgorithmTest extends TestCase
         $histogramBins = $histogram->getHistogramBins();
 
         $this->assertEquals(1, count($histogramBins));
-        $this->assertEquals('TV', $histogramBins[0]->getField());
-        $this->assertEquals(true, $histogramBins[0]->getValue());
+        $this->assertEquals(['TV'=>$tv], $histogramBins[0]->getFields());
         $this->assertEquals(3, $histogramBins[0]->getCount());
     }
 
@@ -124,6 +133,8 @@ class AprioriAlgorithmTest extends TestCase
      * @test
      */
     public function checkPriceInSetSize1() {
+        $price = Price::Budget;
+
         $bookingsProviderMock = $this->createMock(BookingsProvider::class);
         $bookingsProviderMock->method('getSubset')
             ->will($this->onConsecutiveCalls([
@@ -131,20 +142,20 @@ class AprioriAlgorithmTest extends TestCase
                     1, 1, 1,
                     false, false, false, false, false,
                     40.45538, -3.79278,
-                    Price::Budget,
+                    $price,
                     Distance::Empty, Distance::Empty, Distance::Empty),
                 $this->GetBooking(
                     2, 2, 2,
                     false, false, false, false, false,
                     40.45538, -3.79278,
-                    Price::Budget,
+                    $price,
                     Distance::Empty, Distance::Empty, Distance::Empty),
             ],[
                 $this->GetBooking(
                     3, 3, 3,
                     false, false, false, false, false,
                     40.45538, -3.79278,
-                    Price::Budget,
+                    $price,
                     Distance::Empty, Distance::Empty, Distance::Empty),
             ]));
         $bookingsProviderMock->method('hasEndBeenReached')
@@ -156,8 +167,7 @@ class AprioriAlgorithmTest extends TestCase
         $histogramBins = $histogram->getHistogramBins();
 
         $this->assertEquals(1, count($histogramBins));
-        $this->assertEquals('PRICE', $histogramBins[0]->getField());
-        $this->assertEquals(Price::Budget, $histogramBins[0]->getValue());
+        $this->assertEquals(['PRICE'=>$price], $histogramBins[0]->getFields());
         $this->assertEquals(3, $histogramBins[0]->getCount());
     }
 
@@ -165,6 +175,8 @@ class AprioriAlgorithmTest extends TestCase
      * @test
      */
     public function checkDistancesithNoFilterInSetSize1() {
+        $diSea = Distance::Close;
+
         $bookingsProviderMock = $this->createMock(BookingsProvider::class);
         $bookingsProviderMock->method('getSubset')
             ->will($this->onConsecutiveCalls([
@@ -173,20 +185,20 @@ class AprioriAlgorithmTest extends TestCase
                     false, false, false, false, false,
                     40.45538, -3.79278,
                     Price::Empty,
-                    Distance::Close, Distance::Empty, Distance::Empty),
+                    $diSea, Distance::Empty, Distance::Empty),
                 $this->GetBooking(
                     2, 2, 2,
                     false, false, false, false, false,
                     40.45538, -3.79278,
                     Price::Empty,
-                    Distance::Close, Distance::Empty, Distance::Empty),
+                    $diSea, Distance::Empty, Distance::Empty),
             ],[
                 $this->GetBooking(
                     3, 3, 3,
                     false, false, false, false, false,
                     40.45538, -3.79278,
                     Price::Empty,
-                    Distance::Close, Distance::Empty, Distance::Empty),
+                    $diSea, Distance::Empty, Distance::Empty),
             ]));
         $bookingsProviderMock->method('hasEndBeenReached')
             ->will($this->onConsecutiveCalls(false,false,true));
@@ -197,33 +209,32 @@ class AprioriAlgorithmTest extends TestCase
         $histogramBins = $histogram->getHistogramBins();
 
         $this->assertEquals(1, count($histogramBins));
-        $this->assertEquals('SEA', $histogramBins[0]->getField());
-        $this->assertEquals(Distance::Close, $histogramBins[0]->getValue());
+        $this->assertEquals(['SEA'=>$diSea], $histogramBins[0]->getFields());
         $this->assertEquals(3, $histogramBins[0]->getCount());
     }
 
     /**
      * @test
      */
-    public function checkIntegerInSetSize1() {
+    public function checkIntegerInSetSize2() {
         $bookingsProviderMock = $this->createMock(BookingsProvider::class);
         $bookingsProviderMock->method('getSubset')
             ->will($this->onConsecutiveCalls([
                 $this->GetBooking(
-                    7, 1, 1,
+                    7, 8, 1,
                     false, false, false, false, false,
                     40.45538, -3.79278,
                     Price::Empty,
                     Distance::Empty, Distance::Empty, Distance::Empty),
                 $this->GetBooking(
-                    7, 2, 2,
+                    7, 8, 2,
                     false, false, false, false, false,
                     40.45538, -3.79278,
                     Price::Empty,
                     Distance::Close, Distance::Empty, Distance::Empty),
             ],[
                 $this->GetBooking(
-                    7, 3, 3,
+                    7, 8, 3,
                     false, false, false, false, false,
                     40.45538, -3.79278,
                     Price::Empty,
@@ -234,12 +245,11 @@ class AprioriAlgorithmTest extends TestCase
 
         $sut = new AprioriAlgorithm($bookingsProviderMock, $this->configMock);
         $histograms = $sut->run();
-        $histogram = $histograms->getHistogram(1);
+        $histogram = $histograms->getHistogram(2);
         $histogramBins = $histogram->getHistogramBins();
 
         $this->assertEquals(1, count($histogramBins));
-        $this->assertEquals('ROOMS', $histogramBins[0]->getField());
-        $this->assertEquals(7, $histogramBins[0]->getValue());
+        $this->assertEquals(['ROOMS' => 7,'BEDROOMS' => 8], $histogramBins[0]->getFields());
         $this->assertEquals(3, $histogramBins[0]->getCount());
     }
 }

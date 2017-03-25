@@ -8,7 +8,7 @@ class Histograms
         $this->histograms[$setSize] = $histogram;
     }
 
-    public function getHistogram(int $setSize) : Histogram {
+    public function getHistogram(int $setSize) : ?Histogram {
         if (!array_key_exists($setSize, $this->histograms)) {
             return null;
         }
