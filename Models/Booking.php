@@ -2,12 +2,14 @@
 class Booking
 {
     private $id;
+    private $dataTypeCluster;
+
     /**
      * Booking constructor.
      * @param $id int ID of the booking
      * @param $dataTypeCluster DataTypeCluster Data type cluster of  the booking data.
      */
-    public function __construct($id, $dataTypeCluster)
+    public function __construct(int $id, DataTypeCluster $dataTypeCluster)
     {
         $this->id = $id;
         $this->dataTypeCluster = $dataTypeCluster;

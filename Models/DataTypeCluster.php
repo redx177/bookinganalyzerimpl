@@ -18,7 +18,8 @@ class DataTypeCluster
      * @param $priceFields array Price fields.
      * @param $distanceFields array Distance fields.
      */
-    public function __construct($integerFields, $booleanFields, $floatFields, $stringFields, $priceFields, $distanceFields)
+    public function __construct(array $integerFields, array $booleanFields, array $floatFields,
+                                array $stringFields, array $priceFields, array $distanceFields)
     {
         $this->integerFields = $integerFields;
         $this->booleanFields = $booleanFields;

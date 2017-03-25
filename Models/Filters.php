@@ -10,7 +10,7 @@ class Filters
      * @param $action string Action filter.
      * @param DataTypeCluster $dataTypeCluster Data type cluster which contains the filter config.
      */
-    public function __construct($action, DataTypeCluster $dataTypeCluster)
+    public function __construct(string $action, DataTypeCluster $dataTypeCluster)
     {
         $this->dataTypeCluster = $dataTypeCluster;
         $this->action = $action;

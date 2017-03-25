@@ -41,7 +41,7 @@ class AttributanalysisController implements Controller {
       */
      public function render()
      {
-         if ($_REQUEST['action'] == 1) {
+         if (array_key_exists('action', $_REQUEST) && $_REQUEST['action'] == 'run') {
 
          }
 
