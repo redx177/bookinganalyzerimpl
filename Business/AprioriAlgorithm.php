@@ -23,70 +23,86 @@ class AprioriAlgorithm
      */
     public function run(Filters $filters = null) : Histograms
     {
-        $candidates = $this->getCandidates1($filters);
         $frequentSets = [];
-        $frequentSets[0] = $this->filterByMinSup($candidates);
-//        for ($i = 1; empty($frequentSets[$i-1]); $i++) {
-//            $candidates = $this->aprioriGen($frequentSets[$i-1]);
-//            $frequentSets[$i] = $this->filterByMinSup($candidates);
-//        }
+        $frequentSets[0] = $this->getInitialFrequentSets($filters);
+        for ($i = 1; true; $i++) {
+            $candidates = $this->aprioriGen($frequentSets[$i-1]);
+            if (!$candidates) {
+                break;
+            }
+            $countedCandidates = $this->countCandidates($candidates, $filters);
+            $frequentSets[$i] = $this->filterByMinSup($countedCandidates);
+        }
         return $this->generateHistograms($frequentSets, $this->bookingsCount);
     }
 
-
-    private function getCandidates1a(Filters $filters = null): array
+    private function getInitialFrequentSets(Filters $filters = null): array
     {
-        $booking = $this->bookingsProvider->getSubset(0, 1);
         $candidates = [];
-        foreach ($booking->getBooleanFields() as $key => $value) {
-            $candidates[$key.""] = 1;
-        }
-    }
-
-    private function getCandidates1(Filters $filters = null): array
-    {
-        $c1 = [];
         $offset = 0;
         $batchSize = 1000;
         $bookingsCount = 0;
         while (!$this->bookingsProvider->hasEndBeenReached()) {
             $bookings = $this->bookingsProvider->getSubset($offset, $batchSize, $filters);
+            $bookingsCount += count($bookings);
             foreach ($bookings as $booking) {
-                $bookingsCount++;
-                foreach ($booking->getBooleanFields() as $key => $value) {
-                    if ($value) {
-                        if (!array_key_exists($key . $value, $c1)) {
-                            $c1[$key . $value] = [[$key=>$value], 0];
+                $fields = array_merge(
+                    $booking->getFieldsByType(bool::class),
+                    $booking->getFieldsByType(int::class),
+                    $booking->getFieldsByType(Distance::class),
+                    $booking->getFieldsByType(Price::class));
+
+                foreach ($fields as $field) {
+                    if ($field->hasValue()) {
+                        $name = $field->getName();
+                        $value = $field->getValue();
+                        if (!array_key_exists($name . $value, $candidates)) {
+                            $candidates[$name . $value] = [[$name=>$value], 0];
                         }
-                        $c1[$key . $value] = [[$key=>$value], $c1[$key . $value][1]+1];
-                    }
-                }
-                foreach ($booking->getIntegerFields() as $key => $value) {
-                    if (!array_key_exists($key . $value, $c1)) {
-                        $c1[$key . $value] = [[$key=>$value], 0];
-                    }
-                    $c1[$key . $value] = [[$key=>$value], $c1[$key . $value][1]+1];
-                }
-                foreach ($booking->getDistanceFields() as $key => $value) {
-                    if ($value != Distance::Empty) {
-                        if (!array_key_exists($key . $value, $c1)) {
-                            $c1[$key . $value] = [[$key=>$value], 0];
-                        }
-                        $c1[$key . $value] = [[$key=>$value], $c1[$key . $value][1]+1];
-                    }
-                }
-                foreach ($booking->getPricefields() as $key => $value) {
-                    if ($value != Price::Empty) {
-                        if (!array_key_exists($key . $value, $c1)) {
-                            $c1[$key . $value] = [[$key=>$value], 0];
-                        }
-                        $c1[$key . $value] = [[$key=>$value], $c1[$key . $value][1]+1];
+                        $candidates[$name . $value] = [[$name=>$value], $candidates[$name . $value][1]+1];
                     }
                 }
             }
         }
         $this->bookingsCount = $bookingsCount;
-        return $c1;
+        return $this->filterByMinSup($candidates);
+    }
+
+    private function countCandidates($candidates, Filters $filters = null): array
+    {
+        $countedCandidates = [];
+        $offset = 0;
+        $batchSize = 1000;
+        $bookingsCount = 0;
+        while (!$this->bookingsProvider->hasEndBeenReached()) {
+            $bookings = $this->bookingsProvider->getSubset($offset, $batchSize, $filters);
+            $bookingsCount += count($bookings);
+            foreach ($bookings as $booking) {
+                foreach ($candidates as $candidate) {
+                    $fields = $booking->getFieldsByNamesAndValue($candidate);
+                    if (count($fields) != count($candidate)) {
+                        continue;
+                    }
+                    $id = '';
+                    $c = [];
+                    foreach ($fields as $field) {
+                        if (!$field->hasValue()) {
+                            continue 2;
+                        }
+                        $name = $field->getName();
+                        $value = $field->getValue();
+                        $id = $id . $name . $value;
+                        $c[$name] = $value;
+                    }
+
+                    if (!array_key_exists($id, $countedCandidates)) {
+                        $countedCandidates[$id] = [$c, 0];
+                    }
+                    $countedCandidates[$id] = [$c, $countedCandidates[$id][1]+1];
+                }
+            }
+        }
+        return $countedCandidates;
     }
 
     private function filterByMinSup(array $candidates)
@@ -116,16 +132,26 @@ class AprioriAlgorithm
         return $histograms;
     }
 
-//    private function aprioriGen(array $oldFrequentSet)
-//    {
-//        $candidates = [];
-//        foreach ($oldFrequentSet as $base) {
-//            foreach ($oldFrequentSet as $additionalItems) {
-//                foreach ($additionalItems[0] as $additionalItem) {
-//                    $
-//                    $candidate = ;
-//                }
-//            }
-//        }
-//    }
+    private function aprioriGen(array $oldFrequentSet)
+    {
+        $candidates = [];
+        foreach ($oldFrequentSet as $frequentItem1) {
+            $base = $frequentItem1[0];
+            foreach ($oldFrequentSet as $frequentItem2) {
+                $additionalItems = $frequentItem2[0];
+                foreach ($additionalItems as $key => $additionalItem) {
+                    $candidate = $base;
+                    $candidate[$key] = $additionalItem;
+                    if (count($candidate) == count($base)+1) {
+                        // Generate unique key for the fields to prevent duplicates.
+                        ksort($candidate);
+                        $k = implode(array_keys($candidate)) . implode(array_values($candidate));
+
+                        $candidates[$k] = $candidate;
+                    }
+                }
+            }
+        }
+        return $candidates;
+    }
 }

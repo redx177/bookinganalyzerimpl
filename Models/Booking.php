@@ -13,22 +13,22 @@ class Booking
     {
         $this->id = $id;
         foreach ($dataTypeCluster->getIntegerFields() as $key => $value) {
-            array_push($this->fields, new IntegerField($key, $value));
+            $this->fields[] = new IntegerField($key, $value);
         }
         foreach ($dataTypeCluster->getBooleanFields() as $key => $value) {
-            array_push($this->fields, new BooleanField($key, $value));
+            $this->fields[] = new BooleanField($key, $value);
         }
         foreach ($dataTypeCluster->getFloatFields() as $key => $value) {
-            array_push($this->fields, new FloatField($key, $value));
+            $this->fields[] = new FloatField($key, $value);
         }
         foreach ($dataTypeCluster->getStringFields() as $key => $value) {
-            array_push($this->fields, new StringField($key, $value));
+            $this->fields[] = new StringField($key, $value);
         }
         foreach ($dataTypeCluster->getPriceFields() as $key => $value) {
-            array_push($this->fields, new PriceField($key, $value));
+            $this->fields[] = new PriceField($key, $value);
         }
         foreach ($dataTypeCluster->getDistanceFields() as $key => $value) {
-            array_push($this->fields, new DistanceField($key, $value));
+            $this->fields[] = new DistanceField($key, $value);
         }
     }
 
@@ -51,7 +51,7 @@ class Booking
         $fields = [];
         foreach ($this->fields as $field) {
             if ($type == $field->getType()) {
-                array_push($fields, $field);
+                $fields[] = $field;
             }
         }
         return $fields;
@@ -70,5 +70,22 @@ class Booking
             }
         }
         throw new Exception('Field with name ' . $name . ' can not be found.');
+    }
+
+    /**
+     * Gets fields by matching name and value.
+     * @param array $fieldNameAndValue Array of field names and values to check.
+     * @return array Fields which matches $fieldNames
+     */
+    public function getFieldsByNamesAndValue($fieldNameAndValue) {
+        $fields = [];
+        foreach ($fieldNameAndValue as $key => $value) {
+            $field = $this->getFieldByName($key);
+            if ($field->getValue() == $value) {
+                $fields[] = $field;
+            }
+
+        }
+        return $fields;
     }
 }
