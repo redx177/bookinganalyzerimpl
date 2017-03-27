@@ -43,6 +43,9 @@ class AprioriAlgorithm
         $batchSize = 1000;
         $bookingsCount = 0;
         while (!$this->bookingsProvider->hasEndBeenReached()) {
+            if ($offset >= 1000) {
+                break;
+            }
             $bookings = $this->bookingsProvider->getSubset($offset, $batchSize, $filters);
             $bookingsCount += count($bookings);
             foreach ($bookings as $booking) {
@@ -63,6 +66,7 @@ class AprioriAlgorithm
                     }
                 }
             }
+            $offset += $batchSize;
         }
         $this->bookingsCount = $bookingsCount;
         return $this->filterByMinSup($candidates);
@@ -75,6 +79,9 @@ class AprioriAlgorithm
         $batchSize = 1000;
         $bookingsCount = 0;
         while (!$this->bookingsProvider->hasEndBeenReached()) {
+            if ($offset >= 1000) {
+                break;
+            }
             $bookings = $this->bookingsProvider->getSubset($offset, $batchSize, $filters);
             $bookingsCount += count($bookings);
             foreach ($bookings as $booking) {
@@ -101,6 +108,7 @@ class AprioriAlgorithm
                     $countedCandidates[$id] = [$c, $countedCandidates[$id][1]+1];
                 }
             }
+            $offset += $batchSize;
         }
         return $countedCandidates;
     }
@@ -121,11 +129,15 @@ class AprioriAlgorithm
         $setSize = 1;
         $histograms = new Histograms();
         foreach ($frequentSets as $frequentSet) {
-            $histogram = new Histogram();
+            if (count($frequentSet) === 0) {
+                break;
+            }
+
+            $histogram = new Histogram($setSize);
             foreach ($frequentSet as $key => $value) {
                 $histogram->addHistogramBin(new HistogramBin($value[0], $value[1], $bookingsCount));
             }
-            $histograms->addHistogram($setSize, $histogram);
+            $histograms->addHistogram($histogram);
             $setSize++;
         }
 

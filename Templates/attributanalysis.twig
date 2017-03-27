@@ -9,7 +9,9 @@
 
     {{ include('filters.twig') }}
 
-    <div class="container">
-        {{ include('bookingsListing.twig') }}
-    </div>
+    {% if histograms %}
+        <div class="container">
+            {{ include('histogramsAsTable.twig') }}
+        </div>
+    {% endif %}
 {% endblock %}

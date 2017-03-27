@@ -85,6 +85,7 @@ class AprioriAlgorithmTest extends TestCase
         $this->assertEquals(1, count($histogramBins));
         $this->assertEquals(['ROOMS'=>$rooms], $histogramBins[0]->getFields());
         $this->assertEquals(3, $histogramBins[0]->getCount());
+        $this->assertEquals(3, $histogramBins[0]->getTotal());
     }
 
     /**
@@ -249,6 +250,7 @@ class AprioriAlgorithmTest extends TestCase
         $this->assertEquals(1, count($histogramBins));
         $this->assertEquals(['ROOMS' => 7,'BEDROOMS' => 8], $histogramBins[0]->getFields());
         $this->assertEquals(3, $histogramBins[0]->getCount());
+        $this->assertEquals(3, $histogramBins[0]->getTotal());
     }
 
     /**
@@ -283,11 +285,14 @@ class AprioriAlgorithmTest extends TestCase
         $sut = new AprioriAlgorithm($bookingsProviderMock, $this->configMock);
         $histograms = $sut->run();
 
+        $this->assertEquals(3, count($histograms->getAll()));
+
         $histogram2 = $histograms->getHistogram(2);
         $histogramBins2 = $histogram2->getHistogramBins();
         $this->assertEquals(3, count($histogramBins2));
         $this->assertEquals(['ROOMS' => 7,'BEDROOMS' => 8], $histogramBins2[0]->getFields());
         $this->assertEquals(3, $histogramBins2[0]->getCount());
+        $this->assertEquals(3, $histogramBins2[0]->getTotal());
         $this->assertEquals(['ROOMS' => 7, 'STARS' => 9], $histogramBins2[1]->getFields());
         $this->assertEquals(3, $histogramBins2[1]->getCount());
         $this->assertEquals(['BEDROOMS' => 8, 'STARS' => 9], $histogramBins2[2]->getFields());
@@ -298,5 +303,6 @@ class AprioriAlgorithmTest extends TestCase
         $this->assertEquals(1, count($histogramBins3));
         $this->assertEquals(['ROOMS' => 7,'BEDROOMS' => 8, 'STARS' => 9], $histogramBins3[0]->getFields());
         $this->assertEquals(3, $histogramBins3[0]->getCount());
+        $this->assertEquals(3, $histogramBins3[0]->getTotal());
     }
 }

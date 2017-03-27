@@ -7,15 +7,19 @@ spl_autoload_register(function ($classname) {
     Autoloader::load($classname);
 });
 
+/* CONFIG */
 $config = new ConfigProvider($GLOBALS['configContent']);
 
+/* TWIG */
 $loader = new Twig_Loader_Filesystem(__DIR__ . '/Templates');
 $twig = new Twig_Environment($loader, array(
     'debug' => true,
     //'cache' => __DIR__ . '/compilation_cache',
 ));
+$twig->addFunction(new Twig_Function('sortHistogramBinsByCount', 'sortHistogramBinsByCount'));
 $twig->addExtension(new Twig_Extension_Debug());
 
+/* DI CONTAINER */
 $builder = new DI\ContainerBuilder();
 $builder->addDefinitions(array(
     Twig_Environment::class => $twig,
@@ -24,6 +28,7 @@ $builder->addDefinitions(array(
 ));
 $container = $builder->build();
 
+/* CONTROLLER */
 $controller = null;
 $getKeys = array_keys($_REQUEST);
 if (in_array('attributanalysis', $getKeys)) {
@@ -37,3 +42,19 @@ if (in_array('attributanalysis', $getKeys)) {
 }
 
 echo $controller->render();
+
+
+
+
+
+function sortHistogramBinsByCount($histogramBins) {
+    usort($histogramBins, function(HistogramBin $a, HistogramBin $b) {
+        $aCount = $a->getCount();
+        $bCount = $b->getCount();
+        if ($aCount == $bCount) {
+            return 0;
+        }
+        return $aCount > $bCount ? -1 : 1;
+    });
+    return $histogramBins;
+}

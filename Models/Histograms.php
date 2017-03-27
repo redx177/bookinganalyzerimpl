@@ -4,14 +4,32 @@ class Histograms
 {
     private $histograms = [];
 
-    public function addHistogram(int $setSize, Histogram $histogram) {
-        $this->histograms[$setSize] = $histogram;
+    public function addHistogram(Histogram $histogram) {
+        $this->histograms[] = $histogram;
     }
 
     public function getHistogram(int $setSize) : ?Histogram {
-        if (!array_key_exists($setSize, $this->histograms)) {
-            return null;
+        foreach ($this->histograms as $histogram) {
+            if ($setSize == $histogram->getSetSize()) {
+                return $histogram;
+            }
         }
-        return $this->histograms[$setSize];
+        return null;
+    }
+
+    public function getAll() : array {
+        return $this->histograms;
+    }
+
+    public function getTotal() : int {
+        if (count($this->histograms) == 0) {
+            return 0;
+        }
+        $histogramBins = $this->histograms[1]->getHistogramBins();
+
+        if (count($histogramBins) == 0) {
+            return 0;
+        }
+        return $histogramBins[0]->getTotal();
     }
 }

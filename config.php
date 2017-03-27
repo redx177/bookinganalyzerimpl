@@ -43,5 +43,5 @@ $configContent = array(
     ],
     'filterButtonTitle' => 'Apply Fiters',
     'runButtonTitle' => 'Run analysis',
-    'aprioriMinSup' => '100',
+    'aprioriMinSup' => 500,
 );

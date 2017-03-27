@@ -6,28 +6,28 @@ class HistogramBin
     private $count;
     private $total;
 
-    public function __construct($fields, $count, $total)
+    public function __construct(array $fields, int $count, int $total)
     {
         $this->fields = $fields;
         $this->count = $count;
-        $this->toxtal = $total;
+        $this->total = $total;
     }
-    public function getFields()
+    public function getFields() : array
     {
         return $this->fields;
     }
 
-    public function getCount()
+    public function getCount() : int
     {
         return $this->count;
     }
 
-    public function getTotal()
+    public function getTotal() : int
     {
         return $this->total;
     }
 
-    public function getPercentage()
+    public function getPercentage() : float
     {
         return $this->count * 100 / $this->total;
     }
