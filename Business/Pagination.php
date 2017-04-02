@@ -80,7 +80,7 @@ class Pagination {
         if ($currentFirstIndexOnPage == $calculatedFirstIndexOnPage) {
             return $providedPage;
         }
-        return (int)($currentFirstIndexOnPage / $this->getPageSize());
+        return (int)($currentFirstIndexOnPage / $this->getPageSize())+1;
 
     }
 }

@@ -43,6 +43,9 @@
      {
          $filters = $this->filtersProvider->get($_REQUEST);
          $data = $this->bookingsProvider->getSubset($this->pagination->getPageSize(), $filters, $this->pagination->getCurrentPageFirstItemIndex());
+         if (!$data) {
+             $data = $this->bookingsProvider->getLastPageItems();
+         }
 
          $template = $this->twig->load('explore.twig');
          $indices = array_keys($data);

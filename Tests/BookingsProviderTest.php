@@ -117,7 +117,7 @@ class BookingsProviderTest extends TestCase
     /**
      * @test
      */
-    public function from99999999AndCount2ShouldReturn1ItemsAndSkipping2() {
+    public function from99999999AndCount2ShouldReturn0Items() {
         $this->csvIteratorMock
             ->expects($this->exactly(count($this->mockData)))
             ->method('next');
@@ -130,7 +130,7 @@ class BookingsProviderTest extends TestCase
     /**
      * @test
      */
-    public function from0AndCount99999999ShouldReturn1ItemsAndSkipping2() {
+    public function from0AndCount99999999ShouldReturn1ItemsAndSkipping0() {
         $this->csvIteratorMock
             ->expects($this->exactly(count($this->mockData)))
             ->method('next');
@@ -429,4 +429,35 @@ class BookingsProviderTest extends TestCase
 //
 //        $this->assertEquals(1, $itemCount);
 //    }
+
+    /**
+     * @test
+     */
+    public function getLastPageShouldBeFullyPopulatedIfFromIsToHigh() {
+        $this->csvIteratorMock
+            ->expects($this->exactly(count($this->mockData)))
+            ->method('next');
+        $sut = new BookingsProvider($this->csvIteratorMock, $this->dataTypeClustererMock, $this->configMock);
+        $sut->getSubset(2, null,99999999);
+        $data = $sut->getLastPageItems();
+
+        $this->assertEquals(2, count($data));
+        $this->assertEquals(39, $data[8]->getId());
+        $this->assertEquals(40, $data[9]->getId());
+    }
+
+    /**
+     * @test
+     */
+    public function getLastPageShouldBePartiallyPopulatedIfFromIsToHigh() {
+        $this->csvIteratorMock
+            ->expects($this->exactly(count($this->mockData)))
+            ->method('next');
+        $sut = new BookingsProvider($this->csvIteratorMock, $this->dataTypeClustererMock, $this->configMock);
+        $sut->getSubset(3, null,99999999);
+        $data = $sut->getLastPageItems();
+
+        $this->assertEquals(1, count($data));
+        $this->assertEquals(40, $data[9]->getId());
+    }
 }

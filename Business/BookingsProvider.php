@@ -8,6 +8,11 @@ class BookingsProvider {
     private $hasEndBeenReached = false;
 
     /**
+     * @var SplQueue
+     */
+    private $lastPageItems;
+
+    /**
      * DataProvider constructor.
      * @param BookingDataIterator $bookingDataIterator Iterator to access data.
      * @param DataTypeClusterer $dataTypeClusterer Data type clusterer to group raw booking data.
@@ -49,6 +54,12 @@ class BookingsProvider {
             if (!$this->applyFilters($booking, $filters)) {
                 continue;
             }
+
+            if (($matches-$from) % $count === 0) {
+                $this->lastPageItems = new SplQueue();
+            }
+            $this->lastPageItems->enqueue($booking);
+
             $data[$lineNumber] = $booking;
             $lineNumber++;
             $matches++;
@@ -160,10 +171,6 @@ class BookingsProvider {
                 break;
             }
 
-            if (($i-$from) % $count === 0) {
-                $bookingsQueue = new SplQueue();
-            }
-
             $rawBooking = $this->bookingDataIterator->current();
             $booking = $this->getBooking($rawBooking);
 
@@ -171,6 +178,10 @@ class BookingsProvider {
             if (!$this->applyFilters($booking, $filters)) {
                 $this->bookingDataIterator->next();
                 continue;
+            }
+
+            if ($bookingsQueue->count() % $count === 0) {
+                $bookingsQueue = new SplQueue();
             }
 
             // Check if queue limit has been reached.
@@ -182,6 +193,17 @@ class BookingsProvider {
             $this->bookingDataIterator->next();
             $i++;
         }
+        $this->lastPageItems = $bookingsQueue;
         return $i;
+    }
+
+    public function getLastPageItems()
+    {
+        $lastPage = [];
+        while (!$this->lastPageItems->isEmpty() && $data = $this->lastPageItems->dequeue())
+        {
+            $lastPage[$data['line']] = $data['booking'];
+        }
+        return $lastPage;
     }
 }

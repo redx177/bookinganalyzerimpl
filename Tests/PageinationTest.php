@@ -123,12 +123,24 @@ class PageinationTest extends TestCase
     /**
      * @test
      */
-    public function currentPageShouldBeFixedIfInvalidValueProvided() {
+    public function currentPageShouldBeFixedIfInvalidPageProvided() {
         $_REQUEST['page'] = 99;
-        $currentFistIndexOnPage = 20;
+        $currentFistIndexOnPage = 5;
         $sut = new Pagination($this->configMock, $this->dataProviderMock);
 
         $fixedPage = $sut->fixPageValue($currentFistIndexOnPage);
-        $this->assertEquals(5,$fixedPage);
+        $this->assertEquals(2,$fixedPage);
+    }
+
+    /**
+     * @test
+     */
+    public function currentPageShouldBeFixedIfInvalidPageAndFirstIndexProvided() {
+        $_REQUEST['page'] = 99;
+        $currentFistIndexOnPage = 6;
+        $sut = new Pagination($this->configMock, $this->dataProviderMock);
+
+        $fixedPage = $sut->fixPageValue($currentFistIndexOnPage);
+        $this->assertEquals(2,$fixedPage);
     }
 }
