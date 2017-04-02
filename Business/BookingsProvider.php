@@ -1,6 +1,6 @@
 <?php
 class BookingsProvider {
-    private $csvIterator;
+    private $bookingDataIterator;
     private $dataTypeClusterer;
     private $idField;
     private $atLeastFilterFields;
@@ -9,13 +9,13 @@ class BookingsProvider {
 
     /**
      * DataProvider constructor.
-     * @param CsvIterator $csvIterator Iterator to access data.
+     * @param BookingDataIterator $bookingDataIterator Iterator to access data.
      * @param DataTypeClusterer $dataTypeClusterer Data type clusterer to group raw booking data.
      * @param ConfigProvider $config Configuration provider.
      */
-    public function __construct(CsvIterator $csvIterator, DataTypeClusterer $dataTypeClusterer, ConfigProvider $config)
+    public function __construct(BookingDataIterator $bookingDataIterator, DataTypeClusterer $dataTypeClusterer, ConfigProvider $config)
     {
-        $this->csvIterator = $csvIterator;
+        $this->bookingDataIterator = $bookingDataIterator;
         $this->dataTypeClusterer = $dataTypeClusterer;
         $this->idField = $config->get('idField');
         $this->atLeastFilterFields = $config->get('atLeastFilterFields');
@@ -23,77 +23,55 @@ class BookingsProvider {
 
     /**
      * Gets a subset of data.
-     * @param $from Start index to retrieve data from. Count is starting from index 0
-     * @param $count Number of elements to get.
+     * @param int $count Number of elements to get.
      * @param Filters|null $filters Filters to apply to the booking data
+     * @param int $from Start index to retrieve data from. Count is starting from index 0
      * @return array Requested data. Array of Booking
      */
-    public function getSubset($from, $count, Filters $filters = null)
+    public function getSubset(int $count, Filters $filters = null, int $from = 0)
     {
-        $this->csvIterator->rewind();
-
-        // Store the last bookings in case $from is higher than the total count of bookings
-        $bookingsQueue = new SplQueue();
-        if ($this->nextItem != null) {
-            $bookingsQueue->enqueue($this->nextItem);
-            $from += 1;
+        $lineNumber = 0;
+        if ($this->bookingDataIterator->key() != $from) {
+            $lineNumber = $this->rewindAndSkipToFrom($from, $count, $filters);
         }
-        $i = 0;
-        while ($i < $from+$count) {
-            // If end of bookings have been reached, exit for loop.
-            if (!$this->csvIterator->valid()) {
+
+        $data = [];
+        for ($matches = 0; $matches < $count; ) {
+            if (!$this->bookingDataIterator->valid()) {
                 break;
             }
 
-            if (($i-$from) % $count === 0) {
-                $bookingsQueue = new SplQueue();
-            }
-
-            $rawBooking = $this->csvIterator->current();
+            $rawBooking = $this->bookingDataIterator->current();
+            $this->bookingDataIterator->next();
             $booking = $this->getBooking($rawBooking);
 
             // Check if the current $booking matches the provided filters.
             if (!$this->applyFilters($booking, $filters)) {
-                $this->csvIterator->next();
                 continue;
             }
-
-            // Check if queue limit has been reached.
-            if ($bookingsQueue->count() == $count) {
-                $bookingsQueue->dequeue();
-            }
-
-            $bookingsQueue->enqueue(['line' => $i, 'booking' => $booking]);
-            $this->csvIterator->next();
-            $i++;
-        }
-
-        $data = [];
-        $bookingsQueueCount = $bookingsQueue->count();
-        for ($i = 0; $i < $bookingsQueueCount; $i++) {
-            $lineNumberAndBooking = $bookingsQueue->dequeue();
-            $data[$lineNumberAndBooking['line']] = $lineNumberAndBooking['booking'];
+            $data[$lineNumber] = $booking;
+            $lineNumber++;
+            $matches++;
         }
 
         // Check next item to know if the end has been reached.
         $this->nextItem = null;
         do {
-            $this->csvIterator->next();
-
             // Next item is invalid, so end has been reached.
-            if (!$this->csvIterator->valid()) {
+            if (!$this->bookingDataIterator->valid()) {
                 $this->hasEndBeenReached = true;
                 break;
             }
 
-            $rawBooking = $this->csvIterator->current();
+            $rawBooking = $this->bookingDataIterator->current();
             $booking = $this->getBooking($rawBooking);
 
             // If filters apply, store the item. Else continue with the next.
             if ($this->applyFilters($booking, $filters)) {
-                $this->nextItem = ['line' => $i, 'booking' => $booking];
+                $this->nextItem = ['line' => $matches, 'booking' => $booking];
                 break;
             }
+            $this->bookingDataIterator->next();
 
         } while (true);
 
@@ -107,7 +85,7 @@ class BookingsProvider {
 //    public function getItemCount()
 //    {
 //        $itemCount = 0;
-//        for ($this->csvIterator->rewind();$this->csvIterator->valid();$this->csvIterator->next()) {
+//        for ($this->bookingDataIterator->rewind();$this->bookingDataIterator->valid();$this->bookingDataIterator->next()) {
 //            $itemCount++;
 //        }
 //        return $itemCount;
@@ -128,28 +106,28 @@ class BookingsProvider {
         }
 
         foreach ($filters->getFilters() as $filter) {
-            $filterValue = $filter->getValue();
+            $filterField = $filter->getValue();
             $filterName = $filter->getName();
-            if (!$filterValue) {
+            if (!$filterField) {
                 continue;
             }
 
             $field = $booking->getFieldByName($filterName);
             $bookingValue = $field->getValue();
-
+            $filterFieldValue = $filterField->getValue();
             if (in_array($filterName, $this->atLeastFilterFields)) {
-                if ($bookingValue < $filterValue) {
+                if ($bookingValue < $filterFieldValue) {
                     return false;
                 }
                 continue;
             }
-            if (is_array($filterValue)) {
-                if (!in_array($bookingValue, $filterValue)) {
+            if (is_array($filterFieldValue)) {
+                if (!in_array($bookingValue, $filterFieldValue)) {
                     return false;
                 }
                 continue;
             }
-            if ($bookingValue != $filterValue) {
+            if ($bookingValue != $filterFieldValue) {
                 return false;
             }
         }
@@ -163,5 +141,47 @@ class BookingsProvider {
     public function hasEndBeenReached()
     {
         return $this->hasEndBeenReached;
+    }
+
+    private function rewindAndSkipToFrom($from, $count, $filters = null)
+    {
+        $this->bookingDataIterator->rewind();
+
+        // Store the last bookings in case $from is higher than the total count of bookings
+        $bookingsQueue = new SplQueue();
+        if ($this->nextItem != null) {
+            $bookingsQueue->enqueue($this->nextItem);
+            $from += 1;
+        }
+        $i = 0;
+        while ($i < $from) {
+            // If end of bookings have been reached, exit for loop.
+            if (!$this->bookingDataIterator->valid()) {
+                break;
+            }
+
+            if (($i-$from) % $count === 0) {
+                $bookingsQueue = new SplQueue();
+            }
+
+            $rawBooking = $this->bookingDataIterator->current();
+            $booking = $this->getBooking($rawBooking);
+
+            // Check if the current $booking matches the provided filters.
+            if (!$this->applyFilters($booking, $filters)) {
+                $this->bookingDataIterator->next();
+                continue;
+            }
+
+            // Check if queue limit has been reached.
+            if ($bookingsQueue->count() == $count) {
+                $bookingsQueue->dequeue();
+            }
+
+            $bookingsQueue->enqueue(['line' => $i, 'booking' => $booking]);
+            $this->bookingDataIterator->next();
+            $i++;
+        }
+        return $i;
     }
 }

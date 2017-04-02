@@ -4,6 +4,7 @@ class AprioriAlgorithm
 {
     private $bookingsProvider;
     private $bookingsCount;
+    private $bookingsCountCap;
 
     /**
      * AprioriAlgorithm constructor.
@@ -14,6 +15,7 @@ class AprioriAlgorithm
     {
         $this->bookingsProvider = $bookingsProvider;
         $this->minSup = $config->get('aprioriMinSup');
+        $this->bookingsCountCap = $config->get('bookingsCountCap');
     }
 
     /**
@@ -43,10 +45,10 @@ class AprioriAlgorithm
         $batchSize = 1000;
         $bookingsCount = 0;
         while (!$this->bookingsProvider->hasEndBeenReached()) {
-            if ($offset >= 1000) {
+            if ($this->bookingsCountCap && $offset >= $this->bookingsCountCap) {
                 break;
             }
-            $bookings = $this->bookingsProvider->getSubset($offset, $batchSize, $filters);
+            $bookings = $this->bookingsProvider->getSubset($batchSize, $filters);
             $bookingsCount += count($bookings);
             foreach ($bookings as $booking) {
                 $fields = array_merge(
@@ -79,26 +81,24 @@ class AprioriAlgorithm
         $batchSize = 1000;
         $bookingsCount = 0;
         while (!$this->bookingsProvider->hasEndBeenReached()) {
-            if ($offset >= 1000) {
+            if ($this->bookingsCountCap && $offset >= $this->bookingsCountCap) {
                 break;
             }
-            $bookings = $this->bookingsProvider->getSubset($offset, $batchSize, $filters);
+            $bookings = $this->bookingsProvider->getSubset($batchSize, $filters);
             $bookingsCount += count($bookings);
             foreach ($bookings as $booking) {
                 foreach ($candidates as $candidate) {
-                    $fields = $booking->getFieldsByNamesAndValue($candidate);
-                    if (count($fields) != count($candidate)) {
-                        continue;
-                    }
                     $id = '';
                     $c = [];
-                    foreach ($fields as $field) {
-                        if (!$field->hasValue()) {
+                    foreach ($candidate as $key => $value) {
+                        $field = $booking->getFieldByName($key);
+                        if (!$field) {
+                            // This candidate does not match this booking, so go to next candidate.
                             continue 2;
                         }
                         $name = $field->getName();
                         $value = $field->getValue();
-                        $id = $id . $name . $value;
+                        $id .= $value . $name;
                         $c[$name] = $value;
                     }
 

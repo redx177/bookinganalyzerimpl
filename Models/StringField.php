@@ -26,7 +26,7 @@ class StringField implements Field
         return $this->value != '';
     }
 
-    public function getType()
+    public static function getType()
     {
         return string::class;
     }

@@ -4,7 +4,7 @@
  * Iterator for CSV file.
  * First line will be treatened as header line with names and will never be returned.
  */
-class CsvIterator implements Iterator {
+class LoadIncrementalCsvDataIterator implements BookingDataIterator {
     private $filePointer;
     private $currentRowNumber = 0;
     private $currentLine = false;
@@ -97,11 +97,12 @@ class CsvIterator implements Iterator {
      */
     public function rewind()
     {
-        $this->currentRowNumber = 0;
         rewind($this->filePointer);
 
         // Skipping field name line.
         $this->next();
+
+        $this->currentRowNumber = 0;
 
         // Loading first line.
         $this->next();

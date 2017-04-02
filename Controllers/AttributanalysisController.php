@@ -33,9 +33,13 @@ class AttributanalysisController implements Controller {
      public function render()
      {
          $histograms = [];
+         $runtime = 0;
          if (array_key_exists('action', $_REQUEST) && $_REQUEST['action'] == 'run') {
              $filters = $this->filtersProvider->get($_REQUEST);
+             $startTime = microtime(TRUE);
              $histograms = $this->apriori->run($filters);
+             $endTime = microtime(TRUE);
+             $runtime = $endTime - $startTime;
          }
 
          $template = $this->twig->load('attributanalysis.twig');
@@ -44,6 +48,7 @@ class AttributanalysisController implements Controller {
              'histograms' => $histograms,
              'fieldTitles' => $this->config->get('fieldNameMapping'),
              'buttonConfigs' => [new ButtonConfig($this->config->get('runButtonTitle'), 'run')],
+             'runtimeInSeconds' => number_format($runtime, 4),
             ));
      }
  }

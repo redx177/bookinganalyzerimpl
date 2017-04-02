@@ -3,6 +3,7 @@ class Booking
 {
     private $id;
     private $fields = [];
+    private $fieldsByType = [];
 
     /**
      * Booking constructor.
@@ -12,24 +13,20 @@ class Booking
     public function __construct(int $id, DataTypeCluster $dataTypeCluster)
     {
         $this->id = $id;
-        foreach ($dataTypeCluster->getIntegerFields() as $key => $value) {
-            $this->fields[] = new IntegerField($key, $value);
-        }
-        foreach ($dataTypeCluster->getBooleanFields() as $key => $value) {
-            $this->fields[] = new BooleanField($key, $value);
-        }
-        foreach ($dataTypeCluster->getFloatFields() as $key => $value) {
-            $this->fields[] = new FloatField($key, $value);
-        }
-        foreach ($dataTypeCluster->getStringFields() as $key => $value) {
-            $this->fields[] = new StringField($key, $value);
-        }
-        foreach ($dataTypeCluster->getPriceFields() as $key => $value) {
-            $this->fields[] = new PriceField($key, $value);
-        }
-        foreach ($dataTypeCluster->getDistanceFields() as $key => $value) {
-            $this->fields[] = new DistanceField($key, $value);
-        }
+
+        $this->fieldsByType[IntegerField::getType()] = $dataTypeCluster->getIntegerFields();
+        $this->fieldsByType[BooleanField::getType()] = $dataTypeCluster->getBooleanFields();
+        $this->fieldsByType[FloatField::getType()] = $dataTypeCluster->getFloatFields();
+        $this->fieldsByType[StringField::getType()] = $dataTypeCluster->getStringFields();
+        $this->fieldsByType[PriceField::getType()] = $dataTypeCluster->getPriceFields();
+        $this->fieldsByType[DistanceField::getType()] = $dataTypeCluster->getDistanceFields();
+
+        $this->fields = array_merge($this->fieldsByType[IntegerField::getType()],
+            $this->fieldsByType[BooleanField::getType()],
+            $this->fieldsByType[FloatField::getType()],
+            $this->fieldsByType[StringField::getType()],
+            $this->fieldsByType[PriceField::getType()],
+            $this->fieldsByType[DistanceField::getType()]);
     }
 
     public function getId() : int
@@ -48,13 +45,7 @@ class Booking
      * @return array Fields for the given type.
      */
     public function getFieldsByType(string $type) {
-        $fields = [];
-        foreach ($this->fields as $field) {
-            if ($type == $field->getType()) {
-                $fields[] = $field;
-            }
-        }
-        return $fields;
+        return $this->fieldsByType[$type];
     }
 
     /**
@@ -63,13 +54,8 @@ class Booking
      * @return Field Field which matches the name.
      * @throws Exception If field with the given name can not be found.
      */
-    public function getFieldByName(string $name) {
-        foreach ($this->fields as $field) {
-            if ($name == $field->getName()) {
-                return $field;
-            }
-        }
-        throw new Exception('Field with name ' . $name . ' can not be found.');
+    public function getFieldByName(string $name) : Field {
+        return $this->fields[$name];
     }
 
     /**

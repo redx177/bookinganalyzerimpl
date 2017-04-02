@@ -42,7 +42,7 @@
      public function render()
      {
          $filters = $this->filtersProvider->get($_REQUEST);
-         $data = $this->bookingsProvider->getSubset($this->pagination->getCurrentPageFirstItemIndex(), $this->pagination->getPageSize(), $filters);
+         $data = $this->bookingsProvider->getSubset($this->pagination->getPageSize(), $filters, $this->pagination->getCurrentPageFirstItemIndex());
 
          $template = $this->twig->load('explore.twig');
          $indices = array_keys($data);

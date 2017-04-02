@@ -1,7 +1,7 @@
 <?php
 use \PHPUnit\Framework\TestCase;
 
-class CsvIteratorMock {
+class LoadIncrementalCsvDataIteratorMock {
     /**
      * Setup methods required to mock an iterator
      *
@@ -12,7 +12,7 @@ class CsvIteratorMock {
     static public function get(TestCase $testCase, array $items)
     {
 
-        $csvIteratorMock = $testCase->getMockBuilder(CsvIterator::class)
+        $csvIteratorMock = $testCase->getMockBuilder(LoadIncrementalCsvDataIterator::class)
             ->disableOriginalConstructor()
             ->getMock('');
 

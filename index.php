@@ -1,11 +1,41 @@
 <?php
 require_once __DIR__ . '/vendor/autoload.php';
 require_once __DIR__ . '/config.php';
-require_once __DIR__ . '/Utilities/Autoloader.php';
+//require_once __DIR__ . '/Utilities/Autoloader.php';
+require_once __DIR__ . '/Interfaces/BookingDataIterator.php';
+require_once __DIR__ . '/Interfaces/Controller.php';
+require_once __DIR__ . '/Business/AprioriAlgorithm.php';
+require_once __DIR__ . '/Business/BookingsProvider.php';
+require_once __DIR__ . '/Business/DataTypeClusterer.php';
+require_once __DIR__ . '/Business/FiltersProvider.php';
+require_once __DIR__ . '/Business/Pagination.php';
+require_once __DIR__ . '/Controllers/AttributanalysisController.php';
+require_once __DIR__ . '/Controllers/ExploreController.php';
+require_once __DIR__ . '/Models/Field.php';
+require_once __DIR__ . '/Models/Booking.php';
+require_once __DIR__ . '/Models/BooleanField.php';
+require_once __DIR__ . '/Models/ButtonConfig.php';
+require_once __DIR__ . '/Models/DataTypeCluster.php';
+require_once __DIR__ . '/Models/Distance.php';
+require_once __DIR__ . '/Models/DistanceField.php';
+require_once __DIR__ . '/Models/Filter.php';
+require_once __DIR__ . '/Models/Filters.php';
+require_once __DIR__ . '/Models/FloatField.php';
+require_once __DIR__ . '/Models/Histogram.php';
+require_once __DIR__ . '/Models/HistogramBin.php';
+require_once __DIR__ . '/Models/Histograms.php';
+require_once __DIR__ . '/Models/IntegerField.php';
+require_once __DIR__ . '/Models/Price.php';
+require_once __DIR__ . '/Models/PriceField.php';
+require_once __DIR__ . '/Models/StringField.php';
+require_once __DIR__ . '/Utilities/ConfigProvider.php';
+require_once __DIR__ . '/Utilities/LoadAllCsvDataIterator.php';
+require_once __DIR__ . '/Utilities/LoadIncrementalCsvDataIterator.php';
+require_once __DIR__ . '/Utilities/UrlGenerator.php';
 
-spl_autoload_register(function ($classname) {
-    Autoloader::load($classname);
-});
+//spl_autoload_register(function ($classname) {
+//    Autoloader::load($classname);
+//});
 
 /* CONFIG */
 $config = new ConfigProvider($GLOBALS['configContent']);
@@ -23,7 +53,8 @@ $twig->addExtension(new Twig_Extension_Debug());
 $builder = new DI\ContainerBuilder();
 $builder->addDefinitions(array(
     Twig_Environment::class => $twig,
-    CsvIterator::class => new CsvIterator($config->get('dataSource')),
+    BookingDataIterator::class => new LoadIncrementalCsvDataIterator($config->get('dataSource')),
+    //BookingDataIterator::class => new LoadAllCsvDataIterator($config->get('dataSource')),
     ConfigProvider::class => $config
 ));
 $container = $builder->build();

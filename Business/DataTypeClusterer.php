@@ -33,39 +33,46 @@ class DataTypeClusterer
         $distanceFields = [];
         foreach ($this->floatFields as $fieldName) {
             if (array_key_exists($fieldName, $rawData)) {
-                $floatFields[$fieldName] = (float)$rawData[$fieldName];
+                $floatValue = (float)$rawData[$fieldName];
+                $floatFields[$fieldName] = new FloatField($fieldName, $floatValue);
             }
         }
         foreach ($this->booleanFields as $fieldName) {
             if (array_key_exists($fieldName, $rawData)) {
-                $booleanFields[$fieldName] = $rawData[$fieldName] !== '0.0' && $rawData[$fieldName];
+                $boolValue = $rawData[$fieldName] !== '0.0' && $rawData[$fieldName];
+                $booleanFields[$fieldName] = new BooleanField($fieldName, $boolValue);
             }
         }
         foreach ($this->integerFields as $fieldName) {
             if (array_key_exists($fieldName, $rawData)) {
                 if (is_array($rawData[$fieldName])) {
-                    $integerFields[$fieldName] = [];
+                    $intValues = [];
                     foreach ($rawData[$fieldName] as $value) {
-                        array_push($integerFields[$fieldName], (int)$value);
+                        $intValues[] = (int)$value;
                     }
+                    $integerFields[$fieldName] = new IntegerField($fieldName, $intValues);
                 } else {
-                    $integerFields[$fieldName] = (int)$rawData[$fieldName];
+                    $intValue = (int)$rawData[$fieldName];
+                    $integerFields[$fieldName] = new IntegerField($fieldName, $intValue);
                 }
             }
         }
         foreach ($this->stringFields as $fieldName) {
             if (array_key_exists($fieldName, $rawData)) {
-                $stringFields[$fieldName] = $rawData[$fieldName];
+                $stringValue = $rawData[$fieldName];
+                $stringFields[$fieldName] = new StringField($fieldName, $stringValue);
             }
         }
         foreach ($this->priceFields as $fieldName) {
             if (array_key_exists($fieldName, $rawData)) {
-                $priceFields[$fieldName] = $this->getPrice($rawData[$fieldName]);
+                $priceValue = $this->getPrice($rawData[$fieldName]);
+                $priceFields[$fieldName] = new PriceField($fieldName, $priceValue);
             }
         }
         foreach ($this->distanceFields as $fieldName) {
             if (array_key_exists($fieldName, $rawData)) {
-                $distanceFields[$fieldName] = $this->getDistance($rawData[$fieldName]);
+                $distanceValue = $this->getDistance($rawData[$fieldName]);
+                $distanceFields[$fieldName] = new DistanceField($fieldName, $distanceValue);
             }
         }
         return new DataTypeCluster($integerFields, $booleanFields, $floatFields, $stringFields, $priceFields, $distanceFields);
@@ -73,9 +80,10 @@ class DataTypeClusterer
 
     private function getPrice($value)
     {
-        if (strtolower($value) == 'budget') {
+        $lowerCaseValue = strtolower($value);
+        if ($lowerCaseValue == 'budget') {
             return Price::Budget;
-        } elseif (strtolower($value) == 'luxury') {
+        } elseif ($lowerCaseValue == 'luxury') {
             return Price::Luxury;
         } else {
             return Price::Empty;

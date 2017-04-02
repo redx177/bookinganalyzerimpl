@@ -5,7 +5,7 @@ class IntegerField implements Field
     private $name;
     private $value;
 
-    public function __construct(string $name, int $value)
+    public function __construct(string $name, $value)
     {
         $this->name = $name;
         $this->value = $value;
@@ -26,7 +26,7 @@ class IntegerField implements Field
         return $this->value > 0;
     }
 
-    public function getType()
+    public static function getType()
     {
         return int::class;
     }

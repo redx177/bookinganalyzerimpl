@@ -27,12 +27,21 @@ class AprioriAlgorithmTest extends TestCase
                                 $boolBalcony, $boolSauna, $floatLong, $floatLat, $price, $diSea, $diLake, $diSki)
     {
         return new Booking(1, new DataTypeCluster(
-            ['ROOMS' => $intRooms, 'BEDROOMS' => $intBedrooms, 'STARS' => $intStars],
-            ['TV' => $boolTv, 'BBQ' => $boolBbq, 'PETS' => $boolPets, 'BALCONY' => $boolBalcony, 'SAUNA' => $boolSauna],
-            ['long' => $floatLong, 'lat' => $floatLat],
+            ['ROOMS' => new IntegerField('ROOMS', $intRooms),
+                'BEDROOMS' => new IntegerField('BEDROOMS', $intBedrooms),
+                 'STARS' => new IntegerField('STARS', $intStars)],
+            ['TV' => new BooleanField('TV', $boolTv),
+                'BBQ' => new BooleanField('BBQ', $boolBbq),
+                'PETS' => new BooleanField('PETS', $boolPets),
+                'BALCONY' => new BooleanField('BALCONY', $boolBalcony),
+                'SAUNA' => new BooleanField('SAUNA', $boolSauna)],
+            ['long' => new FloatField('long', $floatLong),
+                'lat' => new FloatField('lat', $floatLat)],
             [],
-            ['PRICE' => $price],
-            ['SEA' => $diSea, 'LAKE' => $diLake, 'SKI' => $diSki,]));
+            ['PRICE' => new PriceField('PRICE', $price)],
+            ['SEA' => new DistanceField('SEA', $diSea),
+                'LAKE' => new DistanceField('LAKE', $diLake),
+                'SKI' => new DistanceField('SKI', $diSki)]));
     }
 
     protected function setUp()
