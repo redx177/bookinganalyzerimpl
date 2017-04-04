@@ -1,6 +1,11 @@
 {% extends "base.twig" %}
 
 {% block content %}
+    <script>
+        var statusUrl = {{ statusUrl }};
+        var pullInterval = {{ pullInterval }};
+    </script>
+
     <div class="container">
         <h1>Attributanalysis</h1>
         <p>Search for frequent attributes in the all data or a filtered subset.
@@ -9,11 +14,5 @@
 
     {{ include('filters.twig') }}
 
-    {% if histograms %}
-        <div class="container">
-            {{ include('histogramsAsTable.twig') }}
-        </div>
-    {% endif %}
-
-    <div class="container">Runtime: {{ runtimeInSeconds }}</div>
+    <div class="container" id="results-container"></div>
 {% endblock %}

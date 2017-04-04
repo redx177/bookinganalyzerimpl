@@ -1,73 +1,77 @@
 <?php
+echo "test\n";
+echo __DIR__ . "\n";
+exit(99);
+$rootDir = dirname(dirname(__DIR__));
+require_once $rootDir . '/vendor/autoload.php';
+require_once $rootDir . '/config.php';
+require_once $rootDir . '/Interfaces/BookingDataIterator.php';
+require_once $rootDir . '/Utilities/ConfigProvider.php';
+require_once $rootDir . '/Utilities/LoadAllCsvDataIterator.php';
+require_once $rootDir . '/Utilities/LoadIncrementalCsvDataIterator.php';
+require_once $rootDir . '/Business/AprioriAlgorithm.php';
+require_once $rootDir . '/Business/BookingsProvider.php';
+require_once $rootDir . '/Business/DataTypeClusterer.php';
+require_once $rootDir . '/Business/Pagination.php';
+require_once $rootDir . '/Business/FiltersProvider.php';
+require_once $rootDir . '/Models/Field.php';
+require_once $rootDir . '/Models/Booking.php';
+require_once $rootDir . '/Models/BooleanField.php';
+require_once $rootDir . '/Models/ButtonConfig.php';
+require_once $rootDir . '/Models/DataTypeCluster.php';
+require_once $rootDir . '/Models/Distance.php';
+require_once $rootDir . '/Models/DistanceField.php';
+require_once $rootDir . '/Models/Filter.php';
+require_once $rootDir . '/Models/Filters.php';
+require_once $rootDir . '/Models/FloatField.php';
+require_once $rootDir . '/Models/Histogram.php';
+require_once $rootDir . '/Models/HistogramBin.php';
+require_once $rootDir . '/Models/Histograms.php';
+require_once $rootDir . '/Models/IntegerField.php';
+require_once $rootDir . '/Models/Price.php';
+require_once $rootDir . '/Models/PriceField.php';
+require_once $rootDir . '/Models/StringField.php';
+$config = new ConfigProvider($GLOBALS['configContent']);
 
-//require_once __DIR__ . '/config.php';
-//require_once __DIR__ . '/Utilities/ConfigProvider.php';
-//require_once __DIR__ . '/Business/AprioriAlgorithm.php';
-//require_once __DIR__ . '/Business/BookingsProvider.php';
-//require_once __DIR__ . '/Business/DataTypeClusterer.php';
-//require_once __DIR__ . '/Business/Pagination.php';
-//require_once __DIR__ . '/Models/Field.php';
-//require_once __DIR__ . '/Models/Booking.php';
-//require_once __DIR__ . '/Models/BooleanField.php';
-//require_once __DIR__ . '/Models/ButtonConfig.php';
-//require_once __DIR__ . '/Models/DataTypeCluster.php';
-//require_once __DIR__ . '/Models/Distance.php';
-//require_once __DIR__ . '/Models/DistanceField.php';
-//require_once __DIR__ . '/Models/Filter.php';
-//require_once __DIR__ . '/Models/Filters.php';
-//require_once __DIR__ . '/Models/FloatField.php';
-//require_once __DIR__ . '/Models/Histogram.php';
-//require_once __DIR__ . '/Models/HistogramBin.php';
-//require_once __DIR__ . '/Models/Histograms.php';
-//require_once __DIR__ . '/Models/IntegerField.php';
-//require_once __DIR__ . '/Models/Price.php';
-//require_once __DIR__ . '/Models/PriceField.php';
-//require_once __DIR__ . '/Models/StringField.php';
-//$config = new ConfigProvider($GLOBALS['configContent']);
 
-use WebSocketClient\WebSocketClient;
-use WebSocketClient\WebSocketClientInterface;
+/* TWIG */
+$loader = new Twig_Loader_Filesystem($rootDir . '/Templates');
+$twig = new Twig_Environment($loader, array(
+    'debug' => true,
+    //'cache' => __DIR__ . '/compilation_cache',
+));
+$twig->addFunction(new Twig_Function('sortHistogramBinsByCount', 'sortHistogramBinsByCount'));
+$twig->addExtension(new Twig_Extension_Debug());
 
-class Client implements WebSocketClientInterface
-{
-    private $client;
 
-    public function onWelcome(array $data)
-    {
-    }
+/* DI CONTAINER */
+$builder = new DI\ContainerBuilder();
+$builder->addDefinitions(array(
+    Twig_Environment::class => $twig,
+    BookingDataIterator::class => new LoadIncrementalCsvDataIterator('../../' . $config->get('dataSource')),
+    //BookingDataIterator::class => new LoadAllCsvDataIterator($config->get('dataSource')),
+    ConfigProvider::class => $config,
+    Twig_TemplateWrapper::class => $twig->load('candidatesAndFrequentSetsAsTable.twig'),
+));
+$container = $builder->build();
 
-    public function onEvent($topic, $message)
-    {
-    }
 
-    public function subscribe($topic)
-    {
-        $this->client->subscribe($topic);
-    }
+$filtersProvider = $container->get('FiltersProvider');
+$apriori = $container->get('AprioriAlgorithm');
 
-    public function unsubscribe($topic)
-    {
-        $this->client->unsubscribe($topic);
-    }
+$filters = $filtersProvider->get($_REQUEST);
+$histograms = $apriori->run($filters);
+unlink($config->get('aprioriServicePidFile'));
 
-    public function call($proc, $args, Closure $callback = null)
-    {
-        $this->client->call($proc, $args, $callback);
-    }
 
-    public function publish($topic, $message)
-    {
-        $this->client->publish($topic, $message);
-    }
-
-    public function setClient(WebSocketClient $client)
-    {
-        $this->client = $client;
-    }
+function sortHistogramBinsByCount($histogramBins) {
+    usort($histogramBins, function(HistogramBin $a, HistogramBin $b) {
+        $aCount = $a->getCount();
+        $bCount = $b->getCount();
+        if ($aCount == $bCount) {
+            return 0;
+        }
+        return $aCount > $bCount ? -1 : 1;
+    });
+    return $histogramBins;
 }
-
-$loop = React\EventLoop\Factory::create();
-
-$client = new WebSocketClient(new Client, $loop);
-
-$loop->run();

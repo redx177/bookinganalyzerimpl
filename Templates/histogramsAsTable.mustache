@@ -1,6 +1,5 @@
-<div class="histogramsAsTable">
-    <h1>Results for {{ histograms.total }} records</h1>
-    {% for histogram in histograms.all %}
+{% verbatim %}
+    {{#frequentSet}}
         <table class="table table-responsive">
             <thead class="thead-default">
                 <tr>
@@ -16,7 +15,7 @@
                     <tr>
                         <td>
                             {% for fieldName, fieldValue in histogramBin.fields %}
-                                {{ fieldTitles[fieldName] }}={{ fieldValue }}<br/>
+                            {{fieldTitle fieldName}}={{fieldValue}}<br/>
                             {% endfor %}
                         </td>
                         <td>{{ histogramBin.count }}</td>
@@ -24,6 +23,5 @@
                 {% endfor %}
             </tbody>
         </table>
-    {% endfor %}
-    <div class="container">Runtime: {{ runtimeInSeconds }}</div>
-</div>
+    {{/frequentSet}}
+{% endverbatim %}

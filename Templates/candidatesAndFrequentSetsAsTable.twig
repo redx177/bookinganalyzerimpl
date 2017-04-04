@@ -1,0 +1,61 @@
+<div class="histogramsAsTable">
+    <h1>Analysis progress...</h1>
+    <script>
+        var done = {{ done }};
+    </script>
+    {% set setSize = 1 %}
+    {% for frequentSet in frequentSets %}
+        <table class="table table-responsive">
+            <thead class="thead-default">
+                <tr>
+                    <th colspan="2">Set size: {{ setSize }}</th>
+                </tr>
+                <tr>
+                    <th>Fields</th>
+                    <th>Count</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in frequentSet %}
+                    <tr>
+                        <td>
+                            {% for fieldName, fieldValue in item|first %}
+                                {{ fieldTitles[fieldName] }}={{ fieldValue }}<br/>
+                            {% endfor %}
+                        </td>
+                        <td>{{ item[1] }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% set setSize = setSize+1 %}
+    {% endfor %}
+
+
+    {% if candidates %}
+        <table class="table table-responsive">
+            <thead class="thead-default">
+            <tr>
+                <th colspan="2">Set size: {{ setSize }}</th>
+            </tr>
+            <tr>
+                <th>Fields</th>
+                <th>Count</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for item in candidates %}
+                <tr>
+                    <td>
+                        {% for fieldName, fieldValue in item|first %}
+                            {{ fieldTitles[fieldName] }}={{ fieldValue }}<br/>
+                        {% endfor %}
+                    </td>
+                    <td>{{ item[1] }} <img src="/img/loading.gif" alt="Loading"></td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+    <div class="container">Runtime: {{ runtimeInSeconds }}</div>
+</div>

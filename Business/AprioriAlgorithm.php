@@ -5,17 +5,35 @@ class AprioriAlgorithm
     private $bookingsProvider;
     private $bookingsCount;
     private $bookingsCountCap;
+    private $lastOutput;
+    private $outputFile;
+    private $outputInterval;
+    private $fileWriteCount = 0;
+    private $startTime;
+    private $fieldNameMapping;
+
+    /**
+     * @var Twig_TemplateWrapper
+     */
+    private $template;
 
     /**
      * AprioriAlgorithm constructor.
      * @param BookingsProvider $bookingsProvider Provider for the data to analyze.
      * @param ConfigProvider $config Configuration provider.
+     * @param Twig_TemplateWrapper $template Template to render the wip to.
      */
-    public function __construct(BookingsProvider $bookingsProvider, ConfigProvider $config)
+    public function __construct(BookingsProvider $bookingsProvider, ConfigProvider $config, Twig_TemplateWrapper $template)
     {
         $this->bookingsProvider = $bookingsProvider;
         $this->minSup = $config->get('aprioriMinSup');
         $this->bookingsCountCap = $config->get('bookingsCountCap');
+        $this->outputFile = basename($config->get('aprioriServiceOutput'));
+        $this->outputInterval = $config->get('aprioriOutputInterval');
+        $this->fieldNameMapping = $config->get('fieldNameMapping');
+        $this->lastOutput = microtime(TRUE);
+        $this->startTime = microtime(TRUE);
+        $this->template = $template;
     }
 
     /**
@@ -32,9 +50,10 @@ class AprioriAlgorithm
             if (!$candidates) {
                 break;
             }
-            $countedCandidates = $this->countCandidates($candidates, $filters);
+            $countedCandidates = $this->countCandidates($candidates, $frequentSets, $filters);
             $frequentSets[$i] = $this->filterByMinSup($countedCandidates);
         }
+        $this->writeOutput($countedCandidates = null, $frequentSets);
         return $this->generateHistograms($frequentSets, $this->bookingsCount);
     }
 
@@ -67,6 +86,7 @@ class AprioriAlgorithm
                         $candidates[$name . $value] = [[$name=>$value], $candidates[$name . $value][1]+1];
                     }
                 }
+                $this->writeOutput($candidates);
             }
             $offset += $batchSize;
         }
@@ -74,7 +94,7 @@ class AprioriAlgorithm
         return $this->filterByMinSup($candidates);
     }
 
-    private function countCandidates($candidates, Filters $filters = null): array
+    private function countCandidates($candidates, $frequentSets, Filters $filters = null): array
     {
         $countedCandidates = [];
         $offset = 0;
@@ -107,6 +127,7 @@ class AprioriAlgorithm
                     }
                     $countedCandidates[$id] = [$c, $countedCandidates[$id][1]+1];
                 }
+                $this->writeOutput($countedCandidates, $frequentSets);
             }
             $offset += $batchSize;
         }
@@ -165,5 +186,24 @@ class AprioriAlgorithm
             }
         }
         return $candidates;
+    }
+
+    private function writeOutput($candidates = null, $frequentSets = null)
+    {
+        $currentTime = microtime(TRUE);
+        if ($currentTime - $this->lastOutput > $this->outputInterval || $candidates == null) {
+            $this->lastOutput = microtime(TRUE);
+            $this->fileWriteCount++;
+            $runtime = $currentTime - $this->startTime;
+
+            $content = $this->template->render([
+                'frequentSets' => $frequentSets,
+                'candidates' => $candidates,
+                'fieldTitles' => $this->fieldNameMapping,
+                'runtimeInSeconds' => $runtime,
+                'done' => $candidates == null ? 'true' : 'false',
+            ]);
+            file_put_contents($this->outputFile, $content);
+        }
     }
 }

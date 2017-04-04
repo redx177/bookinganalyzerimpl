@@ -1,5 +1,0 @@
-{
-  "require": {
-    "gabrielbull/websocket-client": "0.3.*"
-  }
-}
