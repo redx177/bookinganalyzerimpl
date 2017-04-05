@@ -1,10 +1,10 @@
 $( document ).ready(function() {
     if (statusUrl) {
-        setInterval(pull, pullInterval * 100)
+        var intervalId = setInterval(function() { pull(intervalId) }, pullInterval * 1000)
     }
 });
 
-function pull() {
+function pull(intervalId) {
     $.ajax({
         method: "GET",
         url: statusUrl,
@@ -12,8 +12,8 @@ function pull() {
         .done(function( msg ) {
             $("#results-container").html(msg);
 
-            if (!done) {
-                setInterval(pull, pullInterval * 100)
+            if (done) {
+                clearInterval(intervalId);
             }
         });
 }

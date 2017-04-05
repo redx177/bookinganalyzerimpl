@@ -1,7 +1,4 @@
 <?php
-echo "test\n";
-echo __DIR__ . "\n";
-exit(99);
 $rootDir = dirname(dirname(__DIR__));
 require_once $rootDir . '/vendor/autoload.php';
 require_once $rootDir . '/config.php';
@@ -32,6 +29,7 @@ require_once $rootDir . '/Models/Price.php';
 require_once $rootDir . '/Models/PriceField.php';
 require_once $rootDir . '/Models/StringField.php';
 $config = new ConfigProvider($GLOBALS['configContent']);
+$config->set('rootDir', $rootDir);
 
 
 /* TWIG */
@@ -46,13 +44,13 @@ $twig->addExtension(new Twig_Extension_Debug());
 
 /* DI CONTAINER */
 $builder = new DI\ContainerBuilder();
-$builder->addDefinitions(array(
+$builder->addDefinitions([
     Twig_Environment::class => $twig,
-    BookingDataIterator::class => new LoadIncrementalCsvDataIterator('../../' . $config->get('dataSource')),
+    BookingDataIterator::class => new LoadIncrementalCsvDataIterator($rootDir . '/' . $config->get('dataSource')),
     //BookingDataIterator::class => new LoadAllCsvDataIterator($config->get('dataSource')),
     ConfigProvider::class => $config,
     Twig_TemplateWrapper::class => $twig->load('candidatesAndFrequentSetsAsTable.twig'),
-));
+]);
 $container = $builder->build();
 
 
@@ -61,7 +59,7 @@ $apriori = $container->get('AprioriAlgorithm');
 
 $filters = $filtersProvider->get($_REQUEST);
 $histograms = $apriori->run($filters);
-unlink($config->get('aprioriServicePidFile'));
+unlink($rootDir.$config->get('aprioriServicePidFile'));
 
 
 function sortHistogramBinsByCount($histogramBins) {

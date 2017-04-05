@@ -11,6 +11,7 @@ class AprioriAlgorithm
     private $fileWriteCount = 0;
     private $startTime;
     private $fieldNameMapping;
+    private $rootDir;
 
     /**
      * @var Twig_TemplateWrapper
@@ -28,9 +29,10 @@ class AprioriAlgorithm
         $this->bookingsProvider = $bookingsProvider;
         $this->minSup = $config->get('aprioriMinSup');
         $this->bookingsCountCap = $config->get('bookingsCountCap');
-        $this->outputFile = basename($config->get('aprioriServiceOutput'));
+        $this->outputFile = $config->get('aprioriServiceOutput');
         $this->outputInterval = $config->get('aprioriOutputInterval');
         $this->fieldNameMapping = $config->get('fieldNameMapping');
+        $this->rootDir = $config->get('rootDir');
         $this->lastOutput = microtime(TRUE);
         $this->startTime = microtime(TRUE);
         $this->template = $template;
@@ -53,7 +55,7 @@ class AprioriAlgorithm
             $countedCandidates = $this->countCandidates($candidates, $frequentSets, $filters);
             $frequentSets[$i] = $this->filterByMinSup($countedCandidates);
         }
-        $this->writeOutput($countedCandidates = null, $frequentSets);
+        $this->writeOutput(null, $frequentSets);
         return $this->generateHistograms($frequentSets, $this->bookingsCount);
     }
 
@@ -196,14 +198,37 @@ class AprioriAlgorithm
             $this->fileWriteCount++;
             $runtime = $currentTime - $this->startTime;
 
+            // Take the top X candidates. Else there can be thousands of them.
+            usort($candidates, array('AprioriAlgorithm', 'frequentSetSort'));
+            $sortedSlicedCandidates = array_slice($candidates, 0, 10);
+
+            $done = $candidates === null;
+            // Sort frequentSets when done.
+            if ($done) {
+                $sortedFrequentSets = [];
+                foreach ($frequentSets as $setSize => $frequentSet) {
+                    usort($frequentSet, array('AprioriAlgorithm', 'frequentSetSort'));
+                    $sortedFrequentSets[$setSize] = $frequentSet;
+                }
+                $frequentSets = $sortedFrequentSets;
+            }
+
             $content = $this->template->render([
                 'frequentSets' => $frequentSets,
-                'candidates' => $candidates,
+                'candidates' => $sortedSlicedCandidates,
+                'candidatesCount' => count($candidates),
                 'fieldTitles' => $this->fieldNameMapping,
                 'runtimeInSeconds' => $runtime,
-                'done' => $candidates == null ? 'true' : 'false',
+                'done' => $done ? 'true' : 'false',
             ]);
-            file_put_contents($this->outputFile, $content);
+            file_put_contents($this->rootDir . $this->outputFile, $content);
         }
+    }
+
+    static function frequentSetSort($a, $b) {
+        if ($a[1] == $b[1]) {
+            return 0;
+        }
+        return $a[1] > $b[1] ? -1 : 1;
     }
 }

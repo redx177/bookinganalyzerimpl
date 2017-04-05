@@ -1,6 +1,6 @@
 <?php
 $configContent = array(
-    'dataSource' => './rapidminerdata.csv',
+    'dataSource' => 'rapidminerdata.csv',
     'pageSize' => 10,
     'paginationWindow' => 3,
     'booleanFields' => ['CAIRCOND','CPOOL','CBBQ','CSAUNA','CJACUZZI','CWASHMACHI','CPARKING','CDISHWASHE','CFIREPLACE','SCTV','SCBALCONY','PETS','SCNOSMOKE','INTERNET'],
@@ -43,10 +43,10 @@ $configContent = array(
     ],
     'filterButtonTitle' => 'Apply Fiters',
     'runButtonTitle' => 'Run analysis',
-    'aprioriMinSup' => 2000,
-    'bookingsCountCap' => 40000, // Debugging only
+    'aprioriMinSup' => 2500,
+    'bookingsCountCap' => 8000, // Debugging only
     'ignoreFields' => ['SCTV'],
-    'aprioriServiceOutput' => '/Services/Apriori/status.json',
-    'aprioriServicePidFile' => 'pid.txt',
+    'aprioriServiceOutput' => '/Services/Apriori/wip/status.htm',
+    'aprioriServicePidFile' => '/Services/Apriori/wip/pid.txt',
     'aprioriOutputInterval' => 10, // Seconds
 );
