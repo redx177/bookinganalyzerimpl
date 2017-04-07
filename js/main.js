@@ -12,7 +12,7 @@ function pull(intervalId) {
         .done(function( msg ) {
             $("#results-container").html(msg);
 
-            if (done) {
+            if ($('#done').length > 0) {
                 clearInterval(intervalId);
             }
         });

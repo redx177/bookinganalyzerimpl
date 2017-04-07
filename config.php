@@ -43,10 +43,11 @@ $configContent = array(
     ],
     'filterButtonTitle' => 'Apply Fiters',
     'runButtonTitle' => 'Run analysis',
-    'aprioriMinSup' => 2500,
-    'bookingsCountCap' => 8000, // Debugging only
+    'aprioriMinSup' => 5,
+    'bookingsCountCap' => 10, // Debugging only
     'ignoreFields' => ['SCTV'],
     'aprioriServiceOutput' => '/Services/Apriori/wip/status.htm',
     'aprioriServicePidFile' => '/Services/Apriori/wip/pid.txt',
+    'aprioriServiceStopFile' => '/Services/Apriori/wip/stop.txt',
     'aprioriOutputInterval' => 10, // Seconds
 );

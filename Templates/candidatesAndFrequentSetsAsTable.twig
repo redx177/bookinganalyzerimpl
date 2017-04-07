@@ -1,13 +1,10 @@
 <div class="histogramsAsTable">
 
     {% if done %}
-        <h1>Analysis done</h1>
+        <h1 id="done">Analysis done</h1>
     {% else %}
         <h1>Analysis progress...</h1>
     {% endif %}
-    <script>
-        var done = {{ done }};
-    </script>
     <div class="container">Runtime: {{ runtimeInSeconds }}</div>
     {% set setSize = 1 %}
     {% for frequentSet in frequentSets %}

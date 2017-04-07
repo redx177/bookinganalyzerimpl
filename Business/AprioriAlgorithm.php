@@ -22,7 +22,7 @@ class AprioriAlgorithm
      * AprioriAlgorithm constructor.
      * @param BookingsProvider $bookingsProvider Provider for the data to analyze.
      * @param ConfigProvider $config Configuration provider.
-     * @param Twig_TemplateWrapper $template Template to render the wip to.
+     * @param Twig_TemplateWrapper|null $template Template to render the wip to.
      */
     public function __construct(BookingsProvider $bookingsProvider, ConfigProvider $config, Twig_TemplateWrapper $template)
     {
@@ -31,6 +31,7 @@ class AprioriAlgorithm
         $this->bookingsCountCap = $config->get('bookingsCountCap');
         $this->outputFile = $config->get('aprioriServiceOutput');
         $this->outputInterval = $config->get('aprioriOutputInterval');
+        $this->stopFile = $config->get('aprioriServiceStopFile');
         $this->fieldNameMapping = $config->get('fieldNameMapping');
         $this->rootDir = $config->get('rootDir');
         $this->lastOutput = microtime(TRUE);
@@ -46,14 +47,19 @@ class AprioriAlgorithm
     public function run(Filters $filters = null) : Histograms
     {
         $frequentSets = [];
+        echo 'getInitialFrequentSets\n';
         $frequentSets[0] = $this->getInitialFrequentSets($filters);
-        for ($i = 1; true; $i++) {
+        for ($i = 1; true || !$this->isStopScriptSet(); $i++) {
+            echo 'aprioriGen\n';
             $candidates = $this->aprioriGen($frequentSets[$i-1]);
             if (!$candidates) {
                 break;
             }
+            echo 'countCandidates\n';
             $countedCandidates = $this->countCandidates($candidates, $frequentSets, $filters);
-            $frequentSets[$i] = $this->filterByMinSup($countedCandidates);
+            $frequentSet = $this->filterByMinSup($countedCandidates);
+            usort($frequentSet, array('AprioriAlgorithm', 'frequentSetSort'));
+            $frequentSets[$i] = $frequentSet;
         }
         $this->writeOutput(null, $frequentSets);
         return $this->generateHistograms($frequentSets, $this->bookingsCount);
@@ -63,7 +69,7 @@ class AprioriAlgorithm
     {
         $candidates = [];
         $offset = 0;
-        $batchSize = 1000;
+        $batchSize = 10;
         $bookingsCount = 0;
         while (!$this->bookingsProvider->hasEndBeenReached()) {
             if ($this->bookingsCountCap && $offset >= $this->bookingsCountCap) {
@@ -93,14 +99,16 @@ class AprioriAlgorithm
             $offset += $batchSize;
         }
         $this->bookingsCount = $bookingsCount;
-        return $this->filterByMinSup($candidates);
+        $frequentSet = $this->filterByMinSup($candidates);
+        usort($frequentSet, array('AprioriAlgorithm', 'frequentSetSort'));
+        return $frequentSet;
     }
 
     private function countCandidates($candidates, $frequentSets, Filters $filters = null): array
     {
         $countedCandidates = [];
         $offset = 0;
-        $batchSize = 1000;
+        $batchSize = 10;
         $bookingsCount = 0;
         while (!$this->bookingsProvider->hasEndBeenReached()) {
             if ($this->bookingsCountCap && $offset >= $this->bookingsCountCap) {
@@ -110,24 +118,24 @@ class AprioriAlgorithm
             $bookingsCount += count($bookings);
             foreach ($bookings as $booking) {
                 foreach ($candidates as $candidate) {
-                    $id = '';
+                    $id = [];
                     $c = [];
                     foreach ($candidate as $key => $value) {
                         $field = $booking->getFieldByName($key);
-                        if (!$field) {
+                        if (!$field->hasValue() || $field->getValue() != $value) {
                             // This candidate does not match this booking, so go to next candidate.
                             continue 2;
                         }
-                        $name = $field->getName();
-                        $value = $field->getValue();
-                        $id .= $value . $name;
-                        $c[$name] = $value;
+                        $id[$key] = $value;
+                        $c[$key] = $value;
                     }
 
-                    if (!array_key_exists($id, $countedCandidates)) {
-                        $countedCandidates[$id] = [$c, 0];
+                    $k = $this->getUniqueKey($id);
+
+                    if (!array_key_exists($k, $countedCandidates)) {
+                        $countedCandidates[$k] = [$c, 0];
                     }
-                    $countedCandidates[$id] = [$c, $countedCandidates[$id][1]+1];
+                    $countedCandidates[$k] = [$c, $countedCandidates[$k][1]+1];
                 }
                 $this->writeOutput($countedCandidates, $frequentSets);
             }
@@ -179,9 +187,7 @@ class AprioriAlgorithm
                     $candidate[$key] = $additionalItem;
                     if (count($candidate) == count($base)+1) {
                         // Generate unique key for the fields to prevent duplicates.
-                        ksort($candidate);
-                        $k = implode(array_keys($candidate)) . implode(array_values($candidate));
-
+                        $k = $this->getUniqueKey($candidate);
                         $candidates[$k] = $candidate;
                     }
                 }
@@ -192,25 +198,24 @@ class AprioriAlgorithm
 
     private function writeOutput($candidates = null, $frequentSets = null)
     {
+        echo 'writeOutput1\n';
+        if (!$this->template) {
+            return;
+        }
+        echo 'writeOutput2\n';
+
         $currentTime = microtime(TRUE);
         if ($currentTime - $this->lastOutput > $this->outputInterval || $candidates == null) {
+            echo 'writeOutput3\n';
             $this->lastOutput = microtime(TRUE);
             $this->fileWriteCount++;
             $runtime = $currentTime - $this->startTime;
 
-            // Take the top X candidates. Else there can be thousands of them.
-            usort($candidates, array('AprioriAlgorithm', 'frequentSetSort'));
-            $sortedSlicedCandidates = array_slice($candidates, 0, 10);
-
-            $done = $candidates === null;
-            // Sort frequentSets when done.
-            if ($done) {
-                $sortedFrequentSets = [];
-                foreach ($frequentSets as $setSize => $frequentSet) {
-                    usort($frequentSet, array('AprioriAlgorithm', 'frequentSetSort'));
-                    $sortedFrequentSets[$setSize] = $frequentSet;
-                }
-                $frequentSets = $sortedFrequentSets;
+            $sortedSlicedCandidates = null;
+            if ($candidates) {
+                usort($candidates, array('AprioriAlgorithm', 'frequentSetSort'));
+                // Take the top X candidates. Else there can be thousands of them.
+                $sortedSlicedCandidates = array_slice($candidates, 0, 10);
             }
 
             $content = $this->template->render([
@@ -219,9 +224,11 @@ class AprioriAlgorithm
                 'candidatesCount' => count($candidates),
                 'fieldTitles' => $this->fieldNameMapping,
                 'runtimeInSeconds' => $runtime,
-                'done' => $done ? 'true' : 'false',
+                'done' => $candidates === null,
             ]);
+            echo 'writeOutput4\n';
             file_put_contents($this->rootDir . $this->outputFile, $content);
+            echo 'writeOutput5\n';
         }
     }
 
@@ -230,5 +237,23 @@ class AprioriAlgorithm
             return 0;
         }
         return $a[1] > $b[1] ? -1 : 1;
+    }
+
+    private function isStopScriptSet()
+    {
+        return file_exists($this->rootDir . $this->stopFile);
+    }
+
+    /**
+     * Generates an unique key for the array.
+     * Order of the elements does not matter.
+     * Sorts the array by key first so [k1=>v1,k2=>v2] and [k2=>v2,k1=>v1] generate the same key.
+     * @param array $array Array to create the unique key for.
+     * @return string Unique key.
+     */
+    private function getUniqueKey($array): string
+    {
+        ksort($array);
+        return implode(array_keys($array)) . implode(array_values($array));
     }
 }

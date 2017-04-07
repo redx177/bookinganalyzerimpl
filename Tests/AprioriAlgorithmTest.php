@@ -86,7 +86,7 @@ class AprioriAlgorithmTest extends TestCase
         $bookingsProviderMock->method('hasEndBeenReached')
             ->will($this->onConsecutiveCalls(false,false,true));
 
-        $sut = new AprioriAlgorithm($bookingsProviderMock, $this->configMock);
+        $sut = new AprioriAlgorithm($bookingsProviderMock, $this->configMock, null);
         $histograms = $sut->run();
         $histogram = $histograms->getHistogram(1);
         $histogramBins = $histogram->getHistogramBins();

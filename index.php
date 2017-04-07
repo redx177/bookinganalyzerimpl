@@ -39,6 +39,7 @@ require_once __DIR__ . '/Utilities/UrlGenerator.php';
 
 /* CONFIG */
 $config = new ConfigProvider($GLOBALS['configContent']);
+$config->set('rootDir', __DIR__);
 
 /* TWIG */
 $loader = new Twig_Loader_Filesystem(__DIR__ . '/Templates');
