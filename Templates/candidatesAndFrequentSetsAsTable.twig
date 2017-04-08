@@ -5,38 +5,47 @@
     {% else %}
         <h1>Analysis progress...</h1>
     {% endif %}
-    <div class="container">Runtime: {{ runtimeInSeconds }}</div>
+    <div class="container">
+        {% if not done %}
+            <button type="button" class="btn btn-danger btn-abort">Abort</button>
+        {% endif %}
+        Runtime: {{ runtimeInSeconds }}<br />
+        Items count: {{ bookingsCount }}
+    </div>
+
     {% set setSize = 1 %}
     {% for frequentSet in frequentSets %}
-        <table class="table table-responsive">
-            <thead class="thead-default">
-                <tr>
-                    <th colspan="2">Set size: {{ setSize }}, Count: {{ frequentSet|length }}</th>
-                </tr>
-                <tr>
-                    <th>Fields</th>
-                    <th>Count</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for item in frequentSet %}
+        {% if frequentSet|length %}
+            <table class="table table-responsive frequent-set">
+                <thead class="thead-default">
                     <tr>
-                        <td>
-                            {% for fieldName, fieldValue in item|first %}
-                                {{ fieldTitles[fieldName] }}={{ fieldValue }}<br/>
-                            {% endfor %}
-                        </td>
-                        <td>{{ item[1] }}</td>
+                        <th colspan="2">Set size: {{ setSize }}, Count: {{ frequentSet|length }}</th>
                     </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+                    <tr>
+                        <th>Fields</th>
+                        <th>Count</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in frequentSet %}
+                        <tr>
+                            <td>
+                                {% for fieldName, fieldValue in item|first %}
+                                    {{ fieldTitles[fieldName] }}={{ fieldValue }}<br/>
+                                {% endfor %}
+                            </td>
+                            <td>{{ item[1] }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% endif %}
         {% set setSize = setSize+1 %}
     {% endfor %}
 
 
     {% if candidates %}
-        <table class="table table-responsive">
+        <table class="table table-responsive candidate">
             <thead class="thead-default">
             <tr>
                 <th colspan="2">Set size: {{ setSize }}, Count: {{ candidatesCount }}</th>

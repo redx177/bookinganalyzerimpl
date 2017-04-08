@@ -14,5 +14,9 @@
 
     {{ include('filters.twig') }}
 
-    <div class="container" id="results-container"></div>
+    <div class="container" id="results-container">
+        {% if isRunning %}
+            <h1>Please wait. Updates every {{ pullInterval }} seconds...</h1>
+        {% endif %}
+    </div>
 {% endblock %}

@@ -1,5 +1,4 @@
 <?php
-echo 'start\n';
 $rootDir = dirname(dirname(__DIR__));
 require_once $rootDir . '/vendor/autoload.php';
 require_once $rootDir . '/config.php';
@@ -32,7 +31,6 @@ require_once $rootDir . '/Models/StringField.php';
 $config = new ConfigProvider($GLOBALS['configContent']);
 $config->set('rootDir', $rootDir);
 
-
 /* TWIG */
 $loader = new Twig_Loader_Filesystem($rootDir . '/Templates');
 $twig = new Twig_Environment($loader, array(
@@ -56,14 +54,17 @@ $builder->addDefinitions([
 $container = $builder->build();
 $container->make(AprioriAlgorithm::class, ['template' => $container->get(Twig_TemplateWrapper::class)]);
 
-
-$filtersProvider = $container->get('FiltersProvider');
-$apriori = $container->get('AprioriAlgorithm');
-
-$filters = $filtersProvider->get($_REQUEST);
-echo 'apriori->run()\n';
-$histograms = $apriori->run($filters);
-unlink($rootDir.$config->get('aprioriServicePidFile'));
+if (array_key_exists('abort', $_GET) && $_GET['abort']) {
+    file_put_contents($rootDir . $config->get('aprioriServiceStopFile'), "");
+} else {
+    $filtersProvider = $container->get('FiltersProvider');
+    $apriori = $container->get('AprioriAlgorithm');
+    parse_str(trim($argv[1], "'"), $params);
+    $filters = $filtersProvider->get($params);
+    unlink($rootDir.$config->get('aprioriServiceStopFile'));
+    $histograms = $apriori->run($filters);
+    unlink($rootDir.$config->get('aprioriServicePidFile'));
+}
 
 
 function sortHistogramBinsByCount($histogramBins) {

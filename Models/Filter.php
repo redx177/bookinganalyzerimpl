@@ -2,29 +2,34 @@
 
 class Filter
 {
-    private $name;
-    private $value;
-    private $type;
+    /**
+     * @var Field
+     */
+    private $field;
 
-    public function __construct(string $name, $value, string $type)
+    public function __construct(Field $field, string $type)
     {
-        $this->name = $name;
-        $this->value = $value;
+        $this->field = $field;
         $this->type = $type;
     }
 
-    public function getName()
+    public function getName(): string
     {
-        return $this->name;
+        return $this->field->getName();
     }
 
     public function getValue()
     {
-        return $this->value;
+        return $this->field->getValue();
     }
 
     public function getType(): string
     {
         return $this->type;
+    }
+
+    public function hasValue(): bool
+    {
+        return $this->field->hasValue();
     }
 }

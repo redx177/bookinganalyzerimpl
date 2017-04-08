@@ -38,15 +38,18 @@ class AttributanalysisController implements Controller {
       */
      public function render()
      {
+         $isRunning = false;
          if (array_key_exists('action', $_REQUEST) && $_REQUEST['action'] == 'run') {
              file_put_contents($this->rootDir . $this->serviceOutput, '');
+             $args = escapeshellarg(http_build_query($_REQUEST));
              $home = $this->rootDir . '/Services/Apriori';
              // php %s/apriori.php -q  : Run apriori.php script in with -q (quiet mode).
              // > %s/wip/output.txt    : STDOUT is saved to 'some/path/output.txt'.
              // 2>&1                   : STDERR is redirected into STDOUT. 'output.txt' aswell.
              // &                      : Run in the background.
              // echo $! > %s/wip/%s    : PID (process id) is saved to a file.
-             exec(sprintf('php %s/apriori.php > %s/wip/output.txt 2>&1 & echo $! > %s%s', $home, $home, $this->rootDir, $this->pidFile));
+             exec(sprintf('php %s/apriori.php %s > %s/wip/output.txt 2>&1 & echo $! > %s%s', $home, $args, $home, $this->rootDir, $this->pidFile));
+             $isRunning = true;
          }
 
          $template = $this->twig->load('attributanalysis.twig');
@@ -56,6 +59,7 @@ class AttributanalysisController implements Controller {
              'buttonConfigs' => [new ButtonConfig($this->runButtonTitle, 'run')],
              'statusUrl' => $this->serviceOutput,
              'pullInterval' => $this->outputInterval,
+             'isRunning' => $isRunning,
             ]);
      }
  }

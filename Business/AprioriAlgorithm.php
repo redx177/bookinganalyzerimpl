@@ -47,17 +47,15 @@ class AprioriAlgorithm
     public function run(Filters $filters = null) : Histograms
     {
         $frequentSets = [];
-        echo 'getInitialFrequentSets\n';
         $frequentSets[0] = $this->getInitialFrequentSets($filters);
-        for ($i = 1; true || !$this->isStopScriptSet(); $i++) {
-            echo 'aprioriGen\n';
+        for ($i = 1; true && !$this->isStopScriptSet(); $i++) {
+            $this->bookingsProvider->rewind();
             $candidates = $this->aprioriGen($frequentSets[$i-1]);
             if (!$candidates) {
                 break;
             }
-            echo 'countCandidates\n';
             $countedCandidates = $this->countCandidates($candidates, $frequentSets, $filters);
-            $frequentSet = $this->filterByMinSup($countedCandidates);
+            $frequentSet = $this->filterByMinSup($countedCandidates, $this->bookingsCount);
             usort($frequentSet, array('AprioriAlgorithm', 'frequentSetSort'));
             $frequentSets[$i] = $frequentSet;
         }
@@ -69,7 +67,7 @@ class AprioriAlgorithm
     {
         $candidates = [];
         $offset = 0;
-        $batchSize = 10;
+        $batchSize = 1000;
         $bookingsCount = 0;
         while (!$this->bookingsProvider->hasEndBeenReached()) {
             if ($this->bookingsCountCap && $offset >= $this->bookingsCountCap) {
@@ -98,8 +96,28 @@ class AprioriAlgorithm
             }
             $offset += $batchSize;
         }
+
+        $filtersArray = $filters->getFilters();
+        if ($filtersArray) {
+            foreach ($filters->getFilters() as $filter) {
+                $filterName = $filter->getName();
+                $filterValue = $filter->getValue();
+                if (is_array($filterValue)) {
+                    foreach ($filterValue as $value) {
+                        if (array_key_exists($filterName . $value, $candidates)) {
+                            unset($candidates[$filterName . $value]);
+                        }
+                    }
+                } else {
+                    if (array_key_exists($filterName . $filterValue, $candidates)) {
+                        unset($candidates[$filterName . $filterValue]);
+                    }
+                }
+            }
+        }
+
         $this->bookingsCount = $bookingsCount;
-        $frequentSet = $this->filterByMinSup($candidates);
+        $frequentSet = $this->filterByMinSup($candidates, $this->bookingsCount);
         usort($frequentSet, array('AprioriAlgorithm', 'frequentSetSort'));
         return $frequentSet;
     }
@@ -108,7 +126,7 @@ class AprioriAlgorithm
     {
         $countedCandidates = [];
         $offset = 0;
-        $batchSize = 10;
+        $batchSize = 1000;
         $bookingsCount = 0;
         while (!$this->bookingsProvider->hasEndBeenReached()) {
             if ($this->bookingsCountCap && $offset >= $this->bookingsCountCap) {
@@ -144,11 +162,11 @@ class AprioriAlgorithm
         return $countedCandidates;
     }
 
-    private function filterByMinSup(array $candidates)
+    private function filterByMinSup(array $candidates, $bookingsCount)
     {
         $frequentSet = [];
         foreach ($candidates as $key => $value) {
-            if ($value[1] >= $this->minSup) {
+            if ($value[1] >= $bookingsCount * $this->minSup) {
                 $frequentSet[$key] = $value;
             }
         }
@@ -198,15 +216,12 @@ class AprioriAlgorithm
 
     private function writeOutput($candidates = null, $frequentSets = null)
     {
-        echo 'writeOutput1\n';
         if (!$this->template) {
             return;
         }
-        echo 'writeOutput2\n';
 
         $currentTime = microtime(TRUE);
         if ($currentTime - $this->lastOutput > $this->outputInterval || $candidates == null) {
-            echo 'writeOutput3\n';
             $this->lastOutput = microtime(TRUE);
             $this->fileWriteCount++;
             $runtime = $currentTime - $this->startTime;
@@ -222,13 +237,12 @@ class AprioriAlgorithm
                 'frequentSets' => $frequentSets,
                 'candidates' => $sortedSlicedCandidates,
                 'candidatesCount' => count($candidates),
+                'bookingsCount' => $this->bookingsCount,
                 'fieldTitles' => $this->fieldNameMapping,
                 'runtimeInSeconds' => $runtime,
                 'done' => $candidates === null,
             ]);
-            echo 'writeOutput4\n';
             file_put_contents($this->rootDir . $this->outputFile, $content);
-            echo 'writeOutput5\n';
         }
     }
 
@@ -255,5 +269,14 @@ class AprioriAlgorithm
     {
         ksort($array);
         return implode(array_keys($array)) . implode(array_values($array));
+    }
+
+    /**
+     * Gets the amount of bookings.
+     * @return int Bookings count.
+     */
+    public function getBookingsCount()
+    {
+        return $this->bookingsCount;
     }
 }

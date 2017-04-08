@@ -33,10 +33,10 @@ class BookingsProvider {
      * @param int $from Start index to retrieve data from. Count is starting from index 0
      * @return array Requested data. Array of Booking
      */
-    public function getSubset(int $count, Filters $filters = null, int $from = 0)
+    public function getSubset(int $count, Filters $filters = null, int $from = null)
     {
         $lineNumber = 0;
-        if ($this->bookingDataIterator->key() != $from) {
+        if ($from != null && $this->bookingDataIterator->key() != $from) {
             $lineNumber = $this->rewindAndSkipToFrom($from, $count, $filters);
         }
 
@@ -117,15 +117,14 @@ class BookingsProvider {
         }
 
         foreach ($filters->getFilters() as $filter) {
-            $filterField = $filter->getValue();
-            $filterName = $filter->getName();
-            if (!$filterField) {
+            if (!$filter->hasValue()) {
                 continue;
             }
+            $filterFieldValue = $filter->getValue();
+            $filterName = $filter->getName();
 
             $field = $booking->getFieldByName($filterName);
             $bookingValue = $field->getValue();
-            $filterFieldValue = $filterField->getValue();
             if (in_array($filterName, $this->atLeastFilterFields)) {
                 if ($bookingValue < $filterFieldValue) {
                     return false;
@@ -156,7 +155,7 @@ class BookingsProvider {
 
     private function rewindAndSkipToFrom($from, $count, $filters = null)
     {
-        $this->bookingDataIterator->rewind();
+        $this->rewind();
 
         // Store the last bookings in case $from is higher than the total count of bookings
         $bookingsQueue = new SplQueue();
@@ -205,5 +204,11 @@ class BookingsProvider {
             $lastPage[$data['line']] = $data['booking'];
         }
         return $lastPage;
+    }
+
+    public function rewind()
+    {
+        $this->bookingDataIterator->rewind();
+        $this->hasEndBeenReached = false;
     }
 }

@@ -43,8 +43,8 @@ $configContent = array(
     ],
     'filterButtonTitle' => 'Apply Fiters',
     'runButtonTitle' => 'Run analysis',
-    'aprioriMinSup' => 5,
-    'bookingsCountCap' => 10, // Debugging only
+    'aprioriMinSup' => 0.4, // percentage
+    'bookingsCountCap' => null, // Debugging only
     'ignoreFields' => ['SCTV'],
     'aprioriServiceOutput' => '/Services/Apriori/wip/status.htm',
     'aprioriServicePidFile' => '/Services/Apriori/wip/pid.txt',

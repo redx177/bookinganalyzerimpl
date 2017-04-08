@@ -59,3 +59,7 @@
   float: left;
   margin-right: 40px;
 }
+.histogramsAsTable .btn-abort {
+  float: left;
+  margin-right: 20px;
+}

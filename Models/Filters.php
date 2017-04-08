@@ -13,23 +13,23 @@ class Filters
     public function __construct(string $action, DataTypeCluster $dataTypeCluster)
     {
         $this->action = $action;
-        foreach ($dataTypeCluster->getIntegerFields() as $key => $value) {
-            array_push($this->filters, new Filter($key, $value, int::class));
+        foreach ($dataTypeCluster->getIntegerFields() as $value) {
+            array_push($this->filters, new Filter($value, int::class));
         }
-        foreach ($dataTypeCluster->getBooleanFields() as $key => $value) {
-            array_push($this->filters, new Filter($key, $value, bool::class));
+        foreach ($dataTypeCluster->getBooleanFields() as  $value) {
+            array_push($this->filters, new Filter($value, bool::class));
         }
-        foreach ($dataTypeCluster->getFloatFields() as $key => $value) {
-            array_push($this->filters, new Filter($key, $value, float::class));
+        foreach ($dataTypeCluster->getFloatFields() as  $value) {
+            array_push($this->filters, new Filter($value, float::class));
         }
-        foreach ($dataTypeCluster->getStringFields() as $key => $value) {
-            array_push($this->filters, new Filter($key, $value, string::class));
+        foreach ($dataTypeCluster->getStringFields() as  $value) {
+            array_push($this->filters, new Filter($value, string::class));
         }
-        foreach ($dataTypeCluster->getPriceFields() as $key => $value) {
-            array_push($this->filters, new Filter($key, $value, Price::class));
+        foreach ($dataTypeCluster->getPriceFields() as  $value) {
+            array_push($this->filters, new Filter($value, Price::class));
         }
-        foreach ($dataTypeCluster->getDistanceFields() as $key => $value) {
-            array_push($this->filters, new Filter($key, $value, Distance::class));
+        foreach ($dataTypeCluster->getDistanceFields() as $value) {
+            array_push($this->filters, new Filter($value, Distance::class));
         }
     }
 
