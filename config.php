@@ -43,7 +43,7 @@ $configContent = array(
     ],
     'filterButtonTitle' => 'Apply Fiters',
     'runButtonTitle' => 'Run analysis',
-    'bookingsCountCap' => null, // Debugging only
+    'bookingsCountCap' => null, // Debugging only. int|null
     'ignoreFields' => ['SCTV'],
     'apriori' => [
         'minSup' => 0.4, // percentage

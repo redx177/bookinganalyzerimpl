@@ -51,9 +51,13 @@ $builder->addDefinitions([
     //BookingDataIterator::class => new LoadAllCsvDataIterator($config->get('dataSource')),
     ConfigProvider::class => $config,
     Twig_TemplateWrapper::class => $template,
+    AprioriAlgorithm::class => function(\Psr\Container\ContainerInterface $c) use (&$template) {
+        return new AprioriAlgorithm($c->get(BookingsProvider::class), $c->get(ConfigProvider), $template);
+    }
 ]);
 $container = $builder->build();
 $container->make(AprioriAlgorithm::class, ['template' => $container->get(Twig_TemplateWrapper::class)]);
+$container->set(Twig_TemplateWrapper::class, \DI\object(Twig_TemplateWrapper::class));
 
 if (array_key_exists('abort', $_GET) && $_GET['abort']) {
     file_put_contents($rootDir . $aprioriConfig['serviceStopFile'], "");

@@ -62,6 +62,7 @@ class AttributanalysisController implements Controller {
              'statusUrl' => $this->serviceOutput,
              'pullInterval' => $this->outputInterval,
              'isRunning' => $isRunning,
+             '_REQUEST' => $_REQUEST,
             ]);
      }
  }
