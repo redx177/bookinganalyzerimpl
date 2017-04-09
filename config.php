@@ -57,5 +57,6 @@ $configContent = array(
         'servicePidFile' => '/Services/KPrototype/wip/pid.txt',
         'serviceStopFile' => '/Services/KPrototype/wip/stop.txt',
         'outputInterval' => 10, // Seconds
+        'gamma' => 1, // value between 0-1.
     ]
 );

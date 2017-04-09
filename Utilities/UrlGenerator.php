@@ -29,12 +29,12 @@ class UrlGenerator
 
     private function getPriceParameters($filters)
     {
-        return $this->getParamsForEnums($filters, 'Price');
+        return $this->getParamsForEnums($filters, Price::class);
     }
 
     private function getDistanceParameters($filters)
     {
-        return $this->getParamsForEnums($filters, 'Distance');
+        return $this->getParamsForEnums($filters, Distance::class);
     }
 
     private function getParamsForEnums($filters, $className)

@@ -31,7 +31,7 @@ class BookingsProvider {
      * @param int $count Number of elements to get.
      * @param Filters|null $filters Filters to apply to the booking data
      * @param int $from Start index to retrieve data from. Count is starting from index 0
-     * @return array Requested data. Array of Booking
+     * @return Booking[] Requested data. Array of Booking
      */
     public function getSubset(int $count, Filters $filters = null, int $from = null)
     {

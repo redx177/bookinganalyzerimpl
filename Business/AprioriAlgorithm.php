@@ -64,7 +64,7 @@ class AprioriAlgorithm
             usort($frequentSet, array('AprioriAlgorithm', 'frequentSetSort'));
             $frequentSets[$i] = $frequentSet;
         }
-        $this->writeOutput(null, $frequentSets);
+        $this->storeState(null, $frequentSets);
         return $this->generateHistograms($frequentSets, $this->bookingsCount);
     }
 
@@ -96,7 +96,7 @@ class AprioriAlgorithm
                         $candidates[$name . $value] = [[$name=>$value], $candidates[$name . $value][1]+1];
                     }
                 }
-                $this->writeOutput($candidates);
+                $this->storeState($candidates);
             }
             $offset += $batchSize;
         }
@@ -157,7 +157,7 @@ class AprioriAlgorithm
                     }
                     $countedCandidates[$k] = [$c, $countedCandidates[$k][1]+1];
                 }
-                $this->writeOutput($countedCandidates, $frequentSets);
+                $this->storeState($countedCandidates, $frequentSets);
             }
             $offset += $batchSize;
         }
@@ -216,9 +216,9 @@ class AprioriAlgorithm
         return $candidates;
     }
 
-    private function writeOutput($candidates = null, $frequentSets = null)
+    private function storeState($candidates = null, $frequentSets = null)
     {
-        $this->aprioriProgress->processState($this->startTime, $this->bookingsCount, $candidates, $frequentSets);
+        $this->aprioriProgress->storeState($this->startTime, $this->bookingsCount, $candidates, $frequentSets);
     }
 
     static function frequentSetSort($a, $b) {

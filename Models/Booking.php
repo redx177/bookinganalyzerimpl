@@ -42,7 +42,7 @@ class Booking
     /**
      * Get fields by a given type.
      * @param string $type Field type to get.
-     * @return array Fields for the given type.
+     * @return Field[] Fields for the given type.
      */
     public function getFieldsByType(string $type) {
         return $this->fieldsByType[$type];

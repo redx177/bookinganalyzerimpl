@@ -5,12 +5,16 @@
  * Not every call to processState is saved to the file.
  * How often this is done can be configured in the $config['apriori']['outputInterval'].
  */
-class AprioriProgressToFile implements AprioriProgress
+class AprioriProgressToMemory implements AprioriProgress
 {
     /**
      * @var Twig_TemplateWrapper
      */
     private $template;
+    /**
+     * @var AprioriState
+     */
+    private $state;
     private $lastOutput;
     private $fieldNameMapping;
     private $rootDir;
@@ -43,21 +47,12 @@ class AprioriProgressToFile implements AprioriProgress
                 $sortedSlicedCandidates = array_slice($candidates, 0, 10);
             }
 
-            $content = $this->template->render([
-                'frequentSets' => $frequentSets,
-                'candidates' => $sortedSlicedCandidates,
-                'candidatesCount' => count($candidates),
-                'bookingsCount' => $bookingsCount,
-                'fieldTitles' => $this->fieldNameMapping,
-                'runtimeInSeconds' => $runtime,
-                'done' => $candidates === null,
-            ]);
-            file_put_contents($this->rootDir . $this->outputFile, $content);
+            $this->state = new AprioriState($frequentSets, $sortedSlicedCandidates, $bookingsCount, $this->fieldNameMapping, $runtime);
         }
     }
 
     public function getState(): AprioriState
     {
-        return new AprioriState([], null, 0, [], 0);
+        return $this->state;
     }
 }

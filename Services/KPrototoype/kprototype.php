@@ -57,7 +57,7 @@ $builder->addDefinitions([
         return new AprioriAlgorithm(
             $c->get(BookingsProvider::class),
             $c->get(ConfigProvider::class),
-            $c->get(AprioriProgressToFile::class));
+            $c->get(AprioriProgressToMemory::class));
     }
 ]);
 $container = $builder->build();
