@@ -3,11 +3,12 @@
 class AprioriAlgorithm
 {
     private $bookingsProvider;
-    private $bookingsCount = 0;
+    private $bookingsCount;
     private $bookingsCountCap;
     private $lastOutput;
     private $outputFile;
     private $outputInterval;
+    private $fileWriteCount = 0;
     private $startTime;
     private $fieldNameMapping;
     private $rootDir;
@@ -16,18 +17,14 @@ class AprioriAlgorithm
      * @var Twig_TemplateWrapper
      */
     private $template;
-    /**
-     * @var AprioriProgress
-     */
-    private $aprioriProgress;
 
     /**
      * AprioriAlgorithm constructor.
      * @param BookingsProvider $bookingsProvider Provider for the data to analyze.
      * @param ConfigProvider $config Configuration provider.
-     * @param AprioriProgress $aprioriProgress Processes the progress of the apriori algorithm.
+     * @param Twig_TemplateWrapper|null $template Template to render the wip to.
      */
-    public function __construct(BookingsProvider $bookingsProvider, ConfigProvider $config, AprioriProgress $aprioriProgress)
+    public function __construct(BookingsProvider $bookingsProvider, ConfigProvider $config, Twig_TemplateWrapper $template = null)
     {
         $this->bookingsProvider = $bookingsProvider;
         $this->bookingsCountCap = $config->get('bookingsCountCap');
@@ -35,13 +32,12 @@ class AprioriAlgorithm
         $this->rootDir = $config->get('rootDir');
         $this->lastOutput = microtime(TRUE);
         $this->startTime = microtime(TRUE);
-        $this->aprioriProgress = $aprioriProgress;
+        $this->template = $template;
 
-        $aprioriConfig = $config->get('apriori');
-        $this->minSup = $aprioriConfig['minSup'];
-        $this->stopFile = $aprioriConfig['serviceStopFile'];
-        $this->outputInterval = $aprioriConfig['outputInterval'];
-        $this->outputFile = $aprioriConfig['serviceOutput'];
+        $kprototypeConfig = $config->get('kprototype');
+        $this->stopFile = $kprototypeConfig['serviceStopFile'];
+        $this->outputInterval = $kprototypeConfig['outputInterval'];
+        $this->outputFile = $kprototypeConfig['serviceOutput'];
     }
 
     /**
@@ -73,12 +69,13 @@ class AprioriAlgorithm
         $candidates = [];
         $offset = 0;
         $batchSize = 1000;
+        $bookingsCount = 0;
         while (!$this->bookingsProvider->hasEndBeenReached()) {
             if ($this->bookingsCountCap && $offset >= $this->bookingsCountCap) {
                 break;
             }
             $bookings = $this->bookingsProvider->getSubset($batchSize, $filters);
-            $this->bookingsCount += count($bookings);
+            $bookingsCount += count($bookings);
             foreach ($bookings as $booking) {
                 $fields = array_merge(
                     $booking->getFieldsByType(bool::class),
@@ -119,6 +116,7 @@ class AprioriAlgorithm
             }
         }
 
+        $this->bookingsCount = $bookingsCount;
         $frequentSet = $this->filterByMinSup($candidates, $this->bookingsCount);
         usort($frequentSet, array('AprioriAlgorithm', 'frequentSetSort'));
         return $frequentSet;
@@ -218,7 +216,34 @@ class AprioriAlgorithm
 
     private function writeOutput($candidates = null, $frequentSets = null)
     {
-        $this->aprioriProgress->processState($this->startTime, $this->bookingsCount, $candidates, $frequentSets);
+        if (!$this->template) {
+            return;
+        }
+
+        $currentTime = microtime(TRUE);
+        if ($currentTime - $this->lastOutput > $this->outputInterval || $candidates == null) {
+            $this->lastOutput = microtime(TRUE);
+            $this->fileWriteCount++;
+            $runtime = $currentTime - $this->startTime;
+
+            $sortedSlicedCandidates = null;
+            if ($candidates) {
+                usort($candidates, array('AprioriAlgorithm', 'frequentSetSort'));
+                // Take the top X candidates. Else there can be thousands of them.
+                $sortedSlicedCandidates = array_slice($candidates, 0, 10);
+            }
+
+            $content = $this->template->render([
+                'frequentSets' => $frequentSets,
+                'candidates' => $sortedSlicedCandidates,
+                'candidatesCount' => count($candidates),
+                'bookingsCount' => $this->bookingsCount,
+                'fieldTitles' => $this->fieldNameMapping,
+                'runtimeInSeconds' => $runtime,
+                'done' => $candidates === null,
+            ]);
+            file_put_contents($this->rootDir . $this->outputFile, $content);
+        }
     }
 
     static function frequentSetSort($a, $b) {

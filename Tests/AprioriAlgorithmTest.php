@@ -1,4 +1,5 @@
 <?php
+require_once dirname(__DIR__) . '/Interfaces/AprioriProgress.php';
 require_once dirname(__DIR__) . '/Business/AprioriAlgorithm.php';
 require_once dirname(__DIR__) . '/Business/BookingsProvider.php';
 require_once dirname(__DIR__) . '/Models/Booking.php';
@@ -22,6 +23,7 @@ use PHPUnit\Framework\TestCase;
 class AprioriAlgorithmTest extends TestCase
 {
     private $configMock;
+    private $aprioriProgressMock;
 
     private function GetBooking($intRooms, $intBedrooms, $intStars, $boolTv, $boolBbq, $boolPets,
                                 $boolBalcony, $boolSauna, $floatLong, $floatLat, $price, $diSea, $diLake, $diSki)
@@ -57,6 +59,8 @@ class AprioriAlgorithmTest extends TestCase
         $this->configMock = $this->createMock(ConfigProvider::class);
         $this->configMock->method('get')
             ->will($this->returnValueMap($map));
+
+        $this->aprioriProgressMock = $this->createMock(AprioriProgress::class);
     }
 
     /**
@@ -91,7 +95,7 @@ class AprioriAlgorithmTest extends TestCase
         $bookingsProviderMock->method('hasEndBeenReached')
             ->will($this->onConsecutiveCalls(false,false,true));
 
-        $sut = new AprioriAlgorithm($bookingsProviderMock, $this->configMock, null);
+        $sut = new AprioriAlgorithm($bookingsProviderMock, $this->configMock, $this->aprioriProgressMock);
         $histograms = $sut->run();
         $histogram = $histograms->getHistogram(1);
         $histogramBins = $histogram->getHistogramBins();
@@ -134,7 +138,7 @@ class AprioriAlgorithmTest extends TestCase
         $bookingsProviderMock->method('hasEndBeenReached')
             ->will($this->onConsecutiveCalls(false,false,true));
 
-        $sut = new AprioriAlgorithm($bookingsProviderMock, $this->configMock);
+        $sut = new AprioriAlgorithm($bookingsProviderMock, $this->configMock, $this->aprioriProgressMock);
         $histograms = $sut->run();
         $histogram = $histograms->getHistogram(1);
         $histogramBins = $histogram->getHistogramBins();
@@ -176,7 +180,7 @@ class AprioriAlgorithmTest extends TestCase
         $bookingsProviderMock->method('hasEndBeenReached')
             ->will($this->onConsecutiveCalls(false,false,true));
 
-        $sut = new AprioriAlgorithm($bookingsProviderMock, $this->configMock);
+        $sut = new AprioriAlgorithm($bookingsProviderMock, $this->configMock, $this->aprioriProgressMock);
         $histograms = $sut->run();
         $histogram = $histograms->getHistogram(1);
         $histogramBins = $histogram->getHistogramBins();
@@ -217,7 +221,7 @@ class AprioriAlgorithmTest extends TestCase
         $bookingsProviderMock->method('hasEndBeenReached')
             ->will($this->onConsecutiveCalls(false,true));
 
-        $sut = new AprioriAlgorithm($bookingsProviderMock, $this->configMock);
+        $sut = new AprioriAlgorithm($bookingsProviderMock, $this->configMock, $this->aprioriProgressMock);
         $histograms = $sut->run();
         $histogram = $histograms->getHistogram(1);
         $histogramBins = $histogram->getHistogramBins();
@@ -256,7 +260,7 @@ class AprioriAlgorithmTest extends TestCase
         $bookingsProviderMock->method('hasEndBeenReached')
             ->will($this->onConsecutiveCalls(false,true,false,true));
 
-        $sut = new AprioriAlgorithm($bookingsProviderMock, $this->configMock);
+        $sut = new AprioriAlgorithm($bookingsProviderMock, $this->configMock, $this->aprioriProgressMock);
         $histograms = $sut->run();
         $histogram = $histograms->getHistogram(2);
         $histogramBins = $histogram->getHistogramBins();
@@ -296,7 +300,7 @@ class AprioriAlgorithmTest extends TestCase
         $bookingsProviderMock->method('hasEndBeenReached')
             ->will($this->onConsecutiveCalls(false,true,false,true,false,true));
 
-        $sut = new AprioriAlgorithm($bookingsProviderMock, $this->configMock);
+        $sut = new AprioriAlgorithm($bookingsProviderMock, $this->configMock, $this->aprioriProgressMock);
         $histograms = $sut->run();
 
         $this->assertEquals(3, count($histograms->getAll()));

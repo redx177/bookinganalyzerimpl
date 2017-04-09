@@ -3,10 +3,12 @@ $rootDir = dirname(dirname(__DIR__));
 require_once $rootDir . '/vendor/autoload.php';
 require_once $rootDir . '/config.php';
 require_once $rootDir . '/Interfaces/BookingDataIterator.php';
+require_once $rootDir . '/Interfaces/AprioriProgress.php';
 require_once $rootDir . '/Utilities/ConfigProvider.php';
 require_once $rootDir . '/Utilities/LoadAllCsvDataIterator.php';
 require_once $rootDir . '/Utilities/LoadIncrementalCsvDataIterator.php';
 require_once $rootDir . '/Business/AprioriAlgorithm.php';
+require_once $rootDir . '/Business/AprioriProgressToFile.php';
 require_once $rootDir . '/Business/BookingsProvider.php';
 require_once $rootDir . '/Business/DataTypeClusterer.php';
 require_once $rootDir . '/Business/Pagination.php';
@@ -52,7 +54,10 @@ $builder->addDefinitions([
     ConfigProvider::class => $config,
     Twig_TemplateWrapper::class => $template,
     AprioriAlgorithm::class => function(\Psr\Container\ContainerInterface $c) use (&$template) {
-        return new AprioriAlgorithm($c->get(BookingsProvider::class), $c->get(ConfigProvider), $template);
+        return new AprioriAlgorithm(
+            $c->get(BookingsProvider::class),
+            $c->get(ConfigProvider::class),
+            $c->get(AprioriProgressToFile::class));
     }
 ]);
 $container = $builder->build();

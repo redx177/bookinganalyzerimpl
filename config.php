@@ -51,5 +51,11 @@ $configContent = array(
         'servicePidFile' => '/Services/Apriori/wip/pid.txt',
         'serviceStopFile' => '/Services/Apriori/wip/stop.txt',
         'outputInterval' => 10, // Seconds
+    ],
+    'kprototype' => [
+        'serviceOutput' => '/Services/KPrototype/wip/status.htm',
+        'servicePidFile' => '/Services/KPrototype/wip/pid.txt',
+        'serviceStopFile' => '/Services/KPrototype/wip/stop.txt',
+        'outputInterval' => 10, // Seconds
     ]
 );
