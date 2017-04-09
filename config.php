@@ -43,11 +43,13 @@ $configContent = array(
     ],
     'filterButtonTitle' => 'Apply Fiters',
     'runButtonTitle' => 'Run analysis',
-    'aprioriMinSup' => 0.4, // percentage
     'bookingsCountCap' => null, // Debugging only
     'ignoreFields' => ['SCTV'],
-    'aprioriServiceOutput' => '/Services/Apriori/wip/status.htm',
-    'aprioriServicePidFile' => '/Services/Apriori/wip/pid.txt',
-    'aprioriServiceStopFile' => '/Services/Apriori/wip/stop.txt',
-    'aprioriOutputInterval' => 10, // Seconds
+    'apriori' => [
+        'minSup' => 0.4, // percentage
+        'serviceOutput' => '/Services/Apriori/wip/status.htm',
+        'servicePidFile' => '/Services/Apriori/wip/pid.txt',
+        'serviceStopFile' => '/Services/Apriori/wip/stop.txt',
+        'outputInterval' => 10, // Seconds
+    ]
 );

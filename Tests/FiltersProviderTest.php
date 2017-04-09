@@ -16,8 +16,13 @@ class FiltersProviderTest extends TestCase
         $this->dataTypeClustererMock = $this->createMock(DataTypeClusterer::class);
         $this->dataTypeClustererMock->method('get')
             ->will($this->returnCallback(function () {
-                return new DataTypeCluster(['a1' => 'a1a', 'a2' => ['a2a', 'a2b']], ['b' => 'b'], ['c' => 'c'],
-                    ['d' => 'd'], ['e' => 'e'], ['f' => 'f']);
+                return new DataTypeCluster(
+                        ['a1' => new IntegerField('a1', 'a1a'), 'a2' => new IntegerField('a2', ['a2a', 'a2b'])],
+                        ['b' => new BooleanField('b', true)],
+                        ['c' => new FloatField('c', 2.2)],
+                        ['d' => new StringField('d', 'd')],
+                        ['e' => new PriceField('e', Price::Budget)],
+                        ['f' => new DistanceField('f', Distance::Close)]);
             }));
     }
 
@@ -41,19 +46,19 @@ class FiltersProviderTest extends TestCase
         $this->assertEquals('a2b', $filterSet[1]->getValue()[1]);
         $this->assertEquals('int', $filterSet[1]->getType());
         $this->assertEquals('b', $filterSet[2]->getName());
-        $this->assertEquals('b', $filterSet[2]->getValue());
+        $this->assertEquals(true, $filterSet[2]->getValue());
         $this->assertEquals('bool', $filterSet[2]->getType());
         $this->assertEquals('c', $filterSet[3]->getName());
-        $this->assertEquals('c', $filterSet[3]->getValue());
+        $this->assertEquals(2.2, $filterSet[3]->getValue());
         $this->assertEquals('float', $filterSet[3]->getType());
         $this->assertEquals('d', $filterSet[4]->getName());
         $this->assertEquals('d', $filterSet[4]->getValue());
         $this->assertEquals('string', $filterSet[4]->getType());
         $this->assertEquals('e', $filterSet[5]->getName());
-        $this->assertEquals('e', $filterSet[5]->getValue());
+        $this->assertEquals(Price::Budget, $filterSet[5]->getValue());
         $this->assertEquals('Price', $filterSet[5]->getType());
         $this->assertEquals('f', $filterSet[6]->getName());
-        $this->assertEquals('f', $filterSet[6]->getValue());
+        $this->assertEquals(Distance::Close, $filterSet[6]->getValue());
         $this->assertEquals('Distance', $filterSet[6]->getType());
     }
 }

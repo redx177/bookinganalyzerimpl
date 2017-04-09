@@ -30,6 +30,7 @@ require_once $rootDir . '/Models/PriceField.php';
 require_once $rootDir . '/Models/StringField.php';
 $config = new ConfigProvider($GLOBALS['configContent']);
 $config->set('rootDir', $rootDir);
+$aprioriConfig = $config->get('apriori');
 
 /* TWIG */
 $loader = new Twig_Loader_Filesystem($rootDir . '/Templates');
@@ -55,15 +56,15 @@ $container = $builder->build();
 $container->make(AprioriAlgorithm::class, ['template' => $container->get(Twig_TemplateWrapper::class)]);
 
 if (array_key_exists('abort', $_GET) && $_GET['abort']) {
-    file_put_contents($rootDir . $config->get('aprioriServiceStopFile'), "");
+    file_put_contents($rootDir . $aprioriConfig['serviceStopFile'], "");
 } else {
     $filtersProvider = $container->get('FiltersProvider');
     $apriori = $container->get('AprioriAlgorithm');
     parse_str(trim($argv[1], "'"), $params);
     $filters = $filtersProvider->get($params);
-    unlink($rootDir.$config->get('aprioriServiceStopFile'));
+    unlink($rootDir.$aprioriConfig['serviceStopFile']);
     $histograms = $apriori->run($filters);
-    unlink($rootDir.$config->get('aprioriServicePidFile'));
+    unlink($rootDir.$aprioriConfig['servicePidFile']);
 }
 
 

@@ -189,7 +189,7 @@ class BookingsProviderTest extends TestCase
     public function filteringIntegerValueShouldRemoveNonMatchingItems() {
         $filtersMock = $this->createMock(Filters::class);
         $filtersMock->method('getFilters')
-            ->willReturn([new Filter('int', new IntegerField('int', 20), int::class)]);
+            ->willReturn([new Filter(new IntegerField('int', 20), int::class)]);
 
         $sut = new BookingsProvider($this->csvIteratorMock, $this->dataTypeClustererMock, $this->configMock);
         $data = $sut->getSubset(3, $filtersMock);
@@ -206,7 +206,7 @@ class BookingsProviderTest extends TestCase
     public function filteringIntegerValueWithAtLeastConditionShouldRemoveNonMatchingItems() {
         $filtersMock = $this->createMock(Filters::class);
         $filtersMock->method('getFilters')
-            ->willReturn([new Filter('int', new IntegerField('int', 5), int::class)]);
+            ->willReturn([new Filter(new IntegerField('int', 5), int::class)]);
 
         $sut = new BookingsProvider($this->csvIteratorMock, $this->dataTypeClustererMock, $this->configMock);
         $data = $sut->getSubset(3, $filtersMock);
@@ -223,7 +223,7 @@ class BookingsProviderTest extends TestCase
     public function filteringIntegerWithMultiSelectionShouldRemoveNonMatchingItems() {
         $filtersMock = $this->createMock(Filters::class);
         $filtersMock->method('getFilters')
-            ->willReturn([new Filter('int2', new IntegerField('int2', [5,21]), int::class)]);
+            ->willReturn([new Filter(new IntegerField('int2', [5,21]), int::class)]);
 
         $sut = new BookingsProvider($this->csvIteratorMock, $this->dataTypeClustererMock, $this->configMock);
         $data = $sut->getSubset(3, $filtersMock);
@@ -240,7 +240,7 @@ class BookingsProviderTest extends TestCase
     public function filteringBooleanValueShouldRemoveNonMatchingItems() {
         $filtersMock = $this->createMock(Filters::class);
         $filtersMock->method('getFilters')
-            ->willReturn([new Filter('bool', new BooleanField('int', true), bool::class)]);
+            ->willReturn([new Filter(new BooleanField('bool', true), bool::class)]);
 
         $sut = new BookingsProvider($this->csvIteratorMock, $this->dataTypeClustererMock, $this->configMock);
         $data = $sut->getSubset(3, $filtersMock);
@@ -257,7 +257,7 @@ class BookingsProviderTest extends TestCase
     public function filteringFloatValueShouldRemoveNonMatchingItems() {
         $filtersMock = $this->createMock(Filters::class);
         $filtersMock->method('getFilters')
-            ->willReturn([new Filter('float', new FloatField('float', 2.21), float::class)]);
+            ->willReturn([new Filter(new FloatField('float', 2.21), float::class)]);
 
         $sut = new BookingsProvider($this->csvIteratorMock, $this->dataTypeClustererMock, $this->configMock);
         $data = $sut->getSubset(3, $filtersMock);
@@ -274,7 +274,7 @@ class BookingsProviderTest extends TestCase
     public function filteringStringValueShouldRemoveNonMatchingItems() {
         $filtersMock = $this->createMock(Filters::class);
         $filtersMock->method('getFilters')
-            ->willReturn([new Filter('str', new StringField('str', 'd1'), string::class)]);
+            ->willReturn([new Filter(new StringField('str', 'd1'), string::class)]);
 
         $sut = new BookingsProvider($this->csvIteratorMock, $this->dataTypeClustererMock, $this->configMock);
         $data = $sut->getSubset(3, $filtersMock);
@@ -291,7 +291,7 @@ class BookingsProviderTest extends TestCase
     public function filteringPriceValueShouldRemoveNonMatchingItems() {
         $filtersMock = $this->createMock(Filters::class);
         $filtersMock->method('getFilters')
-            ->willReturn([new Filter('pri', new PriceField('pri', Price::Luxury), Price::class)]);
+            ->willReturn([new Filter(new PriceField('pri', Price::Luxury), Price::class)]);
 
         $sut = new BookingsProvider($this->csvIteratorMock, $this->dataTypeClustererMock, $this->configMock);
         $data = $sut->getSubset(3, $filtersMock);
@@ -309,7 +309,7 @@ class BookingsProviderTest extends TestCase
     {
         $filtersMock = $this->createMock(Filters::class);
         $filtersMock->method('getFilters')
-            ->willReturn([new Filter('dist', new DistanceField('dist', Distance::Close), Distance::class)]);
+            ->willReturn([new Filter(new DistanceField('dist', Distance::Close), Distance::class)]);
 
         $sut = new BookingsProvider($this->csvIteratorMock, $this->dataTypeClustererMock, $this->configMock);
         $data = $sut->getSubset(3, $filtersMock);
@@ -327,7 +327,7 @@ class BookingsProviderTest extends TestCase
     {
         $filtersMock = $this->createMock(Filters::class);
         $filtersMock->method('getFilters')
-            ->willReturn([new Filter('int', new IntegerField('int', 10), int::class)]);
+            ->willReturn([new Filter(new IntegerField('int', 10), int::class)]);
 
         $sut = new BookingsProvider($this->csvIteratorMock, $this->dataTypeClustererMock, $this->configMock);
         $data = $sut->getSubset(3, $filtersMock, 3);
@@ -377,7 +377,7 @@ class BookingsProviderTest extends TestCase
     public function whenFilteringAndGetting2OutOf3ItemsThenHasBeenReachedShouldReturnFalse() {
         $filtersMock = $this->createMock(Filters::class);
         $filtersMock->method('getFilters')
-            ->willReturn([new Filter('int', new IntegerField('int', 20), int::class)]);
+            ->willReturn([new Filter(new IntegerField('int', 20), int::class)]);
 
         $sut = new BookingsProvider($this->csvIteratorMock, $this->dataTypeClustererMock, $this->configMock);
         $sut->getSubset(2, $filtersMock);
@@ -391,7 +391,7 @@ class BookingsProviderTest extends TestCase
     public function whenFilteringAndGettingAllItemsThenHasBeenReachedShouldReturnTrue() {
         $filtersMock = $this->createMock(Filters::class);
         $filtersMock->method('getFilters')
-            ->willReturn([new Filter('int', new IntegerField('int', 20), int::class)]);
+            ->willReturn([new Filter(new IntegerField('int', 20), int::class)]);
 
         $sut = new BookingsProvider($this->csvIteratorMock, $this->dataTypeClustererMock, $this->configMock);
         $data = $sut->getSubset(3, $filtersMock);
@@ -408,7 +408,7 @@ class BookingsProviderTest extends TestCase
             ->method('next');
         $filtersMock = $this->createMock(Filters::class);
         $filtersMock->method('getFilters')
-            ->willReturn([new Filter('int', new IntegerField('int', 20), int::class)]);
+            ->willReturn([new Filter(new IntegerField('int', 20), int::class)]);
 
         $sut = new BookingsProvider($this->csvIteratorMock, $this->dataTypeClustererMock, $this->configMock);
         $sut->getSubset(9999999, $filtersMock);

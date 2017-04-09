@@ -14,14 +14,21 @@ class UrlGeneratorTest extends TestCase
      */
     public function getParametersShouldCreateValidParameterString() {
         $filters = new Filters(
-            'myAction',
-            new DataTypeCluster(['a1' => 'a1a', 'a2' => ['a2a', 'a2b']], ['b' => 'b'], ['c' => 'c'],
-                ['d' => 'd'], ['e1' => Price::Budget, 'e2' => Price::Luxury, 'e3' => Price::Empty],
-                ['f1' => Distance::Close, 'f2' => Distance::Empty]));
+             'myAction',
+                    new DataTypeCluster(
+                        ['a1' => new IntegerField('a1', 'a1a'), 'a2' => new IntegerField('a2', ['a2a', 'a2b'])],
+                        ['b' => new BooleanField('b', true)],
+                        ['c' => new FloatField('c', 2.2)],
+                        ['d' => new StringField('d', 'd')],
+                        ['e1' => new PriceField('e1', Price::Budget),
+                            'e2' => new PriceField('e2', Price::Luxury),
+                            'e3' => new PriceField('e3', Price::Empty)],
+                        ['f1' => new DistanceField('f1', Distance::Close),
+                            'f2' => new DistanceField('f2', Distance::Empty)]));
         $sut = new UrlGenerator();
 
         $urlParams = $sut->getParameters($filters);
-        $this->assertEquals('action=myAction&a1=a1a&a2[]=a2a&a2[]=a2b&b=b&c=c&d=d&e1=budget&e2=luxury&f1=close', $urlParams);
+        $this->assertEquals('action=myAction&a1=a1a&a2[]=a2a&a2[]=a2b&b=1&c=2.2&d=d&e1=budget&e2=luxury&f1=close', $urlParams);
     }
 
     /**
@@ -30,10 +37,10 @@ class UrlGeneratorTest extends TestCase
     public function missingParametersShouldNotGenerateAdditionalAmpersands() {
         $filters = new Filters(
             'myAction',
-            new DataTypeCluster([], [], ['c' => 'c'],[], [],[]));
+            new DataTypeCluster([], [], ['c' => new FloatField('c', 2.2)],[], [],[]));
         $sut = new UrlGenerator();
 
         $urlParams = $sut->getParameters($filters);
-        $this->assertEquals('action=myAction&c=c', $urlParams);
+        $this->assertEquals('action=myAction&c=2.2', $urlParams);
     }
 }

@@ -46,9 +46,14 @@ class AprioriAlgorithmTest extends TestCase
 
     protected function setUp()
     {
-        $map = array(
-            array('aprioriMinSup', 2),
-        );
+        $map = [
+            ['apriori', [
+                'minSup' => 0.6,
+                'serviceStopFile' => '',
+                'outputInterval' => '',
+                'serviceOutput' => '',
+            ]],
+        ];
         $this->configMock = $this->createMock(ConfigProvider::class);
         $this->configMock->method('get')
             ->will($this->returnValueMap($map));

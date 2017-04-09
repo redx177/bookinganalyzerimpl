@@ -24,19 +24,21 @@ class AprioriAlgorithm
      * @param ConfigProvider $config Configuration provider.
      * @param Twig_TemplateWrapper|null $template Template to render the wip to.
      */
-    public function __construct(BookingsProvider $bookingsProvider, ConfigProvider $config, Twig_TemplateWrapper $template)
+    public function __construct(BookingsProvider $bookingsProvider, ConfigProvider $config, Twig_TemplateWrapper $template = null)
     {
         $this->bookingsProvider = $bookingsProvider;
-        $this->minSup = $config->get('aprioriMinSup');
         $this->bookingsCountCap = $config->get('bookingsCountCap');
-        $this->outputFile = $config->get('aprioriServiceOutput');
-        $this->outputInterval = $config->get('aprioriOutputInterval');
-        $this->stopFile = $config->get('aprioriServiceStopFile');
         $this->fieldNameMapping = $config->get('fieldNameMapping');
         $this->rootDir = $config->get('rootDir');
         $this->lastOutput = microtime(TRUE);
         $this->startTime = microtime(TRUE);
         $this->template = $template;
+
+        $aprioriConfig = $config->get('apriori');
+        $this->minSup = $aprioriConfig['minSup'];
+        $this->stopFile = $aprioriConfig['serviceStopFile'];
+        $this->outputInterval = $aprioriConfig['outputInterval'];
+        $this->outputFile = $aprioriConfig['serviceOutput'];
     }
 
     /**
@@ -97,8 +99,7 @@ class AprioriAlgorithm
             $offset += $batchSize;
         }
 
-        $filtersArray = $filters->getFilters();
-        if ($filtersArray) {
+        if ($filters && $filters->getFilters()) {
             foreach ($filters->getFilters() as $filter) {
                 $filterName = $filter->getName();
                 $filterValue = $filter->getValue();

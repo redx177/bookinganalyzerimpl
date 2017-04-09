@@ -24,11 +24,13 @@ class AttributanalysisController implements Controller {
          $this->twig = $twig;
          $this->filtersProvider = $filtersProvider;
          $this->rootDir = $config->get('rootDir');
-         $this->pidFile = $config->get('aprioriServicePidFile');
          $this->fieldNameMapping = $config->get('fieldNameMapping');
-         $this->serviceOutput = $config->get('aprioriServiceOutput');
-         $this->outputInterval = $config->get('aprioriOutputInterval');
          $this->runButtonTitle = $config->get('runButtonTitle');
+
+         $aprioriConfig = $config->get('apriori');
+         $this->pidFile = $aprioriConfig['servicePidFile'];
+         $this->serviceOutput = $aprioriConfig['serviceOutput'];
+         $this->outputInterval = $aprioriConfig['outputInterval'];
      }
 
 
