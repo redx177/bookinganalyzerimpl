@@ -153,6 +153,8 @@ class DistanceMeasurementTest extends TestCase
 
         $sut = new DistanceMeasurement($configMock);
         $distance = $sut->measure($this->center, $booking);
+
+        // Total Costs calculation: (integer differences sum of squares) + gamma*(sum of categorical missmatches)
         $this->assertEquals((4+4) + $gamma*(1+1), $distance);
     }
 

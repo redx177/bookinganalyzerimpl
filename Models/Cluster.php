@@ -11,17 +11,17 @@ class Cluster
      * @var Associate[]
      */
     private $associates = [];
-    private $totalError;
+    private $totalCosts;
 
     public function __construct(Booking $booking)
     {
         $this->center = $booking;
-        $this->totalError = 0;
+        $this->totalCosts = 0;
     }
 
     public function addAssociate(Associate $associate) {
         $this->associates[] = $associate;
-        $this->totalError += $associate->getDistance();
+        $this->totalCosts += $associate->getDistance();
     }
 
     public function getAssociates(): array
@@ -34,8 +34,8 @@ class Cluster
         return $this->center;
     }
 
-    public function getTotalError(): int
+    public function getTotalCosts(): int
     {
-        return $this->totalError;
+        return $this->totalCosts;
     }
 }
