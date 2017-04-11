@@ -3,7 +3,7 @@
 require_once dirname(__DIR__) . '/Business/DistanceMeasurement.php';
 require_once dirname(__DIR__) . '/Business/DataTypeClusterer.php';
 require_once dirname(__DIR__) . '/Interfaces/Field.php';
-require_once dirname(__DIR__) . '/Models/Prototype.php';
+require_once dirname(__DIR__) . '/Models/Cluster.php';
 require_once dirname(__DIR__) . '/Models/Booking.php';
 require_once dirname(__DIR__) . '/Models/DataTypeCluster.php';
 require_once dirname(__DIR__) . '/Models/IntegerField.php';
@@ -23,7 +23,7 @@ class DistanceMeasurementTest extends TestCase
     /**
      * @var Booking
      */
-    private $prototypeBooking;
+    private $center;
     /**
      * @var ConfigProvider
      */
@@ -31,14 +31,13 @@ class DistanceMeasurementTest extends TestCase
 
     protected function setUp()
     {
-        $this->prototypeBooking = new Booking(1, $this->getDataTypeCluster());
+        $this->center = new Booking(1, $this->getDataTypeCluster());
 
         $map = [
             ['kprototype', ['gamma' => 1]],
         ];
         $this->configMock = $this->createMock(ConfigProvider::class);
-        $this->configMock->method('get')
-            ->will($this->returnValueMap($map));
+        $this->configMock->method('get')->will($this->returnValueMap($map));
     }
 
     private function getDataTypeCluster($int1 = 4, $int2 = 5, $bool1 = false, $bool2 = true, $pri1 = Price::Empty, $dist1 = Distance::Empty): DataTypeCluster
@@ -57,7 +56,7 @@ class DistanceMeasurementTest extends TestCase
      */
     public function sameBookingsShouldReturn0Distance() {
         $sut = new DistanceMeasurement($this->configMock);
-        $distance = $sut->measure($this->prototypeBooking, $this->prototypeBooking);
+        $distance = $sut->measure($this->center, $this->center);
         $this->assertEquals(0, $distance);
     }
 
@@ -68,7 +67,7 @@ class DistanceMeasurementTest extends TestCase
         $booking = new Booking(1, $this->getDataTypeCluster(6));
 
         $sut = new DistanceMeasurement($this->configMock);
-        $distance = $sut->measure($this->prototypeBooking, $booking);
+        $distance = $sut->measure($this->center, $booking);
         $this->assertEquals(4, $distance);
     }
 
@@ -79,7 +78,7 @@ class DistanceMeasurementTest extends TestCase
         $booking = new Booking(1, $this->getDataTypeCluster(6, 3));
 
         $sut = new DistanceMeasurement($this->configMock);
-        $distance = $sut->measure($this->prototypeBooking, $booking);
+        $distance = $sut->measure($this->center, $booking);
         $this->assertEquals(8, $distance);
     }
 
@@ -90,7 +89,7 @@ class DistanceMeasurementTest extends TestCase
         $booking = new Booking(1, $this->getDataTypeCluster(4, 5, true));
 
         $sut = new DistanceMeasurement($this->configMock);
-        $distance = $sut->measure($this->prototypeBooking, $booking);
+        $distance = $sut->measure($this->center, $booking);
         $this->assertEquals(1, $distance);
     }
 
@@ -101,7 +100,7 @@ class DistanceMeasurementTest extends TestCase
         $booking = new Booking(1, $this->getDataTypeCluster(4, 5, true, false));
 
         $sut = new DistanceMeasurement($this->configMock);
-        $distance = $sut->measure($this->prototypeBooking, $booking);
+        $distance = $sut->measure($this->center, $booking);
         $this->assertEquals(2, $distance);
     }
 
@@ -112,7 +111,7 @@ class DistanceMeasurementTest extends TestCase
         $booking = new Booking(1, $this->getDataTypeCluster(4, 5, false, true, Price::Budget));
 
         $sut = new DistanceMeasurement($this->configMock);
-        $distance = $sut->measure($this->prototypeBooking, $booking);
+        $distance = $sut->measure($this->center, $booking);
         $this->assertEquals(1, $distance);
     }
 
@@ -123,7 +122,7 @@ class DistanceMeasurementTest extends TestCase
         $booking = new Booking(1, $this->getDataTypeCluster(4, 5, false, true, Price::Luxury));
 
         $sut = new DistanceMeasurement($this->configMock);
-        $distance = $sut->measure($this->prototypeBooking, $booking);
+        $distance = $sut->measure($this->center, $booking);
         $this->assertEquals(1, $distance);
     }
 
@@ -134,7 +133,7 @@ class DistanceMeasurementTest extends TestCase
         $booking = new Booking(1, $this->getDataTypeCluster(4, 5, false, true, Price::Empty, Distance::Close));
 
         $sut = new DistanceMeasurement($this->configMock);
-        $distance = $sut->measure($this->prototypeBooking, $booking);
+        $distance = $sut->measure($this->center, $booking);
         $this->assertEquals(1, $distance);
     }
 
@@ -153,7 +152,7 @@ class DistanceMeasurementTest extends TestCase
         $booking = new Booking(1, $this->getDataTypeCluster(6, 3, true, false));
 
         $sut = new DistanceMeasurement($configMock);
-        $distance = $sut->measure($this->prototypeBooking, $booking);
+        $distance = $sut->measure($this->center, $booking);
         $this->assertEquals((4+4) + $gamma*(1+1), $distance);
     }
 
@@ -172,7 +171,7 @@ class DistanceMeasurementTest extends TestCase
         $booking = new Booking(1, $this->getDataTypeCluster(6, 3, true, false));
 
         $sut = new DistanceMeasurement($configMock);
-        $distance = $sut->measure($this->prototypeBooking, $booking);
+        $distance = $sut->measure($this->center, $booking);
         $this->assertEquals((4+4) + $gamma*(1+1), $distance);
     }
 }

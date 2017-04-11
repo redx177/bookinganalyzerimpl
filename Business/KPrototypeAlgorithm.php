@@ -8,7 +8,6 @@ class KPrototypeAlgorithm
     private $lastOutput;
     private $outputFile;
     private $outputInterval;
-    private $fileWriteCount = 0;
     private $startTime;
     private $fieldNameMapping;
     private $rootDir;
@@ -21,18 +20,24 @@ class KPrototypeAlgorithm
      * @var DistanceMeasurement
      */
     private $distance;
+    /**
+     * @var Random
+     */
+    private $random;
 
     /**
      * AprioriAlgorithm constructor.
      * @param BookingsProvider $bookingsProvider Provider for the data to analyze.
      * @param ConfigProvider $config Configuration provider.
      * @param DistanceMeasurement $distance Measures distance between two bookings.
+     * @param Random $random Generate random numbers.
      * @param Twig_TemplateWrapper|null $template Template to render the wip to.
      */
     public function __construct(
         BookingsProvider $bookingsProvider,
         ConfigProvider $config,
         DistanceMeasurement $distance,
+        Random $random,
         Twig_TemplateWrapper $template = null)
     {
         $this->bookingsProvider = $bookingsProvider;
@@ -48,62 +53,65 @@ class KPrototypeAlgorithm
         $this->stopFile = $kprototypeConfig['serviceStopFile'];
         $this->outputInterval = $kprototypeConfig['outputInterval'];
         $this->outputFile = $kprototypeConfig['serviceOutput'];
+        $this->random = $random;
     }
 
     /**
      * Analyzes the bookings with the apriori algorithm.
      * @param Filters|null $filters Filter set for the bookings.
-     * @return Histograms Histograms representing the results.
+     * @return Cluster[]
      */
-    public function run(Filters $filters = null) : Histograms
+    public function run(Filters $filters = null): array
     {
         $this->bookingsCount = $this->getBookingsCount($filters);
         $this->bookingsProvider->rewind();
 
-        $prototypes = $this->getPrototypes(2, $filters);
+        $clusters = $this->getInitialEmptyClusters(2, $filters);
+        $clusterCenterIds = $this->getClusterCenterIds($clusters);
         $this->bookingsProvider->rewind();
 
-        $this->assignBookingsToPrototype($prototypes, $filters);
+        $this->assignBookingsToClusters($clusters, $clusterCenterIds, $filters);
+        return $clusters;
     }
 
-    private function getPrototypes(int $k, Filters $filters = null): array
+    private function getInitialEmptyClusters(int $k, Filters $filters = null): array
     {
         if ($k > $this->bookingsCount) {
             $k = $this->bookingsCount;
         }
 
-        $prototypeIndicies = [];
+        $clusterCenterIndices = [];
         for ($i = 0; $i < $k; $i++) {
             $max = $this->bookingsCountCap && $this->bookingsCountCap < $this->bookingsCount
                 ? $this->bookingsCountCap - 1
                 : $this->bookingsCount - 1;
-            $prototypeIndex = mt_rand(0, $max);
+            $clusterCenterIndex = $this->random->generate($max);
 
             // If index is already set, rerun generation.
-            if (in_array($prototypeIndex, $prototypeIndicies)) {
+            if (in_array($clusterCenterIndex, $clusterCenterIndices)) {
                 $i--;
             } else {
-                $prototypeIndicies[] = $prototypeIndex;
+                $clusterCenterIndices[] = $clusterCenterIndex;
             }
         }
-        sort($prototypeIndicies);
+        sort($clusterCenterIndices);
 
         $offset = 0;
         $batchSize = 1000;
-        $prototypes = [];
+        $clusters = [];
         while (!$this->bookingsProvider->hasEndBeenReached()) {
             if ($this->bookingsCountCap && $offset >= $this->bookingsCountCap) {
                 break;
             }
             $bookings = $this->bookingsProvider->getSubset($batchSize, $filters);
             foreach ($bookings as $booking) {
-                if (in_array($offset, $prototypeIndicies)) {
-                    $prototypes[] = new Prototype($booking);
+                if (in_array($offset, $clusterCenterIndices)) {
+                    $clusters[] = new Cluster($booking);
                 }
                 $offset++;
             }
         }
-        return $prototypes;
+        return $clusters;
     }
 
     private function getBookingsCount($filters): int
@@ -121,9 +129,13 @@ class KPrototypeAlgorithm
         return $bookingsCount;
     }
 
-    private function assignBookingsToPrototype(array $prototypes, Filters $filters = null)
+    /**
+     * @param Cluster[] $clusters
+     * @param int[] $clusterCenterIds
+     * @param Filters|null $filters
+     */
+    private function assignBookingsToClusters(array $clusters, array $clusterCenterIds, Filters $filters = null)
     {
-        /* var $protoypes Prototype[] */
         $offset = 0;
         $batchSize = 1000;
         while (!$this->bookingsProvider->hasEndBeenReached()) {
@@ -133,26 +145,43 @@ class KPrototypeAlgorithm
             $bookings = $this->bookingsProvider->getSubset($batchSize, $filters);
             $this->bookingsCount += count($bookings);
             foreach ($bookings as $booking) {
-                $this->assignBookingToPrototype($prototypes, $booking);
+                if (in_array($booking->getId(), $clusterCenterIds)) {
+                    continue;
+                }
+                $this->assignBookingToCluster($clusters, $booking);
             }
         }
     }
 
     /**
-     * @param Prototype[] $prototypes
+     * @param Cluster[] $clusters
      * @param Booking $booking
      */
-    private function assignBookingToPrototype(array $prototypes, Booking $booking)
+    private function assignBookingToCluster(array $clusters, Booking $booking)
     {
-        // [Prototype, Distance]
-        $closestPrototype = [null, 0];
+        $closestCluster = null;
+        $closestDistance = null;
 
-        foreach ($prototypes as $prototype) {
-            $distance = $this->distance->measure($prototype->getPrototypeBooking(), $booking);
-            if ($closestPrototype[1] > $distance) {
-                $closestPrototype = [$prototype, $distance];
+        foreach ($clusters as $cluster) {
+            $distance = $this->distance->measure($cluster->getCenter(), $booking);
+            if ($closestDistance === null || $closestDistance > $distance) {
+                $closestDistance = $distance;
+                $closestCluster = $cluster;
             }
         }
-        $closestPrototype[0]->addBooking($booking);
+        $closestCluster->addAssociate(new Associate($booking, $closestDistance));
+    }
+
+    /**
+     * @param Cluster[] $clusters
+     * @return int[]
+     */
+    private function getClusterCenterIds(array $clusters)
+    {
+        $ids = [];
+        foreach ($clusters as $cluster) {
+            $ids[] = $cluster->getCenter()->getId();
+        }
+        return $ids;
     }
 }
