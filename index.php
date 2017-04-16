@@ -10,8 +10,9 @@ require_once __DIR__ . '/Business/BookingsProvider.php';
 require_once __DIR__ . '/Business/DataTypeClusterer.php';
 require_once __DIR__ . '/Business/FiltersProvider.php';
 require_once __DIR__ . '/Business/Pagination.php';
-require_once __DIR__ . '/Controllers/AttributanalysisController.php';
 require_once __DIR__ . '/Controllers/ExploreController.php';
+require_once __DIR__ . '/Controllers/AttributanalysisController.php';
+require_once __DIR__ . '/Controllers/AttributanalysisWithGroupingController.php';
 require_once __DIR__ . '/Models/Booking.php';
 require_once __DIR__ . '/Models/BooleanField.php';
 require_once __DIR__ . '/Models/ButtonConfig.php';
@@ -32,10 +33,6 @@ require_once __DIR__ . '/Utilities/ConfigProvider.php';
 require_once __DIR__ . '/Utilities/LoadAllCsvDataIterator.php';
 require_once __DIR__ . '/Utilities/LoadIncrementalCsvDataIterator.php';
 require_once __DIR__ . '/Utilities/UrlGenerator.php';
-
-//spl_autoload_register(function ($classname) {
-//    Autoloader::load($classname);
-//});
 
 /* CONFIG */
 $config = new ConfigProvider($GLOBALS['configContent']);
@@ -65,7 +62,7 @@ $controller = null;
 $getKeys = array_keys($_REQUEST);
 if (in_array('attributanalysis', $getKeys)) {
     $controller = $container->get('AttributanalysisController');
-} elseif (in_array('attributanalysiswithgrouping', $getKeys)) {
+} elseif (in_array('attributanalysisWithGrouping', $getKeys)) {
     $controller = $container->get('AttributanalysisWithGroupingController');
 } elseif (in_array('settings', $getKeys)) {
     $controller = $container->get('SettingsController');

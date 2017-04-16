@@ -19,11 +19,20 @@ class Cluster
         $this->totalCosts = 0;
     }
 
-    public function addAssociate(Associate $associate) {
-        $this->associates[] = $associate;
+    public function addAssociate(Associate $associate)
+    {
+        $this->associates[$associate->getId()] = $associate;
         $this->totalCosts += $associate->getDistance();
     }
 
+    public function removeAssociate(Associate $associate)
+    {
+        unset($this->associates[$associate->getId()]);
+    }
+
+    /**
+     * @return Associate[]
+     */
     public function getAssociates(): array
     {
         return $this->associates;

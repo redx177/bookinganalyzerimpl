@@ -1,4 +1,7 @@
 <?php
+spl_autoload_register(function ($classname) {
+    Autoloader::load($classname);
+});
 
 class Autoloader
 {

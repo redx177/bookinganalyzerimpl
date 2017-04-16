@@ -34,6 +34,9 @@ class Booking
         return $this->id;
     }
 
+    /**
+     * @return Field[]
+     */
     public function getFields()
     {
         return $this->fields;

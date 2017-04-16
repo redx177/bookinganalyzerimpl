@@ -3,38 +3,27 @@
 class Associate
 {
     /**
-     * @var Booking
+     * @var int
      */
-    private $booking;
+    private $bookingId;
     /**
      * @var float
      */
     private $distance;
 
-    /**
-     * Associate constructor.
-     * @param Booking $booking
-     * @param float $distance
-     */
-    public function __construct($booking, $distance)
+    public function __construct(Booking $booking, float $distance)
     {
-        $this->booking = $booking;
+        $this->bookingId = $booking->getId();
         $this->distance = $distance;
     }
 
-    /**
-     * @return Booking
-     */
-    public function getBooking(): Booking
-    {
-        return $this->booking;
-    }
-
-    /**
-     * @return float
-     */
     public function getDistance(): float
     {
         return $this->distance;
+    }
+
+    public function getId(): int
+    {
+        return $this->bookingId;
     }
 }

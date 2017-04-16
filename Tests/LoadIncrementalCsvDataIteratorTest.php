@@ -125,7 +125,7 @@ class LoadIncrementalCsvDataIteratorTest extends TestCase
      * @test
      */
     public function providingDiffernentDeliminiterShouldReturnSingleString() {
-        $sut = new LoadIncrementalCsvDataIterator($this->testfile, 0, ',');
+        $sut = new LoadIncrementalCsvDataIterator($this->testfile, null,0, ',');
         $line = $sut->current();
         $this->assertEquals(array('first;second;third' => '1;2;3'), $line);
     }
@@ -147,14 +147,20 @@ class LoadIncrementalCsvDataIteratorTest extends TestCase
         ), $result);
     }
 
-    public function testSkipOneLineShouldReturnSecond() {
+    /**
+     * @test
+     */
+    public function skipOneLineShouldReturnSecond() {
         $sut = new LoadIncrementalCsvDataIterator($this->testfile);
         $sut->skip(1);
         $line = $sut->current();
         $this->assertEquals(array('first' => '2','second' => '3','third' => '4'), $line);
     }
 
-    public function testSkipTwoLineShouldReturnFalse() {
+    /**
+     * @test
+     */
+    public function skipTwoLineShouldReturnFalse() {
         $sut = new LoadIncrementalCsvDataIterator($this->testfile);
         $sut->skip(2);
         $line = $sut->current();

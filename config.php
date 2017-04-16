@@ -43,8 +43,9 @@ $configContent = array(
     ],
     'filterButtonTitle' => 'Apply Fiters',
     'runButtonTitle' => 'Run analysis',
-    'bookingsCountCap' => null, // Debugging only. int|null
+    'bookingsCountCap' => 500, // Debugging only. int|null
     'ignoreFields' => ['SCTV'],
+    'fileCacheDirectory' => '/fileCache/',
     'apriori' => [
         'minSup' => 0.4, // percentage
         'serviceOutput' => '/Services/Apriori/wip/status.htm',
@@ -56,7 +57,8 @@ $configContent = array(
         'serviceOutput' => '/Services/KPrototype/wip/status.htm',
         'servicePidFile' => '/Services/KPrototype/wip/pid.txt',
         'serviceStopFile' => '/Services/KPrototype/wip/stop.txt',
-        'outputInterval' => 10, // Seconds
+        'outputInterval' => 1, // Seconds
         'gamma' => 1, // value between 0-1.
-    ]
+        'maxIterations' => 10,
+    ],
 );

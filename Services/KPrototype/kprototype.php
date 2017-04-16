@@ -5,17 +5,24 @@ require_once $rootDir . '/config.php';
 require_once $rootDir . '/Interfaces/BookingDataIterator.php';
 require_once $rootDir . '/Interfaces/AprioriProgress.php';
 require_once $rootDir . '/Interfaces/Field.php';
+require_once $rootDir . '/Interfaces/Random.php';
 require_once $rootDir . '/Utilities/ConfigProvider.php';
 require_once $rootDir . '/Utilities/LoadAllCsvDataIterator.php';
 require_once $rootDir . '/Utilities/LoadIncrementalCsvDataIterator.php';
 require_once $rootDir . '/Utilities/LoadRedisDataIterator.php';
+require_once $rootDir . '/Utilities/Randomizer.php';
 require_once $rootDir . '/Business/AprioriAlgorithm.php';
 require_once $rootDir . '/Business/AprioriProgressToFile.php';
+require_once $rootDir . '/Business/AprioriProgressToMemory.php';
+require_once $rootDir . '/Business/ClusteringProgress.php';
+require_once $rootDir . '/Business/KPrototypeClusteringProgress.php';
 require_once $rootDir . '/Business/BookingsProvider.php';
 require_once $rootDir . '/Business/DataTypeClusterer.php';
 require_once $rootDir . '/Business/Pagination.php';
 require_once $rootDir . '/Business/FiltersProvider.php';
-require_once $rootDir . '/Business/DataCache.php';
+require_once $rootDir . '/Business/KPrototypeAlgorithm.php';
+require_once $rootDir . '/Business/DistanceMeasurement.php';
+require_once $rootDir . '/Models/AprioriState.php';
 require_once $rootDir . '/Models/Booking.php';
 require_once $rootDir . '/Models/BooleanField.php';
 require_once $rootDir . '/Models/ButtonConfig.php';
@@ -32,9 +39,12 @@ require_once $rootDir . '/Models/IntegerField.php';
 require_once $rootDir . '/Models/Price.php';
 require_once $rootDir . '/Models/PriceField.php';
 require_once $rootDir . '/Models/StringField.php';
+require_once $rootDir . '/Models/Clusters.php';
+require_once $rootDir . '/Models/Cluster.php';
+require_once $rootDir . '/Models/Associate.php';
 $config = new ConfigProvider($GLOBALS['configContent']);
 $config->set('rootDir', $rootDir);
-$aprioriConfig = $config->get('apriori');
+$kprototypeConfig = $config->get('kprototype');
 
 /* TWIG */
 $loader = new Twig_Loader_Filesystem($rootDir . '/Templates');
@@ -44,32 +54,34 @@ $twig = new Twig_Environment($loader, array(
 ));
 $twig->addFunction(new Twig_Function('sortHistogramBinsByCount', 'sortHistogramBinsByCount'));
 $twig->addExtension(new Twig_Extension_Debug());
-$template = $twig->load('candidatesAndFrequentSetsAsTable.twig');
+$template = $twig->load('clusters.twig');
 
 /* REDIS */
 $redis = new Redis();
 $redis->connect('127.0.0.1');
 
-
 /* DI CONTAINER */
 $builder = new DI\ContainerBuilder();
 $builder->addDefinitions([
     Twig_Environment::class => $twig,
+    Twig_TemplateWrapper::class => $template,
+    BookingDataIterator::class => new LoadIncrementalCsvDataIterator($rootDir . '/' . $config->get('dataSource')),
+    //BookingDataIterator::class => new LoadAllCsvDataIterator($rootDir . '/' . $config->get('dataSource')),
     ConfigProvider::class => $config,
     Twig_TemplateWrapper::class => $template,
     Redis::class => $redis,
-    //BookingDataIterator::class => new LoadRedisDataIterator($redis),
-    BookingDataIterator::class => new LoadIncrementalCsvDataIterator($rootDir . '/' . $config->get('dataSource')),
-    //BookingDataIterator::class => new LoadAllCsvDataIterator($rootDir . '/' . $config->get('dataSource')),
-    AprioriProgress::class => \DI\object(AprioriProgressToFile::class)
+    Random::class => new Randomizer(),
+    ClusteringProgress::class => \DI\object(KPrototypeClusteringProgress::class),
 ]);
 $container = $builder->build();
 
+$tmp = $container->get(ClusteringProgress::class);
+
 if (array_key_exists('abort', $_GET) && $_GET['abort']) {
-    file_put_contents($rootDir . $aprioriConfig['serviceStopFile'], "");
+    file_put_contents($rootDir . $kprototypeConfig['serviceStopFile'], "");
 } else {
+    /** @var KPrototypeAlgorithm $kprototype */
     /** @var FiltersProvider $filtersProvider */
-    /** @var AprioriAlgorithm $apriori */
     /** @var DataCache $cache */
 
     // Get filters
@@ -84,27 +96,11 @@ if (array_key_exists('abort', $_GET) && $_GET['abort']) {
     // Cache file
     $cache = $container->get(DataCache::class);
     $cacheFile = $cache->getCacheFile($filters);
-    $countFile = $cache->getCountFile($filters);
-    $container->set(BookingDataIterator::class, new LoadIncrementalCsvDataIterator($cacheFile, $countFile));
-    die();
+    $container->set(BookingDataIterator::class, new LoadIncrementalCsvDataIterator($cacheFile));
 
     // Run algorithm
-    $apriori = $container->get('AprioriAlgorithm');
-    unlink($rootDir . $aprioriConfig['serviceStopFile']);
-    $apriori->run($filters);
-    unlink($rootDir . $aprioriConfig['servicePidFile']);
-}
-
-
-function sortHistogramBinsByCount($histogramBins)
-{
-    usort($histogramBins, function (HistogramBin $a, HistogramBin $b) {
-        $aCount = $a->getCount();
-        $bCount = $b->getCount();
-        if ($aCount == $bCount) {
-            return 0;
-        }
-        return $aCount > $bCount ? -1 : 1;
-    });
-    return $histogramBins;
+    $kprototype = $container->get('KPrototypeAlgorithm');
+    unlink($rootDir.$kprototypeConfig['serviceStopFile']);
+    $kprototype->run($filters);
+    unlink($rootDir.$kprototypeConfig['servicePidFile']);
 }

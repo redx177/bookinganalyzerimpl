@@ -8,31 +8,35 @@ class LoadIncrementalCsvDataIterator implements BookingDataIterator {
     private $filePointer;
     private $currentRowNumber = 0;
     private $currentLine = false;
-    private $deliminiter;
+    private $delimiter;
     private $enclosure;
     private $fieldNames;
+    private $count;
 
     /**
      * CsvIterator constructor.
-     * @param $file File (incl. path) to load.
-     * @param string $deliminiter The optional delimiter parameter sets the field delimiter (one character only).
-     * @param string $enclosure The optional enclosure parameter sets the field enclosure character (one character only).
+     * @param string $dataFile File (incl. path) to load.
+     * @param string|null $countFile File with the count.
+     * @param string|null $delimiter The optional delimiter parameter sets the field delimiter (one character only).
+     * @param string|null $enclosure The optional enclosure parameter sets the field enclosure character (one character only).
      * @throws Exception
      */
-    public function __construct($file, $deliminiter=';', $enclosure = '"')
+    public function __construct(string $dataFile, string $countFile = null, $delimiter=';', $enclosure = '"')
     {
-        if (!file_exists($file)) {
-            throw new Exception('File ['. $file. '] not found');
+        if (!file_exists($dataFile)) {
+            throw new Exception('File ['. $dataFile. '] not found');
         }
-        $this->filePointer = fopen($file, 'r');
+        $this->filePointer = fopen($dataFile, 'r');
         $this->currentRowNumber = 0;
-        $this->deliminiter = $deliminiter;
+        $this->delimiter = $delimiter;
         $this->enclosure = $enclosure;
 
         $this->fieldNames = $this->getFieldNames();
 
         // Loading first line.
         $this->next();
+
+        $this->setCount($countFile);
     }
 
     /**
@@ -55,7 +59,7 @@ class LoadIncrementalCsvDataIterator implements BookingDataIterator {
     public function next()
     {
         $this->currentRowNumber++;
-        $currentLine = fgetcsv($this->filePointer, 0, $this->deliminiter, $this->enclosure);
+        $currentLine = fgetcsv($this->filePointer, 0, $this->delimiter, $this->enclosure);
 
 
         if ($currentLine === false) {
@@ -111,7 +115,7 @@ class LoadIncrementalCsvDataIterator implements BookingDataIterator {
     private function getFieldNames()
     {
         rewind($this->filePointer);
-        return fgetcsv($this->filePointer, 0, $this->deliminiter, $this->enclosure);
+        return fgetcsv($this->filePointer, 0, $this->delimiter, $this->enclosure);
     }
 
     /**
@@ -123,5 +127,23 @@ class LoadIncrementalCsvDataIterator implements BookingDataIterator {
         for($i = 0; $i < $count; $i++) {
             $this->next();
         }
+    }
+
+    private function setCount($countFile)
+    {
+        if ($countFile === null) {
+            $this->count = 0;
+            return;
+        }
+        $this->count = (int)file_get_contents($countFile);
+    }
+
+    /**
+     * Gets the total amount of bookings.
+     * @return int Total amount of bookings
+     */
+    public function count(): int
+    {
+        return $this->count();
     }
 }

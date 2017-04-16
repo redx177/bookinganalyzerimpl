@@ -13,22 +13,22 @@ class LoadAllCsvDataIterator implements BookingDataIterator {
 
     /**
      * CsvIterator constructor.
-     * @param $file File (incl. path) to load.
+     * @param $dataFile File (incl. path) to load.
      * @param string $deliminiter The optional delimiter parameter sets the field delimiter (one character only).
      * @param string $enclosure The optional enclosure parameter sets the field enclosure character (one character only).
      * @throws Exception
      */
-    public function __construct($file, $deliminiter=';', $enclosure = '"')
+    public function __construct($dataFile, $deliminiter=';', $enclosure = '"')
     {
-        if (!file_exists($file)) {
-            throw new Exception('File ['. $file. '] not found');
+        if (!file_exists($dataFile)) {
+            throw new Exception('File ['. $dataFile. '] not found');
         }
-        $this->filePointer = fopen($file, 'r');
+        $this->filePointer = fopen($dataFile, 'r');
         $this->currentRowNumber = 0;
         $this->deliminiter = $deliminiter;
         $this->enclosure = $enclosure;
 
-        $this->initData($file);
+        $this->initData($dataFile);
     }
 
     /**
@@ -107,5 +107,17 @@ class LoadAllCsvDataIterator implements BookingDataIterator {
             $line = str_getcsv($data[$i], $this->deliminiter, $this->enclosure);
             $this->data[] = array_combine($fieldNames, $line);
         }
+    }
+
+    private function setCount($countFile)
+    {
+        if ($countFile === null) {
+            $this->count = 0;
+        }
+        $this->count = (int)file_get_contents($countFile);
+    }
+
+    public function count(): int {
+        return count($this->data);
     }
 }

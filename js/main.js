@@ -1,5 +1,5 @@
 $( document ).ready(function() {
-    if (statusUrl) {
+    if (statusUrl && isRunning) {
         var intervalId = setInterval(function() { pull(intervalId) }, pullInterval * 1000)
     }
 });

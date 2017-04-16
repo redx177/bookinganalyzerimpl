@@ -102,7 +102,7 @@ class BookingsProvider {
 //        return $itemCount;
 //    }
 
-    private function getBooking(array $rawBooking): Booking
+    public function getBooking(array $rawBooking): Booking
     {
         $dataTypeCluster = $this->dataTypeClusterer->get($rawBooking);
         $id = $rawBooking[$this->idField];

@@ -38,6 +38,10 @@ class Filters
         return $this->action;
     }
 
+    /**
+     * Gets the filter fields.
+     * @return Filter[] Filter fields.
+     */
     public function getFilters()
     {
         return $this->filters;

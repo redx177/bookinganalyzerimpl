@@ -2,7 +2,7 @@
 
 /**
  * Saves the apriori progress to a file.
- * Not every call to processState is saved to the file.
+ * Not every call to storeState is saved to file.
  * How often this is done can be configured in the $config['apriori']['outputInterval'].
  */
 class AprioriProgressToFile implements AprioriProgress

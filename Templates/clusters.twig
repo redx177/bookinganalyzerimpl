@@ -1,0 +1,33 @@
+<div class="histogramsAsTable">
+
+    {% if done %}
+        <h1 id="done">Analysis done</h1>
+    {% else %}
+        <h1>Analysis progress...</h1>
+    {% endif %}
+    <div class="container">
+        {% if not done %}
+            <button type="button" class="btn btn-danger btn-abort">Abort</button>
+        {% endif %}
+        Runtime: {{ runtimeInSeconds }}<br />
+        Items count: {{ bookingsCount }}
+    </div>
+
+    <div class="container">
+        {% if done %}
+            <p>Overal error: {{ clusters.totalCosts }}<br /> Iteration: {{ iteration }}</p>
+            <ul>
+                {% for cluster in clusters.clusters %}
+                    <li>Cluster {{ loop.index }}, Item Count: {{ cluster.associates|length }}, Error: {{ cluster.totalCosts }}</li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>Overal error: {{ cluster.totalCosts }}</p>
+            <ul>
+            {% for cluster in clusters.clusters %}
+                <li>Cluster {{ loop.index }}, Item Count: {{ cluster.associates|length }}, Error: {{ cluster.totalCosts }}</li>
+            {% endfor %}
+            </ul>
+        {% endif %}
+    </div>
+</div>

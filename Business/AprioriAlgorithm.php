@@ -19,15 +19,15 @@ class AprioriAlgorithm
     /**
      * @var AprioriProgress
      */
-    private $aprioriProgress;
+    private $progress;
 
     /**
      * AprioriAlgorithm constructor.
      * @param BookingsProvider $bookingsProvider Provider for the data to analyze.
      * @param ConfigProvider $config Configuration provider.
-     * @param AprioriProgress $aprioriProgress Processes the progress of the apriori algorithm.
+     * @param AprioriProgress $progress Processes the progress of the apriori algorithm.
      */
-    public function __construct(BookingsProvider $bookingsProvider, ConfigProvider $config, AprioriProgress $aprioriProgress)
+    public function __construct(BookingsProvider $bookingsProvider, ConfigProvider $config, AprioriProgress $progress)
     {
         $this->bookingsProvider = $bookingsProvider;
         $this->bookingsCountCap = $config->get('bookingsCountCap');
@@ -35,7 +35,7 @@ class AprioriAlgorithm
         $this->rootDir = $config->get('rootDir');
         $this->lastOutput = microtime(TRUE);
         $this->startTime = microtime(TRUE);
-        $this->aprioriProgress = $aprioriProgress;
+        $this->progress = $progress;
 
         $aprioriConfig = $config->get('apriori');
         $this->minSup = $aprioriConfig['minSup'];
@@ -218,7 +218,7 @@ class AprioriAlgorithm
 
     private function storeState($candidates = null, $frequentSets = null)
     {
-        $this->aprioriProgress->storeState($this->startTime, $this->bookingsCount, $candidates, $frequentSets);
+        $this->progress->storeState($this->startTime, $this->bookingsCount, $candidates, $frequentSets);
     }
 
     static function frequentSetSort($a, $b) {
