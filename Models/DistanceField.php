@@ -28,6 +28,6 @@ class DistanceField implements Field
 
     public static function getType()
     {
-        return Distance::class;
+        return DistanceField::class;
     }
 }

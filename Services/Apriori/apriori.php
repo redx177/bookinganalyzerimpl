@@ -16,6 +16,8 @@ require_once $rootDir . '/Business/DataTypeClusterer.php';
 require_once $rootDir . '/Business/Pagination.php';
 require_once $rootDir . '/Business/FiltersProvider.php';
 require_once $rootDir . '/Business/DataCache.php';
+require_once $rootDir . '/Business/BookingDataIteratorAdapter.php';
+require_once $rootDir . '/Business/BookingBuilder.php';
 require_once $rootDir . '/Models/Booking.php';
 require_once $rootDir . '/Models/BooleanField.php';
 require_once $rootDir . '/Models/ButtonConfig.php';

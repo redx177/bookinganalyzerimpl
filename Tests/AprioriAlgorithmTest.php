@@ -1,8 +1,9 @@
 <?php
 require_once dirname(__DIR__) . '/Interfaces/AprioriProgress.php';
 require_once dirname(__DIR__) . '/Interfaces/Field.php';
+require_once dirname(__DIR__) . '/Interfaces/BookingDataIterator.php';
 require_once dirname(__DIR__) . '/Business/AprioriAlgorithm.php';
-require_once dirname(__DIR__) . '/Business/BookingsProvider.php';
+require_once dirname(__DIR__) . '/Business/BookingDataIteratorAdapter.php';
 require_once dirname(__DIR__) . '/Models/Booking.php';
 require_once dirname(__DIR__) . '/Models/Histograms.php';
 require_once dirname(__DIR__) . '/Models/Histogram.php';
@@ -24,6 +25,7 @@ class AprioriAlgorithmTest extends TestCase
 {
     private $configMock;
     private $aprioriProgressMock;
+    private $factoryMock;
 
     private function GetBooking($intRooms, $intBedrooms, $intStars, $boolTv, $boolBbq, $boolPets,
                                 $boolBalcony, $boolSauna, $floatLong, $floatLat, $price, $diSea, $diLake, $diSki)
@@ -61,6 +63,7 @@ class AprioriAlgorithmTest extends TestCase
             ->will($this->returnValueMap($map));
 
         $this->aprioriProgressMock = $this->createMock(AprioriProgress::class);
+        $this->factoryMock = $this->createMock(\DI\FactoryInterface::class);
     }
 
     /**
@@ -69,33 +72,27 @@ class AprioriAlgorithmTest extends TestCase
     public function checkIntegerInSetSize1() {
         $rooms = 7;
 
-        $bookingsProviderMock = $this->createMock(BookingsProvider::class);
-        $bookingsProviderMock->method('getSubset')
-            ->will($this->onConsecutiveCalls([
-                $this->GetBooking(
-                    $rooms, 1, 1,
-                    false, false, false, false, false,
-                    40.45538, -3.79278,
-                    Price::Empty,
-                    Distance::Empty, Distance::Empty, Distance::Empty),
-                $this->GetBooking(
-                    $rooms, 2, 2,
-                    false, false, false, false, false,
-                    40.45538, -3.79278,
-                    Price::Empty,
-                    Distance::Close, Distance::Empty, Distance::Empty),
-            ],[
-                $this->GetBooking(
-                    $rooms, 3, 3,
-                    false, false, false, false, false,
-                    40.45538, -3.79278,
-                    Price::Empty,
-                    Distance::Empty, Distance::Empty, Distance::Empty),
-            ]));
-        $bookingsProviderMock->method('hasEndBeenReached')
-            ->will($this->onConsecutiveCalls(false,false,true));
+        $bookingDataIteratorMock = BookingDataIteratorAdapterMock::get($this, [
+            $this->GetBooking(
+                $rooms, 1, 1,
+                false, false, false, false, false,
+                40.45538, -3.79278,
+                Price::Empty,
+                Distance::Empty, Distance::Empty, Distance::Empty),
+            $this->GetBooking(
+                $rooms, 2, 2,
+                false, false, false, false, false,
+                40.45538, -3.79278,
+                Price::Empty,
+                Distance::Close, Distance::Empty, Distance::Empty),
+            $this->GetBooking(
+                $rooms, 3, 3,
+                false, false, false, false, false,
+                40.45538, -3.79278,
+                Price::Empty,
+                Distance::Empty, Distance::Empty, Distance::Empty)]);
 
-        $sut = new AprioriAlgorithm($bookingsProviderMock, $this->configMock, $this->aprioriProgressMock);
+        $sut = new AprioriAlgorithm($bookingDataIteratorMock, $this->configMock, $this->aprioriProgressMock, $this->factoryMock);
         $histograms = $sut->run();
         $histogram = $histograms->getHistogram(1);
         $histogramBins = $histogram->getHistogramBins();
@@ -112,9 +109,8 @@ class AprioriAlgorithmTest extends TestCase
     public function checkBooleansInSetSize1() {
         $tv = true;
 
-        $bookingsProviderMock = $this->createMock(BookingsProvider::class);
-        $bookingsProviderMock->method('getSubset')
-            ->will($this->onConsecutiveCalls([
+
+        $bookingDataIteratorMock = BookingDataIteratorAdapterMock::get($this, [
                 $this->GetBooking(
                     1, 1, 1,
                     $tv, false, false, false, false,
@@ -127,18 +123,14 @@ class AprioriAlgorithmTest extends TestCase
                     40.45538, -3.79278,
                     Price::Empty,
                     Distance::Empty, Distance::Empty, Distance::Empty),
-            ],[
                 $this->GetBooking(
                     3, 3, 3,
                     $tv, false, false, false, false,
                     40.45538, -3.79278,
                     Price::Empty,
-                    Distance::Empty, Distance::Empty, Distance::Empty),
-            ]));
-        $bookingsProviderMock->method('hasEndBeenReached')
-            ->will($this->onConsecutiveCalls(false,false,true));
+                    Distance::Empty, Distance::Empty, Distance::Empty)]);
 
-        $sut = new AprioriAlgorithm($bookingsProviderMock, $this->configMock, $this->aprioriProgressMock);
+        $sut = new AprioriAlgorithm($bookingDataIteratorMock, $this->configMock, $this->aprioriProgressMock, $this->factoryMock);
         $histograms = $sut->run();
         $histogram = $histograms->getHistogram(1);
         $histogramBins = $histogram->getHistogramBins();
@@ -154,9 +146,7 @@ class AprioriAlgorithmTest extends TestCase
     public function checkPriceInSetSize1() {
         $price = Price::Budget;
 
-        $bookingsProviderMock = $this->createMock(BookingsProvider::class);
-        $bookingsProviderMock->method('getSubset')
-            ->will($this->onConsecutiveCalls([
+        $bookingDataIteratorMock = BookingDataIteratorAdapterMock::get($this, [
                 $this->GetBooking(
                     1, 1, 1,
                     false, false, false, false, false,
@@ -169,18 +159,14 @@ class AprioriAlgorithmTest extends TestCase
                     40.45538, -3.79278,
                     $price,
                     Distance::Empty, Distance::Empty, Distance::Empty),
-            ],[
                 $this->GetBooking(
                     3, 3, 3,
                     false, false, false, false, false,
                     40.45538, -3.79278,
                     $price,
-                    Distance::Empty, Distance::Empty, Distance::Empty),
-            ]));
-        $bookingsProviderMock->method('hasEndBeenReached')
-            ->will($this->onConsecutiveCalls(false,false,true));
+                    Distance::Empty, Distance::Empty, Distance::Empty)]);
 
-        $sut = new AprioriAlgorithm($bookingsProviderMock, $this->configMock, $this->aprioriProgressMock);
+        $sut = new AprioriAlgorithm($bookingDataIteratorMock, $this->configMock, $this->aprioriProgressMock, $this->factoryMock);
         $histograms = $sut->run();
         $histogram = $histograms->getHistogram(1);
         $histogramBins = $histogram->getHistogramBins();
@@ -196,9 +182,7 @@ class AprioriAlgorithmTest extends TestCase
     public function checkDistancesInSetSize1() {
         $diSea = Distance::Close;
 
-        $bookingsProviderMock = $this->createMock(BookingsProvider::class);
-        $bookingsProviderMock->method('getSubset')
-            ->willReturn([
+        $bookingDataIteratorMock = BookingDataIteratorAdapterMock::get($this, [
                 $this->GetBooking(
                     1, 1, 1,
                     false, false, false, false, false,
@@ -216,12 +200,9 @@ class AprioriAlgorithmTest extends TestCase
                     false, false, false, false, false,
                     40.45538, -3.79278,
                     Price::Empty,
-                    $diSea, Distance::Empty, Distance::Empty),
-            ]);
-        $bookingsProviderMock->method('hasEndBeenReached')
-            ->will($this->onConsecutiveCalls(false,true));
+                    $diSea, Distance::Empty, Distance::Empty)]);
 
-        $sut = new AprioriAlgorithm($bookingsProviderMock, $this->configMock, $this->aprioriProgressMock);
+        $sut = new AprioriAlgorithm($bookingDataIteratorMock, $this->configMock, $this->aprioriProgressMock, $this->factoryMock);
         $histograms = $sut->run();
         $histogram = $histograms->getHistogram(1);
         $histogramBins = $histogram->getHistogramBins();
@@ -235,9 +216,7 @@ class AprioriAlgorithmTest extends TestCase
      * @test
      */
     public function checkIntegerInSetSize2() {
-        $bookingsProviderMock = $this->createMock(BookingsProvider::class);
-        $bookingsProviderMock->method('getSubset')
-            ->willReturn([
+        $bookingDataIteratorMock = BookingDataIteratorAdapterMock::get($this, [
                 $this->GetBooking(
                     7, 8, 1,
                     false, false, false, false, false,
@@ -255,12 +234,9 @@ class AprioriAlgorithmTest extends TestCase
                     false, false, false, false, false,
                     40.45538, -3.79278,
                     Price::Empty,
-                    Distance::Empty, Distance::Empty, Distance::Empty),
-            ]);
-        $bookingsProviderMock->method('hasEndBeenReached')
-            ->will($this->onConsecutiveCalls(false,true,false,true));
+                    Distance::Empty, Distance::Empty, Distance::Empty)]);
 
-        $sut = new AprioriAlgorithm($bookingsProviderMock, $this->configMock, $this->aprioriProgressMock);
+        $sut = new AprioriAlgorithm($bookingDataIteratorMock, $this->configMock, $this->aprioriProgressMock, $this->factoryMock);
         $histograms = $sut->run();
         $histogram = $histograms->getHistogram(2);
         $histogramBins = $histogram->getHistogramBins();
@@ -275,9 +251,7 @@ class AprioriAlgorithmTest extends TestCase
      * @test
      */
     public function checkIntegerInSetSize3() {
-        $bookingsProviderMock = $this->createMock(BookingsProvider::class);
-        $bookingsProviderMock->method('getSubset')
-            ->willReturn([
+        $bookingDataIteratorMock = BookingDataIteratorAdapterMock::get($this, [
                 $this->GetBooking(
                     7, 8, 9,
                     false, false, false, false, false,
@@ -295,12 +269,9 @@ class AprioriAlgorithmTest extends TestCase
                     false, false, false, false, false,
                     40.45538, -3.79278,
                     Price::Empty,
-                    Distance::Empty, Distance::Empty, Distance::Empty),
-            ]);
-        $bookingsProviderMock->method('hasEndBeenReached')
-            ->will($this->onConsecutiveCalls(false,true,false,true,false,true));
+                    Distance::Empty, Distance::Empty, Distance::Empty)]);
 
-        $sut = new AprioriAlgorithm($bookingsProviderMock, $this->configMock, $this->aprioriProgressMock);
+        $sut = new AprioriAlgorithm($bookingDataIteratorMock, $this->configMock, $this->aprioriProgressMock, $this->factoryMock);
         $histograms = $sut->run();
 
         $this->assertEquals(3, count($histograms->getAll()));

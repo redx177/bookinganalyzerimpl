@@ -28,6 +28,6 @@ class FloatField implements Field
 
     public static function getType()
     {
-        return float::class;
+        return FloatField::class;
     }
 }

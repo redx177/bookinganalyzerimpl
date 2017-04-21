@@ -23,6 +23,8 @@ require_once $rootDir . '/Business/FiltersProvider.php';
 require_once $rootDir . '/Business/KPrototypeAlgorithm.php';
 require_once $rootDir . '/Business/DistanceMeasurement.php';
 require_once $rootDir . '/Business/DataCache.php';
+require_once $rootDir . '/Business/BookingDataIteratorAdapter.php';
+require_once $rootDir . '/Business/BookingBuilder.php';
 require_once $rootDir . '/Models/AprioriState.php';
 require_once $rootDir . '/Models/Booking.php';
 require_once $rootDir . '/Models/BooleanField.php';
@@ -77,14 +79,15 @@ $builder->addDefinitions([
     Random::class => new Randomizer(),
     KPrototypeAlgorithm::class => \DI\factory(function($container) use ($rootDir, $config) {
         return new KPrototypeAlgorithm(
-            $container->get(BookingsProvider::class),
             $container->get(ConfigProvider::class),
             $container->get(DistanceMeasurement::class),
             $container->get(Random::class),
             $container->get(Redis::class),
-            new LoadIncrementalCsvDataIterator($rootDir . '/' . $config->get('dataSource')),
-            new LoadIncrementalCsvDataIterator($rootDir . '/' . $config->get('dataSource')),
-            $container->get(ClusteringProgress::class)
+            //new LoadIncrementalCsvDataIterator($rootDir . '/' . $config->get('dataSource')),
+            new BookingDataIteratorAdapter($container->make(BookingDataIterator::class), $container->get(BookingBuilder::class)),
+            new BookingDataIteratorAdapter($container->make(BookingDataIterator::class), $container->get(BookingBuilder::class)),
+            $container->get(ClusteringProgress::class),
+            $container->get(BookingBuilder::class)
         );
     })
 ]);

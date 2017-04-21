@@ -3,7 +3,6 @@ use \DI\FactoryInterface;
 
 class AprioriAlgorithm
 {
-    private $bookingsProvider;
     private $bookingsCount = 0;
     private $bookingsCountCap;
     private $lastOutput;
@@ -17,7 +16,7 @@ class AprioriAlgorithm
      */
     private $progress;
     /**
-     * @var BookingDataIterator
+     * @var BookingDataIteratorAdapter
      */
     private $bookingDataIterator;
     /**
@@ -25,21 +24,11 @@ class AprioriAlgorithm
      */
     private $factory;
 
-    /**
-     * AprioriAlgorithm constructor.
-     * @param BookingsProvider $bookingsProvider Provider for the data to analyze.
-     * @param BookingDataIterator $bookingDataIterator Booking data iterator.
-     * @param ConfigProvider $config Configuration provider.
-     * @param AprioriProgress $progress Processes the progress of the apriori algorithm.
-     * @param FactoryInterface $factory Dependency injection factory to make objects.
-     */
-    public function __construct(BookingsProvider $bookingsProvider,
-                                BookingDataIterator $bookingDataIterator,
+    public function __construct(BookingDataIteratorAdapter $bookingDataIterator,
                                 ConfigProvider $config,
                                 AprioriProgress $progress,
                                 FactoryInterface $factory)
     {
-        $this->bookingsProvider = $bookingsProvider;
         $this->progress = $progress;
         $this->bookingDataIterator = $bookingDataIterator;
         $this->factory = $factory;
@@ -56,6 +45,11 @@ class AprioriAlgorithm
         $this->stopFile = $aprioriConfig['serviceStopFile'];
         $this->outputInterval = $aprioriConfig['outputInterval'];
         $this->outputFile = $aprioriConfig['serviceOutput'];
+
+        $this->bookingsCount = $this->bookingDataIterator->count();
+        if ($this->bookingsCountCap) {
+            $this->bookingsCount = $this->bookingsCountCap;
+        }
     }
 
     /**
@@ -99,13 +93,12 @@ class AprioriAlgorithm
         /** @var Field[] $fields */
         $candidates = [];
         $offset = 0;
-        foreach ($this->bookingDataIterator as $rawBooking) {
+        foreach ($this->bookingDataIterator as $booking) {
             if ($this->bookingsCountCap && $offset >= $this->bookingsCountCap) {
                 break;
             }
             $offset++;
 
-            $booking = $this->bookingsProvider->getBooking($rawBooking);
             $fields = array_merge(
                 $booking->getFieldsByType(BooleanField::class),
                 $booking->getFieldsByType(IntegerField::class),
@@ -138,13 +131,12 @@ class AprioriAlgorithm
     {
         $countedCandidates = [];
         $offset = 0;
-        foreach ($this->bookingDataIterator as $rawBooking) {
+        foreach ($this->bookingDataIterator as $booking) {
             if ($this->bookingsCountCap && $offset >= $this->bookingsCountCap) {
                 break;
             }
             $offset++;
 
-            $booking = $this->bookingsProvider->getBooking($rawBooking);
             foreach ($candidates as $candidate) {
                 $id = [];
                 $c = [];

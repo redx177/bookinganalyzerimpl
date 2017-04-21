@@ -28,6 +28,6 @@ class PriceField implements Field
 
     public static function getType()
     {
-        return Price::class;
+        return PriceField::class;
     }
 }

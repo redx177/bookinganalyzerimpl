@@ -16,7 +16,7 @@ require_once dirname(__DIR__) . "/Models/DistanceField.php";
 require_once dirname(__DIR__) . "/Interfaces/BookingDataIterator.php";
 require_once dirname(__DIR__) . "/Utilities/LoadIncrementalCsvDataIterator.php";
 require_once dirname(__DIR__) . "/Utilities/ConfigProvider.php";
-require_once __DIR__ . "/LoadIncrementalCsvDataIteratorMock.php";
+require_once __DIR__ . "/BookingDataIteratorAdapterMock.php";
 
 class BookingsProviderTest extends TestCase
 {
@@ -38,7 +38,7 @@ class BookingsProviderTest extends TestCase
 
     protected function setUp()
     {
-        $this->csvIteratorMock = LoadIncrementalCsvDataIteratorMock::get($this, $this->mockData);
+        $this->csvIteratorMock = BookingDataIteratorAdapterMock::get($this, $this->mockData);
         
         $this->dataTypeClustererMock = $this->createMock(DataTypeClusterer::class);
         $this->dataTypeClustererMock->method('get')

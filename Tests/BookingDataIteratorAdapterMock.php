@@ -1,7 +1,7 @@
 <?php
 use \PHPUnit\Framework\TestCase;
 
-class LoadIncrementalCsvDataIteratorMock {
+class BookingDataIteratorAdapterMock {
     /**
      * Setup methods required to mock an iterator
      *
@@ -12,15 +12,15 @@ class LoadIncrementalCsvDataIteratorMock {
     static public function get(TestCase $testCase, array $items)
     {
 
-        $csvIteratorMock = $testCase->getMockBuilder(LoadIncrementalCsvDataIterator::class)
+        $iteratorMock = $testCase->getMockBuilder(BookingDataIteratorAdapter::class)
             ->disableOriginalConstructor()
-            ->getMock('');
+            ->getMock();
 
         $iteratorData = new \stdClass();
         $iteratorData->array = $items;
         $iteratorData->position = 0;
 
-        $csvIteratorMock->expects($testCase->any())
+        $iteratorMock->expects($testCase->any())
             ->method('rewind')
             ->will(
                 $testCase->returnCallback(
@@ -30,7 +30,7 @@ class LoadIncrementalCsvDataIteratorMock {
                 )
             );
 
-        $csvIteratorMock->expects($testCase->any())
+        $iteratorMock->expects($testCase->any())
             ->method('current')
             ->will(
                 $testCase->returnCallback(
@@ -42,7 +42,7 @@ class LoadIncrementalCsvDataIteratorMock {
                 )
             );
 
-        $csvIteratorMock->expects($testCase->any())
+        $iteratorMock->expects($testCase->any())
             ->method('key')
             ->will(
                 $testCase->returnCallback(
@@ -52,7 +52,7 @@ class LoadIncrementalCsvDataIteratorMock {
                 )
             );
 
-        $csvIteratorMock->expects($testCase->any())
+        $iteratorMock->expects($testCase->any())
             ->method('next')
             ->will(
                 $testCase->returnCallback(
@@ -62,7 +62,7 @@ class LoadIncrementalCsvDataIteratorMock {
                 )
             );
 
-        $csvIteratorMock->expects($testCase->any())
+        $iteratorMock->expects($testCase->any())
             ->method('valid')
             ->will(
                 $testCase->returnCallback(
@@ -72,7 +72,7 @@ class LoadIncrementalCsvDataIteratorMock {
                 )
             );
 
-        $csvIteratorMock->expects($testCase->any())
+        $iteratorMock->expects($testCase->any())
             ->method('skip')
             ->will(
                 $testCase->returnCallback(
@@ -82,6 +82,16 @@ class LoadIncrementalCsvDataIteratorMock {
                 )
             );
 
-        return $csvIteratorMock;
+        $iteratorMock->expects($testCase->any())
+            ->method('count')
+            ->will(
+                $testCase->returnCallback(
+                    function() use ($iteratorData) {
+                        return count($iteratorData->array);
+                    }
+                )
+            );
+
+        return $iteratorMock;
     }
 }

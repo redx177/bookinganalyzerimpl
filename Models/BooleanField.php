@@ -28,6 +28,6 @@ class BooleanField implements Field
 
     public static function getType()
     {
-        return bool::class;
+        return BooleanField::class;
     }
 }

@@ -2,7 +2,6 @@
 
 class KPrototypeAlgorithm
 {
-    private $bookingsProvider;
     private $bookingsCount;
     private $bookingsCountCap;
     private $lastOutput;
@@ -13,10 +12,6 @@ class KPrototypeAlgorithm
     private $rootDir;
     private $maxIterations;
 
-    /**
-     * @var Twig_TemplateWrapper
-     */
-    private $template;
     /**
      * @var DistanceMeasurement
      */
@@ -30,40 +25,32 @@ class KPrototypeAlgorithm
      */
     private $redis;
     /**
-     * @var BookingDataIterator
+     * @var BookingDataIteratorAdapter
      */
     private $bookingDataIterator;
     /**
-     * @var BookingDataIterator
+     * @var BookingDataIteratorAdapter
      */
     private $bookingDataIterator2;
     /**
      * @var ClusteringProgress
      */
     private $progress;
-
     /**
-     * AprioriAlgorithm constructor.
-     * @param BookingsProvider $bookingsProvider Provider for the data to analyze.
-     * @param ConfigProvider $config Configuration provider.
-     * @param DistanceMeasurement $distance Measures distance between two bookings.
-     * @param Random $random Generate random numbers.
-     * @param Redis $redis Redis store.
-     * @param BookingDataIterator $bookingDataIterator Booking data iterator.
-     * @param BookingDataIterator $bookingDataIterator2 Second booking data interator.
-     * @param ClusteringProgress $progress
+     * @var BookingBuilder
      */
+    private $bookingBuilder;
+
     public function __construct(
-        BookingsProvider $bookingsProvider,
         ConfigProvider $config,
         DistanceMeasurement $distance,
         Random $random,
         Redis $redis,
-        BookingDataIterator $bookingDataIterator,
-        BookingDataIterator $bookingDataIterator2,
-        ClusteringProgress $progress)
+        BookingDataIteratorAdapter $bookingDataIterator,
+        BookingDataIteratorAdapter $bookingDataIterator2,
+        ClusteringProgress $progress,
+        BookingBuilder $bookingBuilder)
     {
-        $this->bookingsProvider = $bookingsProvider;
         $this->distance = $distance;
         $this->bookingsCountCap = $config->get('bookingsCountCap');
         $this->fieldNameMapping = $config->get('fieldNameMapping');
@@ -82,7 +69,11 @@ class KPrototypeAlgorithm
         $this->outputFile = $kprototypeConfig['serviceOutput'];
         $this->maxIterations = $kprototypeConfig['maxIterations'];
 
-        $this->bookingsCount = $bookingsProvider->getBookingsCount();
+        $this->bookingsCount = $this->bookingDataIterator->count();
+        if ($this->bookingsCountCap) {
+            $this->bookingsCount = $this->bookingsCountCap;
+        }
+        $this->bookingBuilder = $bookingBuilder;
     }
 
     /**
@@ -126,15 +117,13 @@ class KPrototypeAlgorithm
 //                echo "\nCluster center id: {$cluster->getCenter()->getId()}\n";
 
                 $offset = 0;
-                foreach ($this->bookingDataIterator as $rawBooking) {
+                foreach ($this->bookingDataIterator as $newClusterCenter) {
 //                    echo 1;
                     if ($this->bookingsCountCap && $offset >= $this->bookingsCountCap) {
 //                        echo "\nbookingsCountCap reached. Break!\n";
                         break;
                     }
                     $offset++;
-
-                    $newClusterCenter = $this->bookingsProvider->getBooking($rawBooking);
 
                     // If $booking is already a center, skip it.
                     if (in_array($newClusterCenter->getId(), $clusters->getClusterCenterIds())) {
@@ -194,7 +183,7 @@ class KPrototypeAlgorithm
             } else {
                 $clusterCenterIndices[] = $clusterCenterIndex;
                 $rawBooking = $this->redis->hGetAll($clusterCenterIndex);
-                $booking = $this->bookingsProvider->getBooking($rawBooking);
+                $booking = $this->bookingBuilder->fromRawData($rawBooking);
                 $clusters->addCluster(new Cluster($booking));
             }
         }
@@ -210,11 +199,10 @@ class KPrototypeAlgorithm
         $clusterCenterIds = $clusters->getClusterCenterIds();
 
         $offset = 0;
-        foreach ($this->bookingDataIterator2 as $rawBooking) {
+        foreach ($this->bookingDataIterator2 as $booking) {
             if ($this->bookingsCountCap && $offset >= $this->bookingsCountCap) {
                 break;
             }
-            $booking = $this->bookingsProvider->getBooking($rawBooking);
             if (in_array($booking->getId(), $clusterCenterIds)) {
                 continue;
             }

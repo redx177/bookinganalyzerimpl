@@ -28,6 +28,6 @@ class IntegerField implements Field
 
     public static function getType()
     {
-        return int::class;
+        return IntegerField::class;
     }
 }

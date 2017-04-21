@@ -28,6 +28,6 @@ class StringField implements Field
 
     public static function getType()
     {
-        return string::class;
+        return StringField::class;
     }
 }
