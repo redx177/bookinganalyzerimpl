@@ -31,16 +31,12 @@ class DataCache
     }
 
     public function getCacheFile(Filters $filters = null) {
-        $startTime = microtime(TRUE);
         $hash = $this->hash($filters);
         $this->createCacheFolder();
         $cacheFile = $this->fileCacheDirectory . $hash;
         if (!file_exists($cacheFile)) {
             $this->cacheFile($cacheFile, $filters);
         }
-
-        $currentTime = microtime(TRUE);
-        echo 'Runtime: ' . ($currentTime - $startTime) . "\n";
         return $cacheFile;
     }
 

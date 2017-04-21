@@ -1,11 +1,29 @@
 <?php
 
  class ExploreController implements Controller {
+     /**
+      * @var Twig_Environment
+      */
      private $twig;
+     /**
+      * @var BookingsProvider
+      */
      private $bookingsProvider;
+     /**
+      * @var Pagination
+      */
      private $pagination;
+     /**
+      * @var ConfigProvider
+      */
      private $config;
-     private $filtersProvider;
+     /**
+      * @var Filters
+      */
+     private $filters;
+     /**
+      * @var UrlGenerator
+      */
      private $urlGenerator;
 
      /**
@@ -14,7 +32,7 @@
       * @param Pagination $pagination Pagination provider.
       * @param BookingsProvider $bookingsProvider Provider for the data to display.
       * @param ConfigProvider $config Configuration provider.
-      * @param FiltersProvider $filtersProvider Filters provider to filter data to explore.
+      * @param Filters $filters Filters provided by the user.
       * @param UrlGenerator $urlGenerator Url generator to get parameters to pass to the template.
       * @internal param ConfigProvider $config Configuration provider.
       */
@@ -23,14 +41,14 @@
          Pagination $pagination,
          BookingsProvider $bookingsProvider,
          ConfigProvider $config,
-         FiltersProvider $filtersProvider,
+         Filters $filters,
          UrlGenerator $urlGenerator)
      {
          $this->twig = $twig;
          $this->bookingsProvider = $bookingsProvider;
          $this->pagination = $pagination;
          $this->config = $config;
-         $this->filtersProvider = $filtersProvider;
+         $this->filters = $filters;
          $this->urlGenerator = $urlGenerator;
      }
 
@@ -41,8 +59,7 @@
       */
      public function render()
      {
-         $filters = $this->filtersProvider->get($_REQUEST);
-         $data = $this->bookingsProvider->getSubset($this->pagination->getPageSize(), $filters, $this->pagination->getCurrentPageFirstItemIndex());
+         $data = $this->bookingsProvider->getSubset($this->pagination->getPageSize(), $this->pagination->getCurrentPageFirstItemIndex());
          if (!$data) {
              $data = $this->bookingsProvider->getLastPageItems();
          }
@@ -59,7 +76,7 @@
              'fieldTitles' => $this->config->get('fieldNameMapping'),
              'buttonConfigs' => [new ButtonConfig($this->config->get('filterButtonTitle'), 'apply')],
              '_REQUEST' => $_REQUEST,
-             'searchUrlParameters' => $this->urlGenerator->getParameters($filters),
+             'searchUrlParameters' => $this->urlGenerator->getParameters($this->filters),
             ));
      }
  }

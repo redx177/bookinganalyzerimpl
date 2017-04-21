@@ -43,7 +43,7 @@ $configContent = array(
     ],
     'filterButtonTitle' => 'Apply Fiters',
     'runButtonTitle' => 'Run analysis',
-    'bookingsCountCap' => 500, // Debugging only. int|null
+    'bookingsCountCap' => 50, // Debugging only. int|null
     'ignoreFields' => ['SCTV'],
     'fileCacheDirectory' => '/fileCache/',
     'apriori' => [
@@ -57,7 +57,7 @@ $configContent = array(
         'serviceOutput' => '/Services/KPrototype/wip/status.htm',
         'servicePidFile' => '/Services/KPrototype/wip/pid.txt',
         'serviceStopFile' => '/Services/KPrototype/wip/stop.txt',
-        'outputInterval' => 1, // Seconds
+        'outputInterval' => 10, // Seconds
         'gamma' => 1, // value between 0-1.
         'maxIterations' => 10,
     ],

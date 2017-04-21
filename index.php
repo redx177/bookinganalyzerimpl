@@ -10,6 +10,7 @@ require_once __DIR__ . '/Business/BookingsProvider.php';
 require_once __DIR__ . '/Business/DataTypeClusterer.php';
 require_once __DIR__ . '/Business/FiltersProvider.php';
 require_once __DIR__ . '/Business/Pagination.php';
+require_once __DIR__ . '/Business/DataCache.php';
 require_once __DIR__ . '/Controllers/ExploreController.php';
 require_once __DIR__ . '/Controllers/AttributanalysisController.php';
 require_once __DIR__ . '/Controllers/AttributanalysisWithGroupingController.php';
@@ -57,7 +58,20 @@ $builder->addDefinitions(array(
 ));
 $container = $builder->build();
 
+/* FILTERS */
+/** @var Filters $filters */
+$filters = $container->get('FiltersProvider')->get($_REQUEST);
+$container->set(Filters::class, $filters);
+
+/* FILE CACHE */
+/** @var DataCache $cache */
+$cache = $container->get(DataCache::class);
+$cacheFile = $cache->getCacheFile($filters);
+$countFile = $cache->getCountFile($filters);
+$container->set(BookingDataIterator::class, new LoadIncrementalCsvDataIterator($cacheFile, $countFile));
+
 /* CONTROLLER */
+/** @var Controller $controller */
 $controller = null;
 $getKeys = array_keys($_REQUEST);
 if (in_array('attributanalysis', $getKeys)) {

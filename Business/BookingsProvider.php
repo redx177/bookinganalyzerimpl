@@ -3,8 +3,6 @@ class BookingsProvider {
     private $bookingDataIterator;
     private $dataTypeClusterer;
     private $idField;
-    private $atLeastFilterFields;
-    private $nextItem = null;
     private $hasEndBeenReached = false;
 
     /**
@@ -23,21 +21,19 @@ class BookingsProvider {
         $this->bookingDataIterator = $bookingDataIterator;
         $this->dataTypeClusterer = $dataTypeClusterer;
         $this->idField = $config->get('idField');
-        $this->atLeastFilterFields = $config->get('atLeastFilterFields');
     }
 
     /**
      * Gets a subset of data.
      * @param int $count Number of elements to get.
-     * @param Filters|null $filters Filters to apply to the booking data
      * @param int $from Start index to retrieve data from. Count is starting from index 0
      * @return Booking[] Requested data. Array of Booking
      */
-    public function getSubset(int $count, Filters $filters = null, int $from = null)
+    public function getSubset(int $count, int $from = null)
     {
         $lineNumber = 0;
         if ($from != null && $this->bookingDataIterator->key() != $from) {
-            $lineNumber = $this->rewindAndSkipToFrom($from, $count, $filters);
+            $lineNumber = $this->rewindAndSkipToFrom($from, $count);
         }
 
         $data = [];
@@ -50,11 +46,6 @@ class BookingsProvider {
             $this->bookingDataIterator->next();
             $booking = $this->getBooking($rawBooking);
 
-            // Check if the current $booking matches the provided filters.
-            if (!$this->applyFilters($booking, $filters)) {
-                continue;
-            }
-
             if (($matches-$from) % $count === 0) {
                 $this->lastPageItems = new SplQueue();
             }
@@ -66,25 +57,9 @@ class BookingsProvider {
         }
 
         // Check next item to know if the end has been reached.
-        $this->nextItem = null;
-        do {
-            // Next item is invalid, so end has been reached.
-            if (!$this->bookingDataIterator->valid()) {
-                $this->hasEndBeenReached = true;
-                break;
-            }
-
-            $rawBooking = $this->bookingDataIterator->current();
-            $booking = $this->getBooking($rawBooking);
-
-            // If filters apply, store the item. Else continue with the next.
-            if ($this->applyFilters($booking, $filters)) {
-                $this->nextItem = ['line' => $matches, 'booking' => $booking];
-                break;
-            }
-            $this->bookingDataIterator->next();
-
-        } while (true);
+        if (!$this->bookingDataIterator->valid()) {
+            $this->hasEndBeenReached = true;
+        }
 
         return $data;
     }
@@ -110,40 +85,6 @@ class BookingsProvider {
         return $booking;
     }
 
-    private function applyFilters(Booking $booking, Filters $filters = null)
-    {
-        if ($filters === null) {
-            return true;
-        }
-
-        foreach ($filters->getFilters() as $filter) {
-            if (!$filter->hasValue()) {
-                continue;
-            }
-            $filterFieldValue = $filter->getValue();
-            $filterName = $filter->getName();
-
-            $field = $booking->getFieldByName($filterName);
-            $bookingValue = $field->getValue();
-            if (in_array($filterName, $this->atLeastFilterFields)) {
-                if ($bookingValue < $filterFieldValue) {
-                    return false;
-                }
-                continue;
-            }
-            if (is_array($filterFieldValue)) {
-                if (!in_array($bookingValue, $filterFieldValue)) {
-                    return false;
-                }
-                continue;
-            }
-            if ($bookingValue != $filterFieldValue) {
-                return false;
-            }
-        }
-        return true;
-    }
-
     /**
      * Checks if end has been reached.
      * @return bool TRUE = End has been reached. FALSE = End has not been reached.
@@ -153,16 +94,12 @@ class BookingsProvider {
         return $this->hasEndBeenReached;
     }
 
-    private function rewindAndSkipToFrom($from, $count, $filters = null)
+    private function rewindAndSkipToFrom($from, $count)
     {
         $this->rewind();
 
         // Store the last bookings in case $from is higher than the total count of bookings
         $bookingsQueue = new SplQueue();
-        if ($this->nextItem != null) {
-            $bookingsQueue->enqueue($this->nextItem);
-            $from += 1;
-        }
         $i = 0;
         while ($i < $from) {
             // If end of bookings have been reached, exit for loop.
@@ -172,12 +109,6 @@ class BookingsProvider {
 
             $rawBooking = $this->bookingDataIterator->current();
             $booking = $this->getBooking($rawBooking);
-
-            // Check if the current $booking matches the provided filters.
-            if (!$this->applyFilters($booking, $filters)) {
-                $this->bookingDataIterator->next();
-                continue;
-            }
 
             if ($bookingsQueue->count() % $count === 0) {
                 $bookingsQueue = new SplQueue();
@@ -210,5 +141,10 @@ class BookingsProvider {
     {
         $this->bookingDataIterator->rewind();
         $this->hasEndBeenReached = false;
+    }
+
+    public function getBookingsCount()
+    {
+        return $this->bookingDataIterator->count();
     }
 }

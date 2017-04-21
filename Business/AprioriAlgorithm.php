@@ -1,4 +1,5 @@
 <?php
+use \DI\FactoryInterface;
 
 class AprioriAlgorithm
 {
@@ -11,31 +12,44 @@ class AprioriAlgorithm
     private $startTime;
     private $fieldNameMapping;
     private $rootDir;
-
-    /**
-     * @var Twig_TemplateWrapper
-     */
-    private $template;
     /**
      * @var AprioriProgress
      */
     private $progress;
+    /**
+     * @var BookingDataIterator
+     */
+    private $bookingDataIterator;
+    /**
+     * @var FactoryInterface
+     */
+    private $factory;
 
     /**
      * AprioriAlgorithm constructor.
      * @param BookingsProvider $bookingsProvider Provider for the data to analyze.
+     * @param BookingDataIterator $bookingDataIterator Booking data iterator.
      * @param ConfigProvider $config Configuration provider.
      * @param AprioriProgress $progress Processes the progress of the apriori algorithm.
+     * @param FactoryInterface $factory Dependency injection factory to make objects.
      */
-    public function __construct(BookingsProvider $bookingsProvider, ConfigProvider $config, AprioriProgress $progress)
+    public function __construct(BookingsProvider $bookingsProvider,
+                                BookingDataIterator $bookingDataIterator,
+                                ConfigProvider $config,
+                                AprioriProgress $progress,
+                                FactoryInterface $factory)
     {
         $this->bookingsProvider = $bookingsProvider;
+        $this->progress = $progress;
+        $this->bookingDataIterator = $bookingDataIterator;
+        $this->factory = $factory;
+
+        $this->lastOutput = microtime(TRUE);
+        $this->startTime = microtime(TRUE);
+
         $this->bookingsCountCap = $config->get('bookingsCountCap');
         $this->fieldNameMapping = $config->get('fieldNameMapping');
         $this->rootDir = $config->get('rootDir');
-        $this->lastOutput = microtime(TRUE);
-        $this->startTime = microtime(TRUE);
-        $this->progress = $progress;
 
         $aprioriConfig = $config->get('apriori');
         $this->minSup = $aprioriConfig['minSup'];
@@ -45,21 +59,19 @@ class AprioriAlgorithm
     }
 
     /**
-     * Analyzes the bookings with the apriori algorithm.
-     * @param Filters|null $filters Filter set for the bookings.
+     * Analyzes the bookings with the apriori algorithm and a file as datasource.
      * @return Histograms Histograms representing the results.
      */
-    public function run(Filters $filters = null) : Histograms
+    public function run() : Histograms
     {
         $frequentSets = [];
-        $frequentSets[0] = $this->getInitialFrequentSets($filters);
+        $frequentSets[0] = $this->getInitialFrequentSets();
         for ($i = 1; true && !$this->isStopScriptSet(); $i++) {
-            $this->bookingsProvider->rewind();
             $candidates = $this->aprioriGen($frequentSets[$i-1]);
             if (!$candidates) {
                 break;
             }
-            $countedCandidates = $this->countCandidates($candidates, $frequentSets, $filters);
+            $countedCandidates = $this->countCandidates($candidates, $frequentSets);
             $frequentSet = $this->filterByMinSup($countedCandidates, $this->bookingsCount);
             usort($frequentSet, array('AprioriAlgorithm', 'frequentSetSort'));
             $frequentSets[$i] = $frequentSet;
@@ -68,55 +80,53 @@ class AprioriAlgorithm
         return $this->generateHistograms($frequentSets, $this->bookingsCount);
     }
 
-    private function getInitialFrequentSets(Filters $filters = null): array
+
+    /**
+     * Analyzes the bookings with the apriori algorithm and a provided Clusters as datasource.
+     * @param Clusters $clusters Clusters to analyze. Each Cluster will be anaylzed with the apriori algorithm.
+     * @return Clusters with attached histograms.
+     */
+    public function runOnClusters(Clusters $clusters): Clusters {
+        foreach ($clusters->getClusters() as $cluster) {
+            $this->bookingDataIterator = $this->factory->make(LoadClusterDataIterator::class, ['cluster' => $cluster]);
+            $cluster->setHistograms($this->run());
+        }
+        return $clusters;
+    }
+
+    private function getInitialFrequentSets(): array
     {
+        /** @var Field[] $fields */
         $candidates = [];
         $offset = 0;
-        $batchSize = 1000;
-        while (!$this->bookingsProvider->hasEndBeenReached()) {
+        foreach ($this->bookingDataIterator as $rawBooking) {
             if ($this->bookingsCountCap && $offset >= $this->bookingsCountCap) {
                 break;
             }
-            $bookings = $this->bookingsProvider->getSubset($batchSize, $filters);
-            $this->bookingsCount += count($bookings);
-            foreach ($bookings as $booking) {
-                $fields = array_merge(
-                    $booking->getFieldsByType(bool::class),
-                    $booking->getFieldsByType(int::class),
-                    $booking->getFieldsByType(Distance::class),
-                    $booking->getFieldsByType(Price::class));
+            $offset++;
 
-                foreach ($fields as $field) {
-                    if ($field->hasValue()) {
-                        $name = $field->getName();
-                        $value = $field->getValue();
-                        if (!array_key_exists($name . $value, $candidates)) {
-                            $candidates[$name . $value] = [[$name=>$value], 0];
-                        }
-                        $candidates[$name . $value] = [[$name=>$value], $candidates[$name . $value][1]+1];
+            $booking = $this->bookingsProvider->getBooking($rawBooking);
+            $fields = array_merge(
+                $booking->getFieldsByType(BooleanField::class),
+                $booking->getFieldsByType(IntegerField::class),
+                $booking->getFieldsByType(DistanceField::class),
+                $booking->getFieldsByType(PriceField::class));
+
+            foreach ($fields as $field) {
+                if ($field->hasValue()) {
+                    $name = $field->getName();
+                    $value = $field->getValue();
+                    if (!array_key_exists($name . $value, $candidates)) {
+                        $candidates[$name . $value] = [[$name=>$value], 0];
                     }
+                    $candidates[$name . $value] = [[$name=>$value], $candidates[$name . $value][1]+1];
                 }
+            }
+
+            if ($offset % 1000 == 0) {
                 $this->storeState($candidates);
             }
-            $offset += $batchSize;
-        }
 
-        if ($filters && $filters->getFilters()) {
-            foreach ($filters->getFilters() as $filter) {
-                $filterName = $filter->getName();
-                $filterValue = $filter->getValue();
-                if (is_array($filterValue)) {
-                    foreach ($filterValue as $value) {
-                        if (array_key_exists($filterName . $value, $candidates)) {
-                            unset($candidates[$filterName . $value]);
-                        }
-                    }
-                } else {
-                    if (array_key_exists($filterName . $filterValue, $candidates)) {
-                        unset($candidates[$filterName . $filterValue]);
-                    }
-                }
-            }
         }
 
         $frequentSet = $this->filterByMinSup($candidates, $this->bookingsCount);
@@ -124,43 +134,42 @@ class AprioriAlgorithm
         return $frequentSet;
     }
 
-    private function countCandidates($candidates, $frequentSets, Filters $filters = null): array
+    private function countCandidates($candidates, $frequentSets): array
     {
         $countedCandidates = [];
         $offset = 0;
-        $batchSize = 1000;
-        $bookingsCount = 0;
-        while (!$this->bookingsProvider->hasEndBeenReached()) {
+        foreach ($this->bookingDataIterator as $rawBooking) {
             if ($this->bookingsCountCap && $offset >= $this->bookingsCountCap) {
                 break;
             }
-            $bookings = $this->bookingsProvider->getSubset($batchSize, $filters);
-            $bookingsCount += count($bookings);
-            foreach ($bookings as $booking) {
-                foreach ($candidates as $candidate) {
-                    $id = [];
-                    $c = [];
-                    foreach ($candidate as $key => $value) {
-                        $field = $booking->getFieldByName($key);
-                        if (!$field->hasValue() || $field->getValue() != $value) {
-                            // This candidate does not match this booking, so go to next candidate.
-                            continue 2;
-                        }
-                        $id[$key] = $value;
-                        $c[$key] = $value;
-                    }
+            $offset++;
 
-                    $k = $this->getUniqueKey($id);
-
-                    if (!array_key_exists($k, $countedCandidates)) {
-                        $countedCandidates[$k] = [$c, 0];
+            $booking = $this->bookingsProvider->getBooking($rawBooking);
+            foreach ($candidates as $candidate) {
+                $id = [];
+                $c = [];
+                foreach ($candidate as $key => $value) {
+                    $field = $booking->getFieldByName($key);
+                    if (!$field->hasValue() || $field->getValue() != $value) {
+                        // This candidate does not match this booking, so go to next candidate.
+                        continue 2;
                     }
-                    $countedCandidates[$k] = [$c, $countedCandidates[$k][1]+1];
+                    $id[$key] = $value;
+                    $c[$key] = $value;
                 }
+
+                $k = $this->getUniqueKey($id);
+
+                if (!array_key_exists($k, $countedCandidates)) {
+                    $countedCandidates[$k] = [$c, 0];
+                }
+                $countedCandidates[$k] = [$c, $countedCandidates[$k][1]+1];
+            }
+            if ($offset % 1000 == 0) {
                 $this->storeState($countedCandidates, $frequentSets);
             }
-            $offset += $batchSize;
         }
+        $this->bookingDataIterator->rewind();
         return $countedCandidates;
     }
 

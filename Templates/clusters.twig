@@ -1,32 +1,56 @@
-<div class="histogramsAsTable">
-
-    {% if done %}
-        <h1 id="done">Analysis done</h1>
-    {% else %}
-        <h1>Analysis progress...</h1>
-    {% endif %}
+<div class="clusters">
     <div class="container">
-        {% if not done %}
-            <button type="button" class="btn btn-danger btn-abort">Abort</button>
+
+        {% if status == 2 %}
+            <h1 id="done">Analysis done</h1>
+        {% else %}
+            <h1>Analysis in progress. Updates will come every {{ pullInterval }} seconds</h1>
+        {% endif %}
+
+        <p>Steps:</p>
+        <ul>
+            <li>Cache data: <img src="/img/tick.png" alt="Done">
+            </li>
+            <li>Grouping data:
+                {% if status == 0 %}
+                    <img src="/img/loading.gif" alt="Loading">
+                {% elseif status > 0 %}
+                    <img src="/img/tick.png" alt="Done">
+                {% endif %}
+            </li>
+            <li>Analyze data:
+                {% if status == 1 %}
+                    <img src="/img/loading.gif" alt="Loading">
+                {% elseif status == 2 %}
+                    <img src="/img/tick.png" alt="Done">
+                {% endif %}
+            </li>
+        </ul>
+
+        {% if not status == 2 %}
+            <button type="button" class="btn btn-danger btn-abort">Abort</button><br />
         {% endif %}
         Runtime: {{ runtimeInSeconds }}<br />
         Items count: {{ bookingsCount }}
     </div>
 
     <div class="container">
-        {% if done %}
-            <p>Overal error: {{ clusters.totalCosts }}<br /> Iteration: {{ iteration }}</p>
+        <p>
+            Overal error: {{ clusters.totalCosts }}<br />
+            Iteration: {{ iteration }}<br />
+            Best candidate so far:
+        </p>
+        {% if status == 2 %}
             <ul>
                 {% for cluster in clusters.clusters %}
                     <li>Cluster {{ loop.index }}, Item Count: {{ cluster.associates|length }}, Error: {{ cluster.totalCosts }}</li>
                 {% endfor %}
             </ul>
         {% else %}
-            <p>Overal error: {{ cluster.totalCosts }}</p>
             <ul>
-            {% for cluster in clusters.clusters %}
-                <li>Cluster {{ loop.index }}, Item Count: {{ cluster.associates|length }}, Error: {{ cluster.totalCosts }}</li>
-            {% endfor %}
+                {% for cluster in clusters.clusters %}
+                    <li>Cluster {{ loop.index }}, Item Count: {{ cluster.associates|length }}, Error: {{ cluster.totalCosts }}</li>
+                {% endfor %}
             </ul>
         {% endif %}
     </div>

@@ -22,6 +22,7 @@ require_once $rootDir . '/Business/Pagination.php';
 require_once $rootDir . '/Business/FiltersProvider.php';
 require_once $rootDir . '/Business/KPrototypeAlgorithm.php';
 require_once $rootDir . '/Business/DistanceMeasurement.php';
+require_once $rootDir . '/Business/DataCache.php';
 require_once $rootDir . '/Models/AprioriState.php';
 require_once $rootDir . '/Models/Booking.php';
 require_once $rootDir . '/Models/BooleanField.php';
@@ -65,17 +66,32 @@ $builder = new DI\ContainerBuilder();
 $builder->addDefinitions([
     Twig_Environment::class => $twig,
     Twig_TemplateWrapper::class => $template,
-    BookingDataIterator::class => new LoadIncrementalCsvDataIterator($rootDir . '/' . $config->get('dataSource')),
+//    BookingDataIterator::class => new LoadIncrementalCsvDataIterator($rootDir . '/' . $config->get('dataSource')),
+    BookingDataIterator::class => \DI\factory(function() use ($rootDir, $config) {
+        return new LoadIncrementalCsvDataIterator($rootDir . '/' . $config->get('dataSource'));
+    })->scope(\DI\Scope::PROTOTYPE),
     //BookingDataIterator::class => new LoadAllCsvDataIterator($rootDir . '/' . $config->get('dataSource')),
     ConfigProvider::class => $config,
     Twig_TemplateWrapper::class => $template,
     Redis::class => $redis,
     Random::class => new Randomizer(),
-    ClusteringProgress::class => \DI\object(KPrototypeClusteringProgress::class),
+    KPrototypeAlgorithm::class => \DI\factory(function($container) use ($rootDir, $config) {
+        return new KPrototypeAlgorithm(
+            $container->get(BookingsProvider::class),
+            $container->get(ConfigProvider::class),
+            $container->get(DistanceMeasurement::class),
+            $container->get(Random::class),
+            $container->get(Redis::class),
+            new LoadIncrementalCsvDataIterator($rootDir . '/' . $config->get('dataSource')),
+            new LoadIncrementalCsvDataIterator($rootDir . '/' . $config->get('dataSource')),
+            $container->get(ClusteringProgress::class)
+        );
+    })
 ]);
 $container = $builder->build();
 
-$tmp = $container->get(ClusteringProgress::class);
+// Get a KPrototypeClusteringProcess class here. It will start to keep track of timings as soon as it instantiated.
+$container->set(ClusteringProgress::class, $container->get(KPrototypeClusteringProgress::class));
 
 if (array_key_exists('abort', $_GET) && $_GET['abort']) {
     file_put_contents($rootDir . $kprototypeConfig['serviceStopFile'], "");
@@ -83,6 +99,7 @@ if (array_key_exists('abort', $_GET) && $_GET['abort']) {
     /** @var KPrototypeAlgorithm $kprototype */
     /** @var FiltersProvider $filtersProvider */
     /** @var DataCache $cache */
+    /** @var AprioriAlgorithm $apriori */
 
     // Get filters
     $args = '';
@@ -96,11 +113,17 @@ if (array_key_exists('abort', $_GET) && $_GET['abort']) {
     // Cache file
     $cache = $container->get(DataCache::class);
     $cacheFile = $cache->getCacheFile($filters);
-    $container->set(BookingDataIterator::class, new LoadIncrementalCsvDataIterator($cacheFile));
+    $countFile = $cache->getCountFile($filters);
+    $container->set(BookingDataIterator::class, new LoadIncrementalCsvDataIterator($cacheFile, $countFile));
 
-    // Run algorithm
-    $kprototype = $container->get('KPrototypeAlgorithm');
+    // Run k-prototype
     unlink($rootDir.$kprototypeConfig['serviceStopFile']);
-    $kprototype->run($filters);
+    $kprototype = $container->get(KPrototypeAlgorithm::class);
+    $clusters = $kprototype->run();
+
+    // Run apirori
+    $apriori = $container->get(AprioriAlgorithm::class);
+    $apriori->runOnClusters($clusters);
+
     unlink($rootDir.$kprototypeConfig['servicePidFile']);
 }

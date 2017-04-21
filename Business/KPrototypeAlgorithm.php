@@ -30,9 +30,13 @@ class KPrototypeAlgorithm
      */
     private $redis;
     /**
-     * @var LoadRedisDataIterator
+     * @var BookingDataIterator
      */
-    private $redisIterator;
+    private $bookingDataIterator;
+    /**
+     * @var BookingDataIterator
+     */
+    private $bookingDataIterator2;
     /**
      * @var ClusteringProgress
      */
@@ -45,9 +49,9 @@ class KPrototypeAlgorithm
      * @param DistanceMeasurement $distance Measures distance between two bookings.
      * @param Random $random Generate random numbers.
      * @param Redis $redis Redis store.
-     * @param LoadRedisDataIterator $redisIterator Redis iterator.
+     * @param BookingDataIterator $bookingDataIterator Booking data iterator.
+     * @param BookingDataIterator $bookingDataIterator2 Second booking data interator.
      * @param ClusteringProgress $progress
-     * @internal param Redis $redis Redis datastore.
      */
     public function __construct(
         BookingsProvider $bookingsProvider,
@@ -55,7 +59,8 @@ class KPrototypeAlgorithm
         DistanceMeasurement $distance,
         Random $random,
         Redis $redis,
-        LoadRedisDataIterator $redisIterator,
+        BookingDataIterator $bookingDataIterator,
+        BookingDataIterator $bookingDataIterator2,
         ClusteringProgress $progress)
     {
         $this->bookingsProvider = $bookingsProvider;
@@ -66,7 +71,8 @@ class KPrototypeAlgorithm
         $this->lastOutput = microtime(TRUE);
         $this->startTime = microtime(TRUE);
         $this->redis = $redis;
-        $this->redisIterator = $redisIterator;
+        $this->bookingDataIterator = $bookingDataIterator;
+        $this->bookingDataIterator2 = $bookingDataIterator2;
         $this->progress = $progress;
         $this->random = $random;
 
@@ -75,109 +81,102 @@ class KPrototypeAlgorithm
         $this->outputInterval = $kprototypeConfig['outputInterval'];
         $this->outputFile = $kprototypeConfig['serviceOutput'];
         $this->maxIterations = $kprototypeConfig['maxIterations'];
+
+        $this->bookingsCount = $bookingsProvider->getBookingsCount();
     }
 
     /**
      * Analyzes the bookings with the apriori algorithm.
-     * @param Filters|null $filters Filter set for the bookings.
      * @return Clusters
      */
-    public function run(Filters $filters = null): Clusters
+    public function run(): Clusters
     {
-        $this->dataProvider =
         $k = 2;
-        $this->bookingsCount = $this->redisIterator->count();
 
         // Initialization
-        $clusters = $this->getInitialEmptyClusters($k, $filters);
-        $this->storeState($clusters, 0);
+        $clusters = $this->getInitialEmptyClusters($k);
+        $this->storeState($clusters, 1, 0);
 
-        $count0 = count($clusters->getClusters()[0]->getAssociates());
-        $count1 = count($clusters->getClusters()[1]->getAssociates());
-        echo "init\n";
-        echo "ID1: {$clusters->getClusters()[0]->getCenter()->getId()}\n";
-        echo "ID2: {$clusters->getClusters()[1]->getCenter()->getId()}\n";
-        echo "Associates1: {$count0}\n";
-        echo "Associates2: {$count1}\n";
-        echo "TotalCosts: {$clusters->getTotalCosts()}\n----------------------------------\n";
+//        echo "init\n";
+//        $this->debug($clusters);
+//        $start = microtime(true);
 
-        $this->assignBookingsToClusters($clusters, $filters);
+        $this->assignBookingsToClusters($clusters);
 
-        $count0 = count($clusters->getClusters()[0]->getAssociates());
-        $count1 = count($clusters->getClusters()[1]->getAssociates());
-        echo "first count\n";
-        echo "ID1: {$clusters->getClusters()[0]->getCenter()->getId()}\n";
-        echo "ID2: {$clusters->getClusters()[1]->getCenter()->getId()}\n";
-        echo "Associates1: {$count0}\n";
-        echo "Associates2: {$count1}\n";
-        echo "TotalCosts: {$clusters->getTotalCosts()}\n----------------------------------\n";
+//        echo "\nRuntime: " . (microtime(true) - $start);
+
+//        echo "first count\n";
+//        $this->debug($clusters);
 
         $currentTotalCosts = $clusters->getTotalCosts();
         $bestTotalCosts = $currentTotalCosts;
         $bestClusters = $clusters;
         $delta = 1;
-        $iteration = 1;
+        $iteration = 0;
         while ($delta > 0 && $iteration <= $this->maxIterations) {
             $iteration++;
-            $this->storeState($clusters, $iteration);
+            $this->storeState($clusters, $iteration, 0);
 
-            $count0 = count($clusters->getClusters()[0]->getAssociates());
-            $count1 = count($clusters->getClusters()[1]->getAssociates());
-            echo "main loop\n";
-            echo "Iteration: {$iteration}\n";
-            echo "ID1: {$clusters->getClusters()[0]->getCenter()->getId()}\n";
-            echo "ID2: {$clusters->getClusters()[1]->getCenter()->getId()}\n";
-            echo "Associates1: {$count0}\n";
-            echo "Associates2: {$count1}\n";
-            echo "TotalCosts: {$clusters->getTotalCosts()}\n----------------------------------\n";
-            foreach ($clusters->getClusters() as $cluster) {
+//            echo "main loop\n";
+//            echo "Iteration: {$iteration}\n";
+//            $this->debug($clusters);
 
-                echo "\nCluster center id: {$cluster->getCenter()->getId()}\n";
+            foreach ($clusters->getClusters() as $clusterToReplace) {
+
+//                echo "\nCluster center id: {$cluster->getCenter()->getId()}\n";
 
                 $offset = 0;
-                foreach ($this->redisIterator as $rawBooking) {
-                    echo 1;
+                foreach ($this->bookingDataIterator as $rawBooking) {
+//                    echo 1;
                     if ($this->bookingsCountCap && $offset >= $this->bookingsCountCap) {
-                        echo "\nbookingsCountCap reached. Break!\n";
+//                        echo "\nbookingsCountCap reached. Break!\n";
                         break;
                     }
                     $offset++;
 
-                    $booking = $this->bookingsProvider->getBooking($rawBooking);
+                    $newClusterCenter = $this->bookingsProvider->getBooking($rawBooking);
 
                     // If $booking is already a center, skip it.
-                    if (in_array($booking->getId(), $clusters->getClusterCenterIds())) {
+                    if (in_array($newClusterCenter->getId(), $clusters->getClusterCenterIds())) {
                         continue;
                     }
 
-                    $newClusters = $this->generateNewEmptyClustersWithSwapedCenter($clusters, $cluster, $booking);
-                    $this->assignBookingsToClusters($newClusters, $filters);
+                    $newClusters = $this->generateNewEmptyClustersWithSwapedCenter($clusters, $clusterToReplace, $newClusterCenter);
+                    $this->assignBookingsToClusters($newClusters);
                     $newTotalCosts = $newClusters->getTotalCosts();
                     if ($newTotalCosts < $bestTotalCosts) {
                         $bestTotalCosts = $newTotalCosts;
                         $bestClusters = $newClusters;
                     }
+                    if ($offset % 100 == 0) {
+                        $this->storeState($bestClusters, $iteration, 0);
+                    }
                 }
+
+                $this->bookingDataIterator->rewind();
             }
+
             $delta = $currentTotalCosts - $bestTotalCosts;
             $clusters = $bestClusters;
             $currentTotalCosts = $bestTotalCosts;
-            echo "\nCurrentTotalCosts: {$currentTotalCosts}";
-            echo "\nBestTotalCosts: {$bestTotalCosts}";
-            echo "\nDelta: {$delta}\n-------------------------------------\n";
+
+//            echo "\nRuntime: " . (microtime(true) - $start);
+//            echo "\nCurrentTotalCosts: {$currentTotalCosts}";
+//            echo "\nBestTotalCosts: {$bestTotalCosts}";
+//            echo "\nDelta: {$delta}\n-------------------------------------\n";
         }
-        echo "done!\n";
-        $this->storeStateDone($clusters, $iteration);
+//        echo "done!\n";
+        $this->storeState($clusters, $iteration, 2);
+//        echo "\nRuntime: " . (microtime(true) - $start);
         return $clusters;
     }
 
     /**
      * Gets a Clusters object with $k clusters inside with no Associates added yet.
      * @param int $k Number of clusters.
-     * @param Filters|null $filters Filters to apply.
      * @return Clusters Clusters object with $k clusters inside.
      */
-    private function getInitialEmptyClusters(int $k, Filters $filters = null): Clusters
+    private function getInitialEmptyClusters(int $k): Clusters
     {
         if ($k > $this->bookingsCount) {
             $k = $this->bookingsCount;
@@ -186,11 +185,8 @@ class KPrototypeAlgorithm
         $clusters = new Clusters();
         $clusterCenterIndices = [];
         for ($i = 0; $i < $k; $i++) {
-            $max = $this->bookingsCountCap && $this->bookingsCountCap < $this->bookingsCount
-                ? $this->bookingsCountCap - 1
-                : $this->bookingsCount - 1;
             $clusterCenterIndex = $this->random->generate(100);
-            echo "Center index: {$clusterCenterIndex}\n";
+//            echo "Center index: {$clusterCenterIndex}\n";
 
             // If index is already set, rerun generation.
             if (in_array($clusterCenterIndex, $clusterCenterIndices)) {
@@ -198,7 +194,6 @@ class KPrototypeAlgorithm
             } else {
                 $clusterCenterIndices[] = $clusterCenterIndex;
                 $rawBooking = $this->redis->hGetAll($clusterCenterIndex);
-                var_dump($rawBooking);
                 $booking = $this->bookingsProvider->getBooking($rawBooking);
                 $clusters->addCluster(new Cluster($booking));
             }
@@ -209,30 +204,24 @@ class KPrototypeAlgorithm
     /**
      * Assignes all bookings from the bookingsProvider to the $clusters.
      * @param Clusters $clusters Clusters to add the bookings to.
-     * @param Filters|null $filters Filters to apply.
      */
-    private function assignBookingsToClusters(Clusters $clusters, Filters $filters = null)
+    private function assignBookingsToClusters(Clusters $clusters)
     {
         $clusterCenterIds = $clusters->getClusterCenterIds();
 
         $offset = 0;
-        $batchSize = 100;
-        while (!$this->bookingsProvider->hasEndBeenReached()) {
+        foreach ($this->bookingDataIterator2 as $rawBooking) {
             if ($this->bookingsCountCap && $offset >= $this->bookingsCountCap) {
                 break;
             }
-            $offset += $batchSize;
-
-            $bookings = $this->bookingsProvider->getSubset($batchSize, $filters);
-            $this->bookingsCount += count($bookings);
-            foreach ($bookings as $booking) {
-                if (in_array($booking->getId(), $clusterCenterIds)) {
-                    continue;
-                }
-                $this->assignBookingToCluster($clusters, $booking);
+            $booking = $this->bookingsProvider->getBooking($rawBooking);
+            if (in_array($booking->getId(), $clusterCenterIds)) {
+                continue;
             }
+            $this->assignBookingToCluster($clusters, $booking);
+            $offset++;
         }
-        $this->bookingsProvider->rewind();
+        $this->bookingDataIterator2->rewind();
     }
 
     /**
@@ -274,13 +263,27 @@ class KPrototypeAlgorithm
         return $newClusters;
     }
 
-    private function storeState(Clusters $clusters, $iteration)
+    /**
+     * @param int $status 0 = Data caching done. 1 = Clustering done. 2 = Apriori done.
+     */
+    private function storeState(Clusters $clusters, int $iteration, int $status)
     {
-        $this->progress->storeState($this->startTime, $this->bookingsCount, $clusters, $iteration);
+        $this->progress->storeState($this->startTime, $this->bookingsCount, $clusters, $iteration, $status);
     }
 
-    private function storeStateDone($clusters, $iteration)
+    /**
+     * @param Clusters $clusters
+     * @return array
+     */
+    protected function debug($clusters): array
     {
-        $this->progress->storeState($this->startTime, $this->bookingsCount, $clusters, $iteration, true);
+        $count0 = count($clusters->getClusters()[0]->getAssociates());
+        $count1 = count($clusters->getClusters()[1]->getAssociates());
+        echo "ID1: {$clusters->getClusters()[0]->getCenter()->getId()}\n";
+        echo "ID2: {$clusters->getClusters()[1]->getCenter()->getId()}\n";
+        echo "Associates1: {$count0}\n";
+        echo "Associates2: {$count1}\n";
+        echo "TotalCosts: {$clusters->getTotalCosts()}\n----------------------------------\n";
+        return array($count0, $count1);
     }
 }

@@ -51,6 +51,7 @@ class AprioriProgressToFile implements AprioriProgress
                 'fieldTitles' => $this->fieldNameMapping,
                 'runtimeInSeconds' => $runtime,
                 'done' => $candidates === null,
+                'pullInterval' => $this->outputInterval,
             ]);
             file_put_contents($this->rootDir . $this->outputFile, $content);
         }

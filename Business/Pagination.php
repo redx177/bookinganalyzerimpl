@@ -49,7 +49,7 @@ class Pagination {
 
     /**
      * Gets the page size.
-     * @return Page size
+     * @return int Page size
      */
     public function getPageSize()
     {

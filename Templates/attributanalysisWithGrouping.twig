@@ -21,7 +21,16 @@
 
     <div class="container" id="results-container">
         {% if isRunning %}
-            <h1>Please wait. Updates every {{ pullInterval }} seconds...</h1>
+
+            <div class="container">
+                <h1>Analysis in progress. Updates will come every {{ pullInterval }} seconds</h1>
+                <p>Steps:</p>
+                <ul>
+                    <li>Cache data: <img src="/img/loading.gif" alt="Loading"></li>
+                    <li>Grouping data:</li>
+                    <li>Analyze data:</li>
+                </ul>
+            </div>
         {% endif %}
     </div>
 {% endblock %}

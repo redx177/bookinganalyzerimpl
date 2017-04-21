@@ -21,6 +21,9 @@ $redis->flushAll();
 $i = 0;
 $batchSize = 1000;
 
+
+$startTime = microtime(TRUE);
+echo "Adding bookings to redis:\n";
 while (!$bookingsProvider->hasEndBeenReached()) {
     $bookings = $bookingsProvider->getSubset($batchSize);
     foreach ($bookings as $booking) {
@@ -31,7 +34,10 @@ while (!$bookingsProvider->hasEndBeenReached()) {
         }
         $i++;
     }
-    echo "{$i}\n";
+    echo "- {$i}\n";
 }
 $redis->set('bookingsCount', $i);
-echo $i;
+echo "Setting bookings count to: {$i}\n";
+$endtime = microtime(TRUE);
+$runtime = $endtime - $startTime;
+echo "Runtime: {$runtime}\n";

@@ -3,7 +3,7 @@
     {% if done %}
         <h1 id="done">Analysis done</h1>
     {% else %}
-        <h1>Analysis progress...</h1>
+        <h1>Analysis in progress. Updates will come every {{ pullInterval }} seconds</h1>
     {% endif %}
     <div class="container">
         {% if not done %}

@@ -144,6 +144,6 @@ class LoadIncrementalCsvDataIterator implements BookingDataIterator {
      */
     public function count(): int
     {
-        return $this->count();
+        return $this->count;
     }
 }

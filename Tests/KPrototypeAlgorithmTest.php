@@ -22,9 +22,8 @@ require_once dirname(__DIR__) . '/Models/Associate.php';
 require_once dirname(__DIR__) . '/Utilities/ConfigProvider.php';
 require_once dirname(__DIR__) . '/Utilities/LoadRedisDataIterator.php';
 
-use PHPUnit\Framework\TestCase;
 
-class KPrototypeAlgorithmTest extends TestCase
+class KPrototypeAlgorithmTest //extends PHPUnit\Framework\TestCase
 {
     private $configMock;
     private $distance;

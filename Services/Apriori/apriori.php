@@ -86,12 +86,11 @@ if (array_key_exists('abort', $_GET) && $_GET['abort']) {
     $cacheFile = $cache->getCacheFile($filters);
     $countFile = $cache->getCountFile($filters);
     $container->set(BookingDataIterator::class, new LoadIncrementalCsvDataIterator($cacheFile, $countFile));
-    die();
 
     // Run algorithm
     $apriori = $container->get('AprioriAlgorithm');
     unlink($rootDir . $aprioriConfig['serviceStopFile']);
-    $apriori->run($filters);
+    $apriori->run();
     unlink($rootDir . $aprioriConfig['servicePidFile']);
 }
 
