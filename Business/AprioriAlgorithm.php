@@ -3,7 +3,6 @@ use \DI\FactoryInterface;
 
 class AprioriAlgorithm
 {
-    private $bookingsCount = 0;
     private $bookingsCountCap;
     private $lastOutput;
     private $outputFile;
@@ -45,11 +44,6 @@ class AprioriAlgorithm
         $this->stopFile = $aprioriConfig['serviceStopFile'];
         $this->outputInterval = $aprioriConfig['outputInterval'];
         $this->outputFile = $aprioriConfig['serviceOutput'];
-
-        $this->bookingsCount = $this->bookingDataIterator->count();
-        if ($this->bookingsCountCap) {
-            $this->bookingsCount = $this->bookingsCountCap;
-        }
     }
 
     /**
@@ -66,12 +60,12 @@ class AprioriAlgorithm
                 break;
             }
             $countedCandidates = $this->countCandidates($candidates, $frequentSets);
-            $frequentSet = $this->filterByMinSup($countedCandidates, $this->bookingsCount);
+            $frequentSet = $this->filterByMinSup($countedCandidates, $this->bookingDataIterator->count());
             usort($frequentSet, array('AprioriAlgorithm', 'frequentSetSort'));
             $frequentSets[$i] = $frequentSet;
         }
         $this->storeState(null, $frequentSets);
-        return $this->generateHistograms($frequentSets, $this->bookingsCount);
+        return $this->generateHistograms($frequentSets, $this->bookingDataIterator->count());
     }
 
 
@@ -80,11 +74,17 @@ class AprioriAlgorithm
      * @param Clusters $clusters Clusters to analyze. Each Cluster will be anaylzed with the apriori algorithm.
      * @return Clusters with attached histograms.
      */
-    public function runOnClusters(Clusters $clusters): Clusters {
+    public function runWithClusters(Clusters $clusters): Clusters {
         foreach ($clusters->getClusters() as $cluster) {
-            $this->bookingDataIterator = $this->factory->make(LoadClusterDataIterator::class, ['cluster' => $cluster]);
+            $this->bookingDataIterator = $this->factory->make(
+                BookingDataIteratorAdapter::class, [
+                    'bookingDataIterator' =>
+                        $this->factory->make(LoadClusterDataIterator::class, ['cluster' => $cluster])
+            ]);
+            $this->storeClusterState($clusters, 1, $cluster);
             $cluster->setHistograms($this->run());
         }
+        $this->storeClusterState($clusters, 2);
         return $clusters;
     }
 
@@ -122,7 +122,7 @@ class AprioriAlgorithm
 
         }
 
-        $frequentSet = $this->filterByMinSup($candidates, $this->bookingsCount);
+        $frequentSet = $this->filterByMinSup($candidates, $this->bookingDataIterator->count());
         usort($frequentSet, array('AprioriAlgorithm', 'frequentSetSort'));
         return $frequentSet;
     }
@@ -219,7 +219,16 @@ class AprioriAlgorithm
 
     private function storeState($candidates = null, $frequentSets = null)
     {
-        $this->progress->storeState($this->startTime, $this->bookingsCount, $candidates, $frequentSets);
+        $this->progress->storeState($this->startTime, $this->bookingDataIterator->count(), $candidates, $frequentSets);
+    }
+
+    private function storeClusterState(Clusters $clusters, $status, Cluster $cluster = null)
+    {
+        $this->progress->storeClusterState($clusters, $status, $cluster);
+        // If status is done, store the final state.
+        if ($status == 2) {
+            $this->storeState();
+        }
     }
 
     static function frequentSetSort($a, $b) {
@@ -253,6 +262,6 @@ class AprioriAlgorithm
      */
     public function getBookingsCount()
     {
-        return $this->bookingsCount;
+        return $this->bookingDataIterator->count();
     }
 }

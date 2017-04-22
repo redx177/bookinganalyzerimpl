@@ -7,7 +7,6 @@
  */
 abstract class ClusteringProgress
 {
-    private $lastOutput;
     private $rootDir;
     private $outputInterval;
     private $outputFile;
@@ -16,13 +15,17 @@ abstract class ClusteringProgress
      * @var Twig_TemplateWrapper
      */
     private $template;
+    /**
+     * @var Runtime
+     */
+    private $runtime;
 
     protected abstract function getClusteringConfig(ConfigProvider $config): array;
 
-    public function __construct(ConfigProvider $config, Twig_TemplateWrapper $template)
+    public function __construct(ConfigProvider $config, Twig_TemplateWrapper $template, Runtime $runtime)
     {
         $this->template = $template;
-        $this->lastOutput = microtime(TRUE);
+        $this->runtime = $runtime;
         $this->rootDir = $config->get('rootDir');
 
         $clusteringConfig = $this->getClusteringConfig($config);
@@ -33,36 +36,23 @@ abstract class ClusteringProgress
 
     /**
      * Stores the state to a file every $config['kprototype/dbscan']['outputInterval'] seconds or if $force=true.
-     * @param float $algorithmStartTime Start time of the algorithm.
      * @param int $bookingsCount Count of bookings.
      * @param Clusters $clusters Clustering state.
-     * @param int $iteration Current iteration number.
      * @param int $status 0 = Data caching done. 1 = Clustering done. 2 = Apriori done. ($status=2 will force an output, ignoring outputInterval from config)
      */
-    public function storeState(float $algorithmStartTime, int $bookingsCount, Clusters $clusters, int $iteration, int $status)
+    public function storeState(int $bookingsCount, Clusters $clusters, int $status)
     {
-        $currentTime = microtime(TRUE);
-        if ($currentTime - $this->lastOutput > $this->outputInterval || $status == 2) {
-            $this->lastOutput = microtime(TRUE);
-            $runtime = $currentTime - $algorithmStartTime;
-
-//            $count0 = count($clusters->getClusters()[0]->getAssociates());
-//            $count1 = count($clusters->getClusters()[1]->getAssociates());
-//            echo "before render\n";
-//            echo "ID1: {$clusters->getClusters()[0]->getCenter()->getId()}\n";
-//            echo "ID2: {$clusters->getClusters()[1]->getCenter()->getId()}\n";
-//            echo "Associates1: {$count0}\n";
-//            echo "Associates2: {$count1}\n";
-//            echo "TotalCosts: {$clusters->getTotalCosts()}\n----------------------------------\n";
+        if ($this->runtime->fromLastTick() > $this->outputInterval || $status == 2) {
+            echo "clustering write output\n";
             $content = $this->template->render([
                 'clusters' => $clusters,
                 'bookingsCount' => $bookingsCount,
-                'runtimeInSeconds' => $runtime,
-                'iteration' => $iteration,
+                'runtimeInSeconds' => $this->runtime->fromBeginning(),
                 'status' => $status,
                 'pullInterval' => $this->outputInterval,
             ]);
             file_put_contents($this->rootDir . $this->outputFile, $content);
+            $this->runtime->tick();
         }
     }
 }

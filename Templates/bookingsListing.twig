@@ -3,22 +3,22 @@
         <tr>
             <th><div>ID</div></th>
             {% set firstBooking = bookings|first %}
-            {% for field in firstBooking.getFieldsByType('string') %}
+            {% for field in firstBooking.getFieldsByType('StringField') %}
                 <th><div>{{ fieldTitles[field.getName()] }}</div></th>
             {% endfor %}
-            {% for field in firstBooking.getFieldsByType('Price') %}
+            {% for field in firstBooking.getFieldsByType('PriceField') %}
                 <th><div>{{ fieldTitles[field.getName()] }}</div></th>
             {% endfor %}
-            {% for field in firstBooking.getFieldsByType('int') %}
+            {% for field in firstBooking.getFieldsByType('IntegerField') %}
                 <th><div>{{ fieldTitles[field.getName()] }}</div></th>
             {% endfor %}
-            {% for field in firstBooking.getFieldsByType('Distance') %}
+            {% for field in firstBooking.getFieldsByType('DistanceField') %}
                 <th><div>{{ fieldTitles[field.getName()] }}</div></th>
             {% endfor %}
-            {% for field in firstBooking.getFieldsByType('bool') %}
+            {% for field in firstBooking.getFieldsByType('BooleanField') %}
                 <th><div>{{ fieldTitles[field.getName()] }}</div></th>
             {% endfor %}
-            {% for field in firstBooking.getFieldsByType('float') %}
+            {% for field in firstBooking.getFieldsByType('FloatField') %}
                 <th><div>{{ fieldTitles[field.getName()] }}</div></th>
             {% endfor %}
         </tr>
@@ -27,10 +27,10 @@
         {% for booking in bookings %}
             <tr>
                 <td>{{ booking.getId() }}</td>
-                {% for field in booking.getFieldsByType('string') %}
+                {% for field in booking.getFieldsByType('StringField') %}
                     <td>{{ field.getValue() }}</td>
                 {% endfor %}
-                {% for field in booking.getFieldsByType('Price') %}
+                {% for field in booking.getFieldsByType('PriceField') %}
                     <td>
                         {% if field.getValue() == constant('Price::Budget') %}
                             <span class="glyphicon glyphicon-piggy-bank" aria-hidden="true"></span>
@@ -39,24 +39,24 @@
                         {% endif %}
                     </td>
                 {% endfor %}
-                {% for field in booking.getFieldsByType('int') %}
+                {% for field in booking.getFieldsByType('IntegerField') %}
                     <td>{{ field.getValue() }}</td>
                 {% endfor %}
-                {% for field in booking.getFieldsByType('Distance') %}
+                {% for field in booking.getFieldsByType('DistanceField') %}
                     <td>
                         {% if field.getValue() == constant('Distance::Close') %}
                             <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
                         {% endif %}
                     </td>
                 {% endfor %}
-                {% for field in booking.getFieldsByType('bool') %}
+                {% for field in booking.getFieldsByType('BooleanField') %}
                     <td>
                         {% if field.getValue() %}
                             <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
                         {% endif %}
                     </td>
                 {% endfor %}
-                {% for field in booking.getFieldsByType('float') %}
+                {% for field in booking.getFieldsByType('FloatField') %}
                     <td>{{ field.getValue() }}</td>
                 {% endfor %}
             </tr>

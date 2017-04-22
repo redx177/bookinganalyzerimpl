@@ -1,72 +1,68 @@
+{% set setSize = 1 %}
+
 <div class="histogramsAsTable">
-
-    {% if done %}
-        <h1 id="done">Analysis done</h1>
-    {% else %}
-        <h1>Analysis in progress. Updates will come every {{ pullInterval }} seconds</h1>
-    {% endif %}
-    <div class="container">
-        {% if not done %}
-            <button type="button" class="btn btn-danger btn-abort">Abort</button>
-        {% endif %}
-        Runtime: {{ runtimeInSeconds }}<br />
-        Items count: {{ bookingsCount }}
-    </div>
-
-    {% set setSize = 1 %}
     {% for frequentSet in frequentSets %}
         {% if frequentSet|length %}
-            <table class="table table-responsive frequent-set">
-                <thead class="thead-default">
-                    <tr>
-                        <th colspan="2">Set size: {{ setSize }}, Count: {{ frequentSet|length }}</th>
-                    </tr>
-                    <tr>
-                        <th>Fields</th>
-                        <th>Count</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for item in frequentSet %}
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    Set size: {{ setSize }}, Set count: {{ frequentSet|length }}
+                </div>
+
+                <table class="table frequent-set">
+                    <thead class="thead-default">
                         <tr>
-                            <td>
-                                {% for fieldName, fieldValue in item|first %}
-                                    {{ fieldTitles[fieldName] }}={{ fieldValue }}<br/>
-                                {% endfor %}
-                            </td>
-                            <td>{{ item[1] }}</td>
+                            <th>Fields</th>
+                            <th>Count</th>
                         </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        {% for item in frequentSet %}
+                            <tr>
+                                <td>
+                                    {% for fieldName, fieldValue in item|first %}
+                                        {{ fieldTitles[fieldName] }}={{ fieldValue }}<br/>
+                                    {% endfor %}
+                                </td>
+                                <td>{{ item[1] }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         {% endif %}
         {% set setSize = setSize+1 %}
     {% endfor %}
 
 
     {% if candidates %}
-        <table class="table table-responsive candidate">
-            <thead class="thead-default">
-            <tr>
-                <th colspan="2">Set size: {{ setSize }}, Count: {{ candidatesCount }}</th>
-            </tr>
-            <tr>
-                <th>Fields</th>
-                <th>Count</th>
-            </tr>
-            </thead>
-            <tbody>
-            {% for candidate in candidates %}
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                Set size: {{ setSize }}, Set count: {{ candidatesCount }}
+            </div>
+
+            <table class="table candidate">
+                <thead class="thead-default">
                 <tr>
-                    <td>
-                        {% for fieldName, fieldValue in candidate|first %}
-                            {{ fieldTitles[fieldName] }}={{ fieldValue }}<br/>
-                        {% endfor %}
-                    </td>
-                    <td>{{ candidate[1] }} <img src="/img/loading.gif" alt="Loading"></td>
+                    <th colspan="2">Set size: {{ setSize }}, Count: {{ candidatesCount }}</th>
                 </tr>
-            {% endfor %}
-            </tbody>
-        </table>
+                <tr>
+                    <th>Fields</th>
+                    <th>Count</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for candidate in candidates %}
+                    <tr>
+                        <td>
+                            {% for fieldName, fieldValue in candidate|first %}
+                                {{ fieldTitles[fieldName] }}={{ fieldValue }}<br/>
+                            {% endfor %}
+                        </td>
+                        <td>{{ candidate[1] }} <img src="/img/loading.gif" alt="Loading"></td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
     {% endif %}
 </div>

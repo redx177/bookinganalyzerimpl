@@ -54,12 +54,40 @@
 .bookingListing td {
   border: 1px solid #ccc;
 }
-.histogramsAsTable .table {
-  width: 0;
+.histogramsAsTable .panel {
   float: left;
-  margin-right: 40px;
+  margin-right: 20px;
 }
 .histogramsAsTable .btn-abort {
   float: left;
   margin-right: 20px;
+}
+.clustersanalysis .progressbar .alert {
+  float: left;
+}
+.clustersanalysis .progressbar::after {
+  clear: both;
+  content: ' ';
+  display: block;
+}
+.glyphicon-refresh {
+  -webkit-animation: spin 4s linear infinite;
+  -moz-animation: spin 4s linear infinite;
+  animation: spin 4s linear infinite;
+}
+@-moz-keyframes spin {
+  100% {
+    -moz-transform: rotate(360deg);
+  }
+}
+@-webkit-keyframes spin {
+  100% {
+    -webkit-transform: rotate(360deg);
+  }
+}
+@keyframes spin {
+  100% {
+    -webkit-transform: rotate(360deg);
+    transform: rotate(360deg);
+  }
 }

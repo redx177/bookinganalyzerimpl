@@ -2,19 +2,15 @@
 
 /**
  * Saves the apriori progress to a file.
- * Not every call to processState is saved to the file.
+ * Not every call to storeState is saved to file.
  * How often this is done can be configured in the $config['apriori']['outputInterval'].
  */
-class AprioriProgressToMemory implements AprioriProgress
+class AprioriProgressForClusters implements AprioriProgress
 {
     /**
      * @var Twig_TemplateWrapper
      */
     private $template;
-    /**
-     * @var AprioriState
-     */
-    private $state;
     private $lastOutput;
     private $fieldNameMapping;
     private $rootDir;
@@ -35,25 +31,11 @@ class AprioriProgressToMemory implements AprioriProgress
 
     public function storeState(float $algorithmStartTime, int $bookingsCount, array $candidates = null, array $frequentSets = null)
     {
-        $currentTime = microtime(TRUE);
-        if ($currentTime - $this->lastOutput > $this->outputInterval || $candidates == null) {
-            $this->lastOutput = microtime(TRUE);
-            $runtime = $currentTime - $algorithmStartTime;
-
-            $sortedSlicedCandidates = null;
-            if ($candidates) {
-                usort($candidates, array('AprioriAlgorithm', 'frequentSetSort'));
-                // Take the top X candidates. Else there can be thousands of them.
-                $sortedSlicedCandidates = array_slice($candidates, 0, 10);
-            }
-
-            $this->state = new AprioriState($frequentSets, $sortedSlicedCandidates, $bookingsCount, $this->fieldNameMapping, $runtime);
-        }
     }
 
     public function getState(): AprioriState
     {
-        return $this->state;
+        return new AprioriState([], null, 0, [], 0);
     }
 
     public function storeClusterState(Clusters $clusters, $status, Cluster $cluster = null)

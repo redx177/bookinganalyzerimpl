@@ -6,14 +6,18 @@ require_once $rootDir . '/Interfaces/BookingDataIterator.php';
 require_once $rootDir . '/Interfaces/AprioriProgress.php';
 require_once $rootDir . '/Interfaces/Field.php';
 require_once $rootDir . '/Interfaces/Random.php';
+require_once $rootDir . '/Interfaces/AprioriProgress.php';
 require_once $rootDir . '/Utilities/ConfigProvider.php';
 require_once $rootDir . '/Utilities/LoadAllCsvDataIterator.php';
 require_once $rootDir . '/Utilities/LoadIncrementalCsvDataIterator.php';
+require_once $rootDir . '/Utilities/LoadClusterDataIterator.php';
 require_once $rootDir . '/Utilities/LoadRedisDataIterator.php';
 require_once $rootDir . '/Utilities/Randomizer.php';
+require_once $rootDir . '/Utilities/Runtime.php';
 require_once $rootDir . '/Business/AprioriAlgorithm.php';
 require_once $rootDir . '/Business/AprioriProgressToFile.php';
 require_once $rootDir . '/Business/AprioriProgressToMemory.php';
+require_once $rootDir . '/Business/AprioriProgressForClusters.php';
 require_once $rootDir . '/Business/ClusteringProgress.php';
 require_once $rootDir . '/Business/KPrototypeClusteringProgress.php';
 require_once $rootDir . '/Business/BookingsProvider.php';
@@ -68,28 +72,20 @@ $builder = new DI\ContainerBuilder();
 $builder->addDefinitions([
     Twig_Environment::class => $twig,
     Twig_TemplateWrapper::class => $template,
-//    BookingDataIterator::class => new LoadIncrementalCsvDataIterator($rootDir . '/' . $config->get('dataSource')),
-    BookingDataIterator::class => \DI\factory(function() use ($rootDir, $config) {
-        return new LoadIncrementalCsvDataIterator($rootDir . '/' . $config->get('dataSource'));
-    })->scope(\DI\Scope::PROTOTYPE),
-    //BookingDataIterator::class => new LoadAllCsvDataIterator($rootDir . '/' . $config->get('dataSource')),
     ConfigProvider::class => $config,
     Twig_TemplateWrapper::class => $template,
     Redis::class => $redis,
-    Random::class => new Randomizer(),
-    KPrototypeAlgorithm::class => \DI\factory(function($container) use ($rootDir, $config) {
-        return new KPrototypeAlgorithm(
-            $container->get(ConfigProvider::class),
-            $container->get(DistanceMeasurement::class),
-            $container->get(Random::class),
-            $container->get(Redis::class),
-            //new LoadIncrementalCsvDataIterator($rootDir . '/' . $config->get('dataSource')),
-            new BookingDataIteratorAdapter($container->make(BookingDataIterator::class), $container->get(BookingBuilder::class)),
-            new BookingDataIteratorAdapter($container->make(BookingDataIterator::class), $container->get(BookingBuilder::class)),
-            $container->get(ClusteringProgress::class),
-            $container->get(BookingBuilder::class)
-        );
-    })
+    Random::class => \DI\object(Randomizer::class),
+    AprioriProgress::class => \DI\object(AprioriProgressToFile::class),
+    BookingDataIteratorAdapter::class => \DI\object(BookingDataIteratorAdapter::class)->scope(\DI\Scope::PROTOTYPE),
+
+    // Scope::PROTOTYPE is set so it creates a new instance everytime.
+    BookingDataIterator::class => \DI\factory(function () use ($rootDir, $config) {
+        return new LoadIncrementalCsvDataIterator($rootDir . '/' . $config->get('dataSource'));
+    })->scope(\DI\Scope::PROTOTYPE),
+
+    // Create new instance here. It will start tracking time from the point of instantiation.
+    Runtime::class => new Runtime(),
 ]);
 $container = $builder->build();
 
@@ -115,18 +111,22 @@ if (array_key_exists('abort', $_GET) && $_GET['abort']) {
 
     // Cache file
     $cache = $container->get(DataCache::class);
-    $cacheFile = $cache->getCacheFile($filters);
+    $dataFile = $cache->getCacheFile($filters);
     $countFile = $cache->getCountFile($filters);
-    $container->set(BookingDataIterator::class, new LoadIncrementalCsvDataIterator($cacheFile, $countFile));
+    $container->set('dataFile', \DI\value($dataFile));
+    $container->set('countFile', \DI\value($countFile));
+    $container->set(BookingDataIterator::class, \DI\object(LoadIncrementalCsvDataIterator::class)
+        ->constructor(\DI\get(dataFile), \DI\get(countFile))
+        ->scope(\DI\Scope::PROTOTYPE));
 
     // Run k-prototype
-    unlink($rootDir.$kprototypeConfig['serviceStopFile']);
+    unlink($rootDir . $kprototypeConfig['serviceStopFile']);
     $kprototype = $container->get(KPrototypeAlgorithm::class);
     $clusters = $kprototype->run();
 
     // Run apirori
     $apriori = $container->get(AprioriAlgorithm::class);
-    $apriori->runOnClusters($clusters);
+    $apriori->runWithClusters($clusters);
 
-    unlink($rootDir.$kprototypeConfig['servicePidFile']);
+    unlink($rootDir . $kprototypeConfig['servicePidFile']);
 }

@@ -46,7 +46,6 @@ $twig = new Twig_Environment($loader, array(
 ));
 $twig->addFunction(new Twig_Function('sortHistogramBinsByCount', 'sortHistogramBinsByCount'));
 $twig->addExtension(new Twig_Extension_Debug());
-$template = $twig->load('candidatesAndFrequentSetsAsTable.twig');
 
 /* REDIS */
 $redis = new Redis();
@@ -58,12 +57,14 @@ $builder = new DI\ContainerBuilder();
 $builder->addDefinitions([
     Twig_Environment::class => $twig,
     ConfigProvider::class => $config,
-    Twig_TemplateWrapper::class => $template,
     Redis::class => $redis,
     //BookingDataIterator::class => new LoadRedisDataIterator($redis),
     BookingDataIterator::class => new LoadIncrementalCsvDataIterator($rootDir . '/' . $config->get('dataSource')),
     //BookingDataIterator::class => new LoadAllCsvDataIterator($rootDir . '/' . $config->get('dataSource')),
-    AprioriProgress::class => \DI\object(AprioriProgressToFile::class)
+    AprioriProgress::class => \DI\object(AprioriProgressToFile::class),
+
+    // Create new instance here. It will start tracking time from the point of instantiation.
+    Runtime::class => new Runtime(),
 ]);
 $container = $builder->build();
 

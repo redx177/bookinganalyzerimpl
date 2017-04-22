@@ -21,15 +21,27 @@
 
     <div class="container" id="results-container">
         {% if isRunning %}
-
-            <div class="container">
+            <div class="container clustersanalysis">
                 <h1>Analysis in progress. Updates will come every {{ pullInterval }} seconds</h1>
-                <p>Steps:</p>
-                <ul>
-                    <li>Cache data: <img src="/img/loading.gif" alt="Loading"></li>
-                    <li>Grouping data:</li>
-                    <li>Analyze data:</li>
-                </ul>
+
+                <div class="panel panel-default">
+                    <div class="panel-heading">Progress</div>
+                    <div class="panel-body">
+                        <div class="progressbar">
+                            <div class="alert alert-warning" role="alert">
+                                <span class="glyphicon glyphicon-refresh" aria-hidden="true"></span>
+                                Cache data
+                            </div>
+                            <div class="alert alert-warning" role="alert">
+                                Grouping data
+                            </div>
+
+                            <div class="alert alert-{% if status > 1 %}success{% else %}warning{% endif %}" role="alert">
+                                Analyze data
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         {% endif %}
     </div>

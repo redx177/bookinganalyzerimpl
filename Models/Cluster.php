@@ -2,6 +2,8 @@
 
 class Cluster
 {
+    private $totalCosts;
+
     /**
      * @var Booking
      */
@@ -11,7 +13,11 @@ class Cluster
      * @var Associate[]
      */
     private $associates = [];
-    private $totalCosts;
+
+    /**
+     * @var Histograms
+     */
+    private $histograms;
 
     public function __construct(Booking $booking)
     {
@@ -46,5 +52,10 @@ class Cluster
     public function getTotalCosts(): int
     {
         return $this->totalCosts;
+    }
+
+    public function setHistograms(Histograms $histograms)
+    {
+        $this->histograms = $histograms;
     }
 }

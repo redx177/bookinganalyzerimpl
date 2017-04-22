@@ -2,11 +2,23 @@
 
 class Clusters
 {
+    private $centerIds;
+    private $iteration;
+
     /**
      * @var Cluster[]
      */
     private $clusters;
-    private $centerIds;
+
+    public function __construct($iteration)
+    {
+        $this->iteration = $iteration;
+    }
+
+    public function getIteration(): int
+    {
+        return $this->iteration;
+    }
 
     public function addCluster(Cluster $cluster)
     {
@@ -42,5 +54,14 @@ class Clusters
     public function getClusterCenterIds()
     {
         return $this->centerIds;
+    }
+
+    public function getBookingsCount()
+    {
+        $bookingsCount = 0;
+        foreach ($this->getClusters() as $cluster) {
+            $bookingsCount += count($cluster->getAssociates());
+        }
+        return $bookingsCount;
     }
 }

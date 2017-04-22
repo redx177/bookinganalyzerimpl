@@ -1,57 +1,92 @@
-<div class="clusters">
-    <div class="container">
+<div class="container clustersanalysis">
+    {% if status == 2 %}
+        <h1 id="done">Analysis done</h1>
+    {% else %}
+        <h1>Analysis in progress. Updates will come every {{ pullInterval }} seconds</h1>
+    {% endif %}
 
-        {% if status == 2 %}
-            <h1 id="done">Analysis done</h1>
-        {% else %}
-            <h1>Analysis in progress. Updates will come every {{ pullInterval }} seconds</h1>
-        {% endif %}
+    <div class="panel panel-default">
+        <div class="panel-heading">Progress</div>
+        <div class="panel-body">
+            <div class="progressbar">
 
-        <p>Steps:</p>
-        <ul>
-            <li>Cache data: <img src="/img/tick.png" alt="Done">
-            </li>
-            <li>Grouping data:
-                {% if status == 0 %}
-                    <img src="/img/loading.gif" alt="Loading">
-                {% elseif status > 0 %}
-                    <img src="/img/tick.png" alt="Done">
-                {% endif %}
-            </li>
-            <li>Analyze data:
-                {% if status == 1 %}
-                    <img src="/img/loading.gif" alt="Loading">
-                {% elseif status == 2 %}
-                    <img src="/img/tick.png" alt="Done">
-                {% endif %}
-            </li>
-        </ul>
+                <div class="alert alert-success" role="alert">
+                    <span class="glyphicon glyphicon-ok-sign" aria-hidden="true"></span>
+                    Cache data
+                </div>
+                <div class="alert alert-{% if status > 0 %}success{% else %}warning{% endif %}" role="alert">
+                    {% if status == 0 %}
+                        <span class="glyphicon glyphicon-refresh" aria-hidden="true"></span>
+                    {% elseif status > 0 %}
+                        <span class="glyphicon glyphicon-ok-sign" aria-hidden="true"></span>
+                    {% endif %}
+                    Grouping data
+                </div>
 
-        {% if not status == 2 %}
-            <button type="button" class="btn btn-danger btn-abort">Abort</button><br />
-        {% endif %}
-        Runtime: {{ runtimeInSeconds }}<br />
-        Items count: {{ bookingsCount }}
+                <div class="alert alert-{% if status > 1 %}success{% else %}warning{% endif %}" role="alert">
+                    {% if status == 1 %}
+                        <span class="glyphicon glyphicon-refresh" aria-hidden="true"></span>
+                    {% elseif status > 1 %}
+                        <span class="glyphicon glyphicon-ok-sign" aria-hidden="true"></span>
+                    {% endif %}
+                    Analyze data
+                </div>
+            </div>
+
+            {% if not status == 2 %}
+                <button type="button" class="btn btn-danger btn-abort">Abort</button><br />
+            {% endif %}
+            Runtime: {{ runtimeInSeconds }}<br />
+            Items count: {{ bookingsCount }}<br />
+            Overal error: {{ clusters.totalCosts }}<br />
+            Iteration: {{ clusters.iteration }}<br />
+            Best candidate{% if status == 0 %} so far{% endif %}:
+            {% if status == 2 %}
+                <ul>
+                    {% for cluster in clusters.clusters %}
+                        <li>Cluster {{ loop.index }}, Item Count: {{ cluster.associates|length }}, Error: {{ cluster.totalCosts }}</li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <ul>
+                    {% for cluster in clusters.clusters %}
+                        <li>Cluster {{ loop.index }}, Item Count: {{ cluster.associates|length }}, Error: {{ cluster.totalCosts }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        </div>
     </div>
 
-    <div class="container">
-        <p>
-            Overal error: {{ clusters.totalCosts }}<br />
-            Iteration: {{ iteration }}<br />
-            Best candidate so far:
-        </p>
-        {% if status == 2 %}
-            <ul>
-                {% for cluster in clusters.clusters %}
-                    <li>Cluster {{ loop.index }}, Item Count: {{ cluster.associates|length }}, Error: {{ cluster.totalCosts }}</li>
-                {% endfor %}
-            </ul>
-        {% else %}
-            <ul>
-                {% for cluster in clusters.clusters %}
-                    <li>Cluster {{ loop.index }}, Item Count: {{ cluster.associates|length }}, Error: {{ cluster.totalCosts }}</li>
-                {% endfor %}
-            </ul>
+    <div class="clusters">
+        {% if status > 0 %}
+
+            {% set index = 0 %}
+            {% for analyzedCluster in analyzedClusters %}
+                {% set index = index + 1 %}
+                <div class="cluster">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            Cluster {{ index }}, Item Count: {{ analyzedCluster.cluster.associates|length }}, Error {{ analyzedCluster.cluster.totalCosts }}
+                        </div>
+                        <div class="panel-body">
+                            {{ include('candidatesAndFrequentSetsAsTable.twig', {
+                                'frequentSets': analyzedCluster.frequentSets,
+                                'candidates': analyzedCluster.candidates,
+                            }) }}
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+            {% if currentCluster %}
+                {% set index = index + 1 %}
+                <div class="cluster">
+                    <h2>Cluster {{ index }}, Item Count: {{ currentCluster.cluster.associates|length }}, Error {{ currentCluster.cluster.totalCosts }}</h2>
+                    {{ include('candidatesAndFrequentSetsAsTable.twig', {
+                        'frequentSets': currentCluster.frequentSets,
+                        'candidates': currentCluster.candidates,
+                    }) }}
+                </div>
+            {% endif %}
         {% endif %}
     </div>
 </div>

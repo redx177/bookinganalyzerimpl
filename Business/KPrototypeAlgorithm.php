@@ -4,10 +4,8 @@ class KPrototypeAlgorithm
 {
     private $bookingsCount;
     private $bookingsCountCap;
-    private $lastOutput;
     private $outputFile;
     private $outputInterval;
-    private $startTime;
     private $fieldNameMapping;
     private $rootDir;
     private $maxIterations;
@@ -55,8 +53,6 @@ class KPrototypeAlgorithm
         $this->bookingsCountCap = $config->get('bookingsCountCap');
         $this->fieldNameMapping = $config->get('fieldNameMapping');
         $this->rootDir = $config->get('rootDir');
-        $this->lastOutput = microtime(TRUE);
-        $this->startTime = microtime(TRUE);
         $this->redis = $redis;
         $this->bookingDataIterator = $bookingDataIterator;
         $this->bookingDataIterator2 = $bookingDataIterator2;
@@ -83,10 +79,11 @@ class KPrototypeAlgorithm
     public function run(): Clusters
     {
         $k = 2;
+        $iteration = 1;
 
         // Initialization
         $clusters = $this->getInitialEmptyClusters($k);
-        $this->storeState($clusters, 1, 0);
+        $this->storeState($clusters, 0);
 
 //        echo "init\n";
 //        $this->debug($clusters);
@@ -103,10 +100,8 @@ class KPrototypeAlgorithm
         $bestTotalCosts = $currentTotalCosts;
         $bestClusters = $clusters;
         $delta = 1;
-        $iteration = 0;
         while ($delta > 0 && $iteration <= $this->maxIterations) {
-            $iteration++;
-            $this->storeState($clusters, $iteration, 0);
+            $this->storeState($clusters, 0);
 
 //            echo "main loop\n";
 //            echo "Iteration: {$iteration}\n";
@@ -130,7 +125,7 @@ class KPrototypeAlgorithm
                         continue;
                     }
 
-                    $newClusters = $this->generateNewEmptyClustersWithSwapedCenter($clusters, $clusterToReplace, $newClusterCenter);
+                    $newClusters = $this->generateNewEmptyClustersWithSwapedCenter($clusters, $clusterToReplace, $newClusterCenter, $iteration);
                     $this->assignBookingsToClusters($newClusters);
                     $newTotalCosts = $newClusters->getTotalCosts();
                     if ($newTotalCosts < $bestTotalCosts) {
@@ -138,7 +133,7 @@ class KPrototypeAlgorithm
                         $bestClusters = $newClusters;
                     }
                     if ($offset % 100 == 0) {
-                        $this->storeState($bestClusters, $iteration, 0);
+                        $this->storeState($bestClusters, 0);
                     }
                 }
 
@@ -148,6 +143,7 @@ class KPrototypeAlgorithm
             $delta = $currentTotalCosts - $bestTotalCosts;
             $clusters = $bestClusters;
             $currentTotalCosts = $bestTotalCosts;
+            $iteration++;
 
 //            echo "\nRuntime: " . (microtime(true) - $start);
 //            echo "\nCurrentTotalCosts: {$currentTotalCosts}";
@@ -155,7 +151,7 @@ class KPrototypeAlgorithm
 //            echo "\nDelta: {$delta}\n-------------------------------------\n";
         }
 //        echo "done!\n";
-        $this->storeState($clusters, $iteration, 2);
+        $this->storeState($clusters, 1);
 //        echo "\nRuntime: " . (microtime(true) - $start);
         return $clusters;
     }
@@ -171,7 +167,7 @@ class KPrototypeAlgorithm
             $k = $this->bookingsCount;
         }
 
-        $clusters = new Clusters();
+        $clusters = new Clusters(1);
         $clusterCenterIndices = [];
         for ($i = 0; $i < $k; $i++) {
             $clusterCenterIndex = $this->random->generate(100);
@@ -237,11 +233,12 @@ class KPrototypeAlgorithm
      * @param Clusters $oldClusters Old Clusters.
      * @param Cluster $clusterToReplace Cluster in $oldClusters which should not be placed into the new Clusters object..
      * @param Booking $newCenter New Center to add to the new Clusters object and should replace the $clusterToReplace.
+     * @param int $iteration Current iteration number.
      * @return Clusters New Clusters object with one Cluster replaced.
      */
-    private function generateNewEmptyClustersWithSwapedCenter(Clusters $oldClusters, Cluster $clusterToReplace, Booking $newCenter)
+    private function generateNewEmptyClustersWithSwapedCenter(Clusters $oldClusters, Cluster $clusterToReplace, Booking $newCenter, int $iteration)
     {
-        $newClusters = new Clusters();
+        $newClusters = new Clusters($iteration);
         foreach ($oldClusters->getClusters() as $oldCluster) {
             if ($oldCluster->getCenter()->getId() != $clusterToReplace->getCenter()->getId()) {
                 $newClusters->addCluster(new Cluster($oldCluster->getCenter()));
@@ -254,9 +251,9 @@ class KPrototypeAlgorithm
     /**
      * @param int $status 0 = Data caching done. 1 = Clustering done. 2 = Apriori done.
      */
-    private function storeState(Clusters $clusters, int $iteration, int $status)
+    private function storeState(Clusters $clusters, int $status)
     {
-        $this->progress->storeState($this->startTime, $this->bookingsCount, $clusters, $iteration, $status);
+        $this->progress->storeState($this->bookingsCount, $clusters, $status);
     }
 
     /**
