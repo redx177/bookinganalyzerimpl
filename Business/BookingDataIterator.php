@@ -1,9 +1,9 @@
 <?php
 
-class BookingDataIteratorAdapter implements BookingDataIterator
+class DataIteratorAdapter implements DataIterator
 {
     /**
-     * @var BookingDataIterator
+     * @var DataIterator
      */
     private $bookingDataIterator;
     /**
@@ -11,7 +11,7 @@ class BookingDataIteratorAdapter implements BookingDataIterator
      */
     private $bookingBuilder;
 
-    public function __construct(BookingDataIterator $bookingDataIterator, BookingBuilder $bookingBuilder)
+    public function __construct(DataIterator $bookingDataIterator, BookingBuilder $bookingBuilder)
     {
         $this->bookingDataIterator = $bookingDataIterator;
         $this->bookingBuilder = $bookingBuilder;

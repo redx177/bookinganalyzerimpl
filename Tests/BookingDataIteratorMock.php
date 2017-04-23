@@ -12,7 +12,7 @@ class BookingDataIteratorAdapterMock {
     static public function get(TestCase $testCase, array $items)
     {
 
-        $iteratorMock = $testCase->getMockBuilder(BookingDataIteratorAdapter::class)
+        $iteratorMock = $testCase->getMockBuilder(BookingDataIterator::class)
             ->disableOriginalConstructor()
             ->getMock();
 
