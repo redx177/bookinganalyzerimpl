@@ -9,6 +9,7 @@ require_once $rootDir . '/Utilities/ConfigProvider.php';
 require_once $rootDir . '/Utilities/LoadAllCsvDataIterator.php';
 require_once $rootDir . '/Utilities/LoadIncrementalCsvDataIterator.php';
 require_once $rootDir . '/Utilities/LoadRedisDataIterator.php';
+require_once $rootDir . '/Utilities/Runtime.php';
 require_once $rootDir . '/Business/AprioriAlgorithm.php';
 require_once $rootDir . '/Business/AprioriProgressToFile.php';
 require_once $rootDir . '/Business/BookingsProvider.php';
@@ -59,7 +60,7 @@ $builder->addDefinitions([
     ConfigProvider::class => $config,
     Redis::class => $redis,
     //BookingDataIterator::class => new LoadRedisDataIterator($redis),
-    BookingDataIterator::class => new LoadIncrementalCsvDataIterator($rootDir . '/' . $config->get('dataSource')),
+    BookingDataIterator::class => new LoadIncrementalCsvDataIterator($config, $rootDir . '/' . $config->get('dataSource')),
     //BookingDataIterator::class => new LoadAllCsvDataIterator($rootDir . '/' . $config->get('dataSource')),
     AprioriProgress::class => \DI\object(AprioriProgressToFile::class),
 
@@ -86,9 +87,11 @@ if (array_key_exists('abort', $_GET) && $_GET['abort']) {
 
     // Cache file
     $cache = $container->get(DataCache::class);
-    $cacheFile = $cache->getCacheFile($filters);
-    $countFile = $cache->getCountFile($filters);
-    $container->set(BookingDataIterator::class, new LoadIncrementalCsvDataIterator($cacheFile, $countFile));
+    $container->set('dataFile', \DI\value($cache->getCacheFile($filters)));
+    $container->set('countFile', \DI\value($cache->getCountFile($filters)));
+    $container->set(BookingDataIterator::class, \DI\object(LoadIncrementalCsvDataIterator::class)
+        ->constructor(\DI\get(ConfigProvider::class), \DI\get('dataFile'), \DI\get('countFile'))
+        ->scope(\DI\Scope::PROTOTYPE));
 
     // Run algorithm
     $apriori = $container->get('AprioriAlgorithm');

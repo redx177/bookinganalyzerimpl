@@ -43,7 +43,7 @@ $configContent = array(
     ],
     'filterButtonTitle' => 'Apply Fiters',
     'runButtonTitle' => 'Run analysis',
-    'bookingsCountCap' => 50, // Debugging only. int|null
+    'bookingsCountCap' => 500, // Debugging only. int|null
     'ignoreFields' => ['SCTV'],
     'fileCacheDirectory' => '/fileCache/',
     'apriori' => [

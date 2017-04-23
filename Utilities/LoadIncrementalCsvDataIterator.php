@@ -12,6 +12,7 @@ class LoadIncrementalCsvDataIterator implements BookingDataIterator {
     private $enclosure;
     private $fieldNames;
     private $count;
+    private $bookingsCountCap;
 
     /**
      * CsvIterator constructor.
@@ -21,11 +22,13 @@ class LoadIncrementalCsvDataIterator implements BookingDataIterator {
      * @param string|null $enclosure The optional enclosure parameter sets the field enclosure character (one character only).
      * @throws Exception
      */
-    public function __construct(string $dataFile, string $countFile = null, $delimiter=';', $enclosure = '"')
+    public function __construct(ConfigProvider $config, string $dataFile, string $countFile = null, $delimiter=';', $enclosure = '"')
     {
         if (!file_exists($dataFile)) {
             throw new Exception('File ['. $dataFile. '] not found');
         }
+        $this->bookingsCountCap = $config->get('bookingsCountCap');
+
         $this->filePointer = fopen($dataFile, 'r');
         $this->currentRowNumber = 0;
         $this->delimiter = $delimiter;
@@ -144,6 +147,9 @@ class LoadIncrementalCsvDataIterator implements BookingDataIterator {
      */
     public function count(): int
     {
+        if ($this->bookingsCountCap) {
+            return $this->bookingsCountCap;
+        }
         return $this->count;
     }
 }

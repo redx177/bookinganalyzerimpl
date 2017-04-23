@@ -81,7 +81,7 @@ $builder->addDefinitions([
 
     // Scope::PROTOTYPE is set so it creates a new instance everytime.
     BookingDataIterator::class => \DI\factory(function () use ($rootDir, $config) {
-        return new LoadIncrementalCsvDataIterator($rootDir . '/' . $config->get('dataSource'));
+        return new LoadIncrementalCsvDataIterator($config,$rootDir . '/' . $config->get('dataSource'));
     })->scope(\DI\Scope::PROTOTYPE),
 
     // Create new instance here. It will start tracking time from the point of instantiation.
@@ -111,12 +111,10 @@ if (array_key_exists('abort', $_GET) && $_GET['abort']) {
 
     // Cache file
     $cache = $container->get(DataCache::class);
-    $dataFile = $cache->getCacheFile($filters);
-    $countFile = $cache->getCountFile($filters);
-    $container->set('dataFile', \DI\value($dataFile));
-    $container->set('countFile', \DI\value($countFile));
+    $container->set('dataFile', \DI\value($cache->getCacheFile($filters)));
+    $container->set('countFile', \DI\value($cache->getCountFile($filters)));
     $container->set(BookingDataIterator::class, \DI\object(LoadIncrementalCsvDataIterator::class)
-        ->constructor(\DI\get(dataFile), \DI\get(countFile))
+        ->constructor(\DI\get('dataFile'), \DI\get('countFile'))
         ->scope(\DI\Scope::PROTOTYPE));
 
     // Run k-prototype
