@@ -4,7 +4,7 @@
  * Iterator for CSV file.
  * First line will be treatened as header line with names and will never be returned.
  */
-class LoadAllCsvDataIterator implements BookingDataIterator {
+class LoadAllCsvDataIterator implements DataIterator {
     private $filePointer;
     private $currentRowNumber = 0;
     private $deliminiter;

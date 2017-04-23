@@ -23,11 +23,11 @@ class KPrototypeAlgorithm
      */
     private $redis;
     /**
-     * @var BookingDataIteratorAdapter
+     * @var BookingDataIterator
      */
     private $bookingDataIterator;
     /**
-     * @var BookingDataIteratorAdapter
+     * @var BookingDataIterator
      */
     private $bookingDataIterator2;
     /**
@@ -44,8 +44,8 @@ class KPrototypeAlgorithm
         DistanceMeasurement $distance,
         Random $random,
         Redis $redis,
-        BookingDataIteratorAdapter $bookingDataIterator,
-        BookingDataIteratorAdapter $bookingDataIterator2,
+        BookingDataIterator $bookingDataIterator,
+        BookingDataIterator $bookingDataIterator2,
         ClusteringProgress $progress,
         BookingBuilder $bookingBuilder)
     {

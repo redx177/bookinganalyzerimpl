@@ -1,9 +1,9 @@
 <?php
 require_once dirname(__DIR__) . '/Interfaces/AprioriProgress.php';
 require_once dirname(__DIR__) . '/Interfaces/Field.php';
-require_once dirname(__DIR__) . '/Interfaces/BookingDataIterator.php';
+require_once dirname(__DIR__) . '/Interfaces/DataIterator.php';
 require_once dirname(__DIR__) . '/Business/AprioriAlgorithm.php';
-require_once dirname(__DIR__) . '/Business/BookingDataIteratorAdapter.php';
+require_once dirname(__DIR__) . '/Business/BookingDataIterator.php';
 require_once dirname(__DIR__) . '/Models/Booking.php';
 require_once dirname(__DIR__) . '/Models/Histograms.php';
 require_once dirname(__DIR__) . '/Models/Histogram.php';
@@ -72,7 +72,7 @@ class AprioriAlgorithmTest extends TestCase
     public function checkIntegerInSetSize1() {
         $rooms = 7;
 
-        $bookingDataIteratorMock = BookingDataIteratorAdapterMock::get($this, [
+        $bookingDataIteratorMock = BookingDataIteratorMock::get($this, [
             $this->GetBooking(
                 $rooms, 1, 1,
                 false, false, false, false, false,
@@ -110,7 +110,7 @@ class AprioriAlgorithmTest extends TestCase
         $tv = true;
 
 
-        $bookingDataIteratorMock = BookingDataIteratorAdapterMock::get($this, [
+        $bookingDataIteratorMock = BookingDataIteratorMock::get($this, [
                 $this->GetBooking(
                     1, 1, 1,
                     $tv, false, false, false, false,
@@ -146,7 +146,7 @@ class AprioriAlgorithmTest extends TestCase
     public function checkPriceInSetSize1() {
         $price = Price::Budget;
 
-        $bookingDataIteratorMock = BookingDataIteratorAdapterMock::get($this, [
+        $bookingDataIteratorMock = BookingDataIteratorMock::get($this, [
                 $this->GetBooking(
                     1, 1, 1,
                     false, false, false, false, false,
@@ -182,7 +182,7 @@ class AprioriAlgorithmTest extends TestCase
     public function checkDistancesInSetSize1() {
         $diSea = Distance::Close;
 
-        $bookingDataIteratorMock = BookingDataIteratorAdapterMock::get($this, [
+        $bookingDataIteratorMock = BookingDataIteratorMock::get($this, [
                 $this->GetBooking(
                     1, 1, 1,
                     false, false, false, false, false,
@@ -216,7 +216,7 @@ class AprioriAlgorithmTest extends TestCase
      * @test
      */
     public function checkIntegerInSetSize2() {
-        $bookingDataIteratorMock = BookingDataIteratorAdapterMock::get($this, [
+        $bookingDataIteratorMock = BookingDataIteratorMock::get($this, [
                 $this->GetBooking(
                     7, 8, 1,
                     false, false, false, false, false,
@@ -251,7 +251,7 @@ class AprioriAlgorithmTest extends TestCase
      * @test
      */
     public function checkIntegerInSetSize3() {
-        $bookingDataIteratorMock = BookingDataIteratorAdapterMock::get($this, [
+        $bookingDataIteratorMock = BookingDataIteratorMock::get($this, [
                 $this->GetBooking(
                     7, 8, 9,
                     false, false, false, false, false,

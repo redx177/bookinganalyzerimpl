@@ -2,7 +2,7 @@
 $rootDir = dirname(dirname(__DIR__));
 require_once $rootDir . '/vendor/autoload.php';
 require_once $rootDir . '/config.php';
-require_once $rootDir . '/Interfaces/BookingDataIterator.php';
+require_once $rootDir . '/Interfaces/DataIterator.php';
 require_once $rootDir . '/Interfaces/AprioriProgress.php';
 require_once $rootDir . '/Interfaces/Field.php';
 require_once $rootDir . '/Interfaces/Random.php';
@@ -27,7 +27,7 @@ require_once $rootDir . '/Business/FiltersProvider.php';
 require_once $rootDir . '/Business/KPrototypeAlgorithm.php';
 require_once $rootDir . '/Business/DistanceMeasurement.php';
 require_once $rootDir . '/Business/DataCache.php';
-require_once $rootDir . '/Business/BookingDataIteratorAdapter.php';
+require_once $rootDir . '/Business/BookingDataIterator.php';
 require_once $rootDir . '/Business/BookingBuilder.php';
 require_once $rootDir . '/Models/AprioriState.php';
 require_once $rootDir . '/Models/Booking.php';
@@ -77,10 +77,10 @@ $builder->addDefinitions([
     Redis::class => $redis,
     Random::class => \DI\object(Randomizer::class),
     AprioriProgress::class => \DI\object(AprioriProgressToFile::class),
-    BookingDataIteratorAdapter::class => \DI\object(BookingDataIteratorAdapter::class)->scope(\DI\Scope::PROTOTYPE),
+    BookingDataIterator::class => \DI\object(BookingDataIterator::class)->scope(\DI\Scope::PROTOTYPE),
 
     // Scope::PROTOTYPE is set so it creates a new instance everytime.
-    BookingDataIterator::class => \DI\factory(function () use ($rootDir, $config) {
+    DataIterator::class => \DI\factory(function () use ($rootDir, $config) {
         return new LoadIncrementalCsvDataIterator($config,$rootDir . '/' . $config->get('dataSource'));
     })->scope(\DI\Scope::PROTOTYPE),
 
@@ -113,8 +113,8 @@ if (array_key_exists('abort', $_GET) && $_GET['abort']) {
     $cache = $container->get(DataCache::class);
     $container->set('dataFile', \DI\value($cache->getCacheFile($filters)));
     $container->set('countFile', \DI\value($cache->getCountFile($filters)));
-    $container->set(BookingDataIterator::class, \DI\object(LoadIncrementalCsvDataIterator::class)
-        ->constructor(\DI\get('dataFile'), \DI\get('countFile'))
+    $container->set(DataIterator::class, \DI\object(LoadIncrementalCsvDataIterator::class)
+        ->constructor(\DI\get(ConfigProvider::class), \DI\get('dataFile'), \DI\get('countFile'))
         ->scope(\DI\Scope::PROTOTYPE));
 
     // Run k-prototype

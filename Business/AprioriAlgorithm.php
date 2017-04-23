@@ -15,7 +15,7 @@ class AprioriAlgorithm
      */
     private $progress;
     /**
-     * @var BookingDataIteratorAdapter
+     * @var BookingDataIterator
      */
     private $bookingDataIterator;
     /**
@@ -23,7 +23,7 @@ class AprioriAlgorithm
      */
     private $factory;
 
-    public function __construct(BookingDataIteratorAdapter $bookingDataIterator,
+    public function __construct(BookingDataIterator $bookingDataIterator,
                                 ConfigProvider $config,
                                 AprioriProgress $progress,
                                 FactoryInterface $factory)
@@ -77,8 +77,8 @@ class AprioriAlgorithm
     public function runWithClusters(Clusters $clusters): Clusters {
         foreach ($clusters->getClusters() as $cluster) {
             $this->bookingDataIterator = $this->factory->make(
-                BookingDataIteratorAdapter::class, [
-                    'bookingDataIterator' =>
+                BookingDataIterator::class, [
+                    'DataIterator' =>
                         $this->factory->make(LoadClusterDataIterator::class, ['cluster' => $cluster])
             ]);
             $this->storeClusterState($clusters, 1, $cluster);

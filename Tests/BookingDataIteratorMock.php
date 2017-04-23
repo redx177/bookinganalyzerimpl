@@ -1,7 +1,7 @@
 <?php
 use \PHPUnit\Framework\TestCase;
 
-class BookingDataIteratorAdapterMock {
+class BookingDataIteratorMock {
     /**
      * Setup methods required to mock an iterator
      *

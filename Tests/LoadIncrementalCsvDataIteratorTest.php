@@ -2,15 +2,17 @@
 use \PHPUnit\Framework\TestCase,
     org\bovigo\vfs\vfsStream;
 
-require_once dirname(__DIR__) . "/Interfaces/BookingDataIterator.php";
+require_once dirname(__DIR__) . "/Interfaces/DataIterator.php";
 require_once dirname(__DIR__) . "/Utilities/LoadIncrementalCsvDataIterator.php";
 
 class LoadIncrementalCsvDataIteratorTest extends TestCase
 {
     private $testfile;
+    private $configMock;
 
     protected function setUp()
     {
+        $this->configMock = $this->createMock(ConfigProvider::class);
         $this->testfile = 'home/test.csv';
 
         // Creating mock data file with vfs (virtual file system).
@@ -25,7 +27,7 @@ class LoadIncrementalCsvDataIteratorTest extends TestCase
      * @test
      */
     public function validFileShouldBeOpened() {
-        new LoadIncrementalCsvDataIterator($this->testfile);
+        new LoadIncrementalCsvDataIterator($this->configMock, $this->testfile);
         $this->assertTrue(true);
     }
 
@@ -34,14 +36,14 @@ class LoadIncrementalCsvDataIteratorTest extends TestCase
      * @expectedException Exception
      */
     public function invalidFileShouldThrowException() {
-        new LoadIncrementalCsvDataIterator("invalidFile");
+        new LoadIncrementalCsvDataIterator($this->configMock, "invalidFile");
     }
 
     /**
      * @test
      */
     public function gettingFirstLineShouldReturnCorrectData() {
-        $sut = new LoadIncrementalCsvDataIterator($this->testfile);
+        $sut = new LoadIncrementalCsvDataIterator($this->configMock, $this->testfile);
         $line = $sut->current();
         $this->assertEquals(array('first' => '1','second' => '2','third' => '3'), $line);
     }
@@ -50,7 +52,7 @@ class LoadIncrementalCsvDataIteratorTest extends TestCase
      * @test
      */
     public function gettingSecondLineShouldReturnCorrectData() {
-        $sut = new LoadIncrementalCsvDataIterator($this->testfile);
+        $sut = new LoadIncrementalCsvDataIterator($this->configMock, $this->testfile);
         $sut->next();
         $line = $sut->current();
         $this->assertEquals(array('first' => '2','second' => '3','third' => '4'), $line);
@@ -60,7 +62,7 @@ class LoadIncrementalCsvDataIteratorTest extends TestCase
      * @test
      */
     public function gettingThirdLineShouldReturnFalse() {
-        $sut = new LoadIncrementalCsvDataIterator($this->testfile);
+        $sut = new LoadIncrementalCsvDataIterator($this->configMock, $this->testfile);
         $sut->next();
         $sut->next();
         $line = $sut->current();
@@ -71,7 +73,7 @@ class LoadIncrementalCsvDataIteratorTest extends TestCase
      * @test
      */
     public function validFieldOnFirstLineShouldReturnTrue() {
-        $sut = new LoadIncrementalCsvDataIterator($this->testfile);
+        $sut = new LoadIncrementalCsvDataIterator($this->configMock, $this->testfile);
         $valid = $sut->valid();
         $this->assertTrue($valid);
     }
@@ -80,7 +82,7 @@ class LoadIncrementalCsvDataIteratorTest extends TestCase
      * @test
      */
     public function validFieldForSecondLineShouldReturnTrue() {
-        $sut = new LoadIncrementalCsvDataIterator($this->testfile);
+        $sut = new LoadIncrementalCsvDataIterator($this->configMock, $this->testfile);
         $sut->next();
         $valid = $sut->valid();
         $this->assertTrue($valid);
@@ -90,7 +92,7 @@ class LoadIncrementalCsvDataIteratorTest extends TestCase
      * @test
      */
     public function validFieldForThirdLineShouldReturnFalse() {
-        $sut = new LoadIncrementalCsvDataIterator($this->testfile);
+        $sut = new LoadIncrementalCsvDataIterator($this->configMock, $this->testfile);
         $sut->next();
         $sut->next();
         $valid = $sut->valid();
@@ -101,7 +103,7 @@ class LoadIncrementalCsvDataIteratorTest extends TestCase
      * @test
      */
     public function afterARewindItShouldReturnFirstLine() {
-        $sut = new LoadIncrementalCsvDataIterator($this->testfile);
+        $sut = new LoadIncrementalCsvDataIterator($this->configMock, $this->testfile);
         $sut->next();
         $sut->rewind();
         $line = $sut->current();
@@ -112,7 +114,7 @@ class LoadIncrementalCsvDataIteratorTest extends TestCase
      * @test
      */
     public function afterARewindAndANextItShouldReturnTheSecondElement() {
-        $sut = new LoadIncrementalCsvDataIterator($this->testfile);
+        $sut = new LoadIncrementalCsvDataIterator($this->configMock, $this->testfile);
         $sut->next();
         $sut->next();
         $sut->rewind();
@@ -125,7 +127,7 @@ class LoadIncrementalCsvDataIteratorTest extends TestCase
      * @test
      */
     public function providingDiffernentDeliminiterShouldReturnSingleString() {
-        $sut = new LoadIncrementalCsvDataIterator($this->testfile, null,0, ',');
+        $sut = new LoadIncrementalCsvDataIterator($this->configMock, $this->testfile, null,0, ',');
         $line = $sut->current();
         $this->assertEquals(array('first;second;third' => '1;2;3'), $line);
     }
@@ -134,7 +136,7 @@ class LoadIncrementalCsvDataIteratorTest extends TestCase
      * @test
      */
     public function loopingThroughShouldReturnAllElements() {
-        $sut = new LoadIncrementalCsvDataIterator($this->testfile);
+        $sut = new LoadIncrementalCsvDataIterator($this->configMock, $this->testfile);
 
         $result = [];
         foreach($sut as $key => $value) {
@@ -151,7 +153,7 @@ class LoadIncrementalCsvDataIteratorTest extends TestCase
      * @test
      */
     public function skipOneLineShouldReturnSecond() {
-        $sut = new LoadIncrementalCsvDataIterator($this->testfile);
+        $sut = new LoadIncrementalCsvDataIterator($this->configMock, $this->testfile);
         $sut->skip(1);
         $line = $sut->current();
         $this->assertEquals(array('first' => '2','second' => '3','third' => '4'), $line);
@@ -161,7 +163,7 @@ class LoadIncrementalCsvDataIteratorTest extends TestCase
      * @test
      */
     public function skipTwoLineShouldReturnFalse() {
-        $sut = new LoadIncrementalCsvDataIterator($this->testfile);
+        $sut = new LoadIncrementalCsvDataIterator($this->configMock, $this->testfile);
         $sut->skip(2);
         $line = $sut->current();
         $this->assertFalse($line);

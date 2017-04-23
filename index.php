@@ -2,7 +2,7 @@
 require_once __DIR__ . '/vendor/autoload.php';
 require_once __DIR__ . '/config.php';
 //require_once __DIR__ . '/Utilities/Autoloader.php';
-require_once __DIR__ . '/Interfaces/BookingDataIterator.php';
+require_once __DIR__ . '/Interfaces/DataIterator.php';
 require_once __DIR__ . '/Interfaces/Controller.php';
 require_once __DIR__ . '/Interfaces/Field.php';
 require_once __DIR__ . '/Business/AprioriAlgorithm.php';
@@ -11,6 +11,8 @@ require_once __DIR__ . '/Business/DataTypeClusterer.php';
 require_once __DIR__ . '/Business/FiltersProvider.php';
 require_once __DIR__ . '/Business/Pagination.php';
 require_once __DIR__ . '/Business/DataCache.php';
+require_once __DIR__ . '/Business/BookingDataIterator.php';
+require_once __DIR__ . '/Business/BookingBuilder.php';
 require_once __DIR__ . '/Controllers/ExploreController.php';
 require_once __DIR__ . '/Controllers/AttributanalysisController.php';
 require_once __DIR__ . '/Controllers/AttributanalysisWithGroupingController.php';
@@ -52,7 +54,7 @@ $twig->addExtension(new Twig_Extension_Debug());
 $builder = new DI\ContainerBuilder();
 $builder->addDefinitions(array(
     Twig_Environment::class => $twig,
-    BookingDataIterator::class => new LoadIncrementalCsvDataIterator($config->get('dataSource')),
+    DataIterator::class => new LoadIncrementalCsvDataIterator($config, $config->get('dataSource')),
     //BookingDataIterator::class => new LoadAllCsvDataIterator($config->get('dataSource')),
     ConfigProvider::class => $config
 ));
@@ -68,7 +70,7 @@ $container->set(Filters::class, $filters);
 $cache = $container->get(DataCache::class);
 $cacheFile = $cache->getCacheFile($filters);
 $countFile = $cache->getCountFile($filters);
-$container->set(BookingDataIterator::class, new LoadIncrementalCsvDataIterator($cacheFile, $countFile));
+$container->set(DataIterator::class, new LoadIncrementalCsvDataIterator($config, $cacheFile, $countFile));
 
 /* CONTROLLER */
 /** @var Controller $controller */

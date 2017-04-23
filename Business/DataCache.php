@@ -9,7 +9,7 @@ class DataCache
     private $idField;
 
     /**
-     * @var BookingDataIterator
+     * @var DataIterator
      */
     private $iterator;
     /**
@@ -17,7 +17,7 @@ class DataCache
      */
     private $dataTypeClusterer;
 
-    public function __construct(ConfigProvider $config, BookingDataIterator $iterator, DataTypeClusterer $clusterer, $delimiter=';', $enclosure = '"')
+    public function __construct(ConfigProvider $config, DataIterator $iterator, DataTypeClusterer $clusterer, $delimiter=';', $enclosure = '"')
     {
         $rootDir = $config->get('rootDir');
         $this->fileCacheDirectory = $rootDir . $config->get('fileCacheDirectory');

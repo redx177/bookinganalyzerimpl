@@ -1,5 +1,5 @@
 <?php
-require_once dirname(__DIR__) . "/Interfaces/BookingDataIterator.php";
+require_once dirname(__DIR__) . "/Interfaces/DataIterator.php";
 require_once dirname(__DIR__) . "/Utilities/LoadAllCsvDataIterator.php";
 
 use \PHPUnit\Framework\TestCase,

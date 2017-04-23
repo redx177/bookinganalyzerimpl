@@ -3,7 +3,7 @@
 /**
  * Iterator for redis store.
  */
-class LoadClusterDataIterator implements BookingDataIterator
+class LoadClusterDataIterator implements DataIterator
 {
     private $currentLine = false;
     private $currentRowNumber;

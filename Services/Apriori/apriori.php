@@ -2,7 +2,7 @@
 $rootDir = dirname(dirname(__DIR__));
 require_once $rootDir . '/vendor/autoload.php';
 require_once $rootDir . '/config.php';
-require_once $rootDir . '/Interfaces/BookingDataIterator.php';
+require_once $rootDir . '/Interfaces/DataIterator.php';
 require_once $rootDir . '/Interfaces/AprioriProgress.php';
 require_once $rootDir . '/Interfaces/Field.php';
 require_once $rootDir . '/Utilities/ConfigProvider.php';
@@ -17,7 +17,7 @@ require_once $rootDir . '/Business/DataTypeClusterer.php';
 require_once $rootDir . '/Business/Pagination.php';
 require_once $rootDir . '/Business/FiltersProvider.php';
 require_once $rootDir . '/Business/DataCache.php';
-require_once $rootDir . '/Business/BookingDataIteratorAdapter.php';
+require_once $rootDir . '/Business/BookingDataIterator.php';
 require_once $rootDir . '/Business/BookingBuilder.php';
 require_once $rootDir . '/Models/Booking.php';
 require_once $rootDir . '/Models/BooleanField.php';
@@ -60,7 +60,7 @@ $builder->addDefinitions([
     ConfigProvider::class => $config,
     Redis::class => $redis,
     //BookingDataIterator::class => new LoadRedisDataIterator($redis),
-    BookingDataIterator::class => new LoadIncrementalCsvDataIterator($config, $rootDir . '/' . $config->get('dataSource')),
+    DataIterator::class => new LoadIncrementalCsvDataIterator($config, $rootDir . '/' . $config->get('dataSource')),
     //BookingDataIterator::class => new LoadAllCsvDataIterator($rootDir . '/' . $config->get('dataSource')),
     AprioriProgress::class => \DI\object(AprioriProgressToFile::class),
 
@@ -89,7 +89,7 @@ if (array_key_exists('abort', $_GET) && $_GET['abort']) {
     $cache = $container->get(DataCache::class);
     $container->set('dataFile', \DI\value($cache->getCacheFile($filters)));
     $container->set('countFile', \DI\value($cache->getCountFile($filters)));
-    $container->set(BookingDataIterator::class, \DI\object(LoadIncrementalCsvDataIterator::class)
+    $container->set(DataIterator::class, \DI\object(LoadIncrementalCsvDataIterator::class)
         ->constructor(\DI\get(ConfigProvider::class), \DI\get('dataFile'), \DI\get('countFile'))
         ->scope(\DI\Scope::PROTOTYPE));
 

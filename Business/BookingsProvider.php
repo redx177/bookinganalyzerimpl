@@ -1,8 +1,6 @@
 <?php
 class BookingsProvider {
     private $bookingDataIterator;
-    private $dataTypeClusterer;
-    private $idField;
     private $hasEndBeenReached = false;
 
     /**
@@ -13,14 +11,10 @@ class BookingsProvider {
     /**
      * DataProvider constructor.
      * @param BookingDataIterator $bookingDataIterator Iterator to access data.
-     * @param DataTypeClusterer $dataTypeClusterer Data type clusterer to group raw booking data.
-     * @param ConfigProvider $config Configuration provider.
      */
-    public function __construct(BookingDataIterator $bookingDataIterator, DataTypeClusterer $dataTypeClusterer, ConfigProvider $config)
+    public function __construct(BookingDataIterator $bookingDataIterator)
     {
         $this->bookingDataIterator = $bookingDataIterator;
-        $this->dataTypeClusterer = $dataTypeClusterer;
-        $this->idField = $config->get('idField');
     }
 
     /**
@@ -42,9 +36,8 @@ class BookingsProvider {
                 break;
             }
 
-            $rawBooking = $this->bookingDataIterator->current();
+            $booking = $this->bookingDataIterator->current();
             $this->bookingDataIterator->next();
-            $booking = $this->getBooking($rawBooking);
 
             if (($matches-$from) % $count === 0) {
                 $this->lastPageItems = new SplQueue();
@@ -62,27 +55,6 @@ class BookingsProvider {
         }
 
         return $data;
-    }
-
-//    /**
-//     * Gets the total item count.
-//     * @return int
-//     */
-//    public function getItemCount()
-//    {
-//        $itemCount = 0;
-//        for ($this->bookingDataIterator->rewind();$this->bookingDataIterator->valid();$this->bookingDataIterator->next()) {
-//            $itemCount++;
-//        }
-//        return $itemCount;
-//    }
-
-    public function getBooking(array $rawBooking): Booking
-    {
-        $dataTypeCluster = $this->dataTypeClusterer->get($rawBooking);
-        $id = $rawBooking[$this->idField];
-        $booking = new Booking($id, $dataTypeCluster);
-        return $booking;
     }
 
     /**
@@ -107,8 +79,7 @@ class BookingsProvider {
                 break;
             }
 
-            $rawBooking = $this->bookingDataIterator->current();
-            $booking = $this->getBooking($rawBooking);
+            $booking = $this->bookingDataIterator->current();
 
             if ($bookingsQueue->count() % $count === 0) {
                 $bookingsQueue = new SplQueue();

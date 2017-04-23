@@ -1,6 +1,6 @@
 <?php
 
-interface BookingDataIterator extends Iterator
+interface DataIterator extends Iterator
 {
     /**
      * Skips a given amount of lines.
