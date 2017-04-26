@@ -51,7 +51,7 @@ require_once $rootDir . '/Models/Cluster.php';
 require_once $rootDir . '/Models/Associate.php';
 $config = new ConfigProvider($GLOBALS['configContent']);
 $config->set('rootDir', $rootDir);
-$kprototypeConfig = $config->get('KPrototypeResult');
+$dbscanConfig = $config->get('dbscan');
 
 /* TWIG */
 $loader = new Twig_Loader_Filesystem($rootDir . '/Templates');
@@ -93,9 +93,9 @@ $container = $builder->build();
 $container->set(ClusteringProgress::class, $container->get(KPrototypeClusteringProgress::class));
 
 if (array_key_exists('abort', $_GET) && $_GET['abort']) {
-    file_put_contents($rootDir . $kprototypeConfig['serviceStopFile'], "");
+    file_put_contents($rootDir . $dbscanConfig['serviceStopFile'], "");
 } else {
-    /** @var KPrototypeAlgorithm $kprototype */
+    /** @var DBScanAlgorithm $dbscan */
     /** @var FiltersProvider $filtersProvider */
     /** @var DataCache $cache */
     /** @var AprioriAlgorithm $apriori */
@@ -118,13 +118,13 @@ if (array_key_exists('abort', $_GET) && $_GET['abort']) {
         ->scope(\DI\Scope::PROTOTYPE));
 
     // Run k-prototype
-    unlink($rootDir . $kprototypeConfig['serviceStopFile']);
-    $kprototype = $container->get(KPrototypeAlgorithm::class);
-    $clusters = $kprototype->run();
+    unlink($rootDir . $dbscanConfig['serviceStopFile']);
+    $dbscan = $container->get(DBScanAlgorithm::class);
+    $clusters = $dbscan->run();
 
     // Run apirori
     $apriori = $container->get(AprioriAlgorithm::class);
     $apriori->runWithClusters($clusters);
 
-    unlink($rootDir . $kprototypeConfig['servicePidFile']);
+    unlink($rootDir . $dbscanConfig['servicePidFile']);
 }

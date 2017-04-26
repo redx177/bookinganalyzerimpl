@@ -29,8 +29,9 @@
   width: 105px;
 }
 .filters button {
-  clear: both;
+  float: left;
   display: block;
+  margin: 20px 50px 0 0;
 }
 .paginationNavigation {
   display: flex;
@@ -69,6 +70,12 @@
   clear: both;
   content: ' ';
   display: block;
+}
+.clustersanalysis .cluster .panel-heading span {
+  float: right;
+}
+.clustersanalysis span.glyphicon-eye-open {
+  display: none;
 }
 .glyphicon-refresh {
   -webkit-animation: spin 4s linear infinite;

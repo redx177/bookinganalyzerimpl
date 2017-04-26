@@ -71,15 +71,15 @@ class AprioriAlgorithm
 
     /**
      * Analyzes the bookings with the apriori algorithm and a provided Clusters as datasource.
-     * @param Clusters $clusters Clusters to analyze. Each Cluster will be anaylzed with the apriori algorithm.
-     * @return Clusters with attached histograms.
+     * @param KPrototypeResult $clusters Clusters to analyze. Each Cluster will be anaylzed with the apriori algorithm.
+     * @return KPrototypeResult with attached histograms.
      */
-    public function runWithClusters(Clusters $clusters): Clusters {
+    public function runWithClusters(KPrototypeResult $clusters): KPrototypeResult {
         foreach ($clusters->getClusters() as $cluster) {
             $this->bookingDataIterator = $this->factory->make(
                 BookingDataIterator::class, [
                     'DataIterator' =>
-                        $this->factory->make(LoadClusterDataIterator::class, ['cluster' => $cluster])
+                        $this->factory->make(LoadClusterDataIterator::class, ['KPrototypeCluster' => $cluster])
             ]);
             $this->storeClusterState($clusters, 1, $cluster);
             $cluster->setHistograms($this->run());
@@ -222,7 +222,7 @@ class AprioriAlgorithm
         $this->progress->storeState($this->startTime, $this->bookingDataIterator->count(), $candidates, $frequentSets);
     }
 
-    private function storeClusterState(Clusters $clusters, $status, Cluster $cluster = null)
+    private function storeClusterState(KPrototypeResult $clusters, $status, KPrototypeCluster $cluster = null)
     {
         $this->progress->storeClusterState($clusters, $status, $cluster);
         // If status is done, store the final state.

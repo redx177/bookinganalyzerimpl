@@ -1,6 +1,6 @@
 <?php
 
-class Cluster
+class KPrototypeCluster
 {
     private $totalCosts;
 
@@ -19,7 +19,7 @@ class Cluster
      */
     private $histograms;
 
-    public function __construct(Booking $booking)
+    public function __construct(Booking $booking = null)
     {
         $this->center = $booking;
         $this->totalCosts = 0;

@@ -29,7 +29,7 @@ class AprioriProgressToFile implements AprioriProgress
      */
     private $analyzedClusters;
     /**
-     * @var Clusters
+     * @var KPrototypeResult
      */
     private $clusters;
     /**
@@ -49,7 +49,7 @@ class AprioriProgressToFile implements AprioriProgress
         $this->aprioriOutputInterval = $aprioriConfig['outputInterval'];
         $this->aprioriOutputFile = $aprioriConfig['serviceOutput'];
 
-        $kprototypeConfig = $config->get('kprototype');
+        $kprototypeConfig = $config->get('KPrototypeResult');
         $this->kprototypeOutputInterval = $kprototypeConfig['outputInterval'];
         $this->kprototypeOutputFile = $kprototypeConfig['serviceOutput'];
     }
@@ -92,7 +92,7 @@ class AprioriProgressToFile implements AprioriProgress
         return new AprioriState([], null, 0, [], 0);
     }
 
-    public function storeClusterState(Clusters $clusters, $status, Cluster $cluster = null)
+    public function storeClusterState(KPrototypeResult $clusters, $status, KPrototypeCluster $cluster = null)
     {
         if ($this->currentCluster != null) {
             $this->analyzedClusters[] = $this->currentCluster;
@@ -100,7 +100,7 @@ class AprioriProgressToFile implements AprioriProgress
         if ($cluster == null) {
             $this->currentCluster = null;
         } else {
-            $this->currentCluster = ['cluster' => $cluster];
+            $this->currentCluster = ['KPrototypeCluster' => $cluster];
         }
         $this->clusters = $clusters;
         $this->status = $status;
@@ -121,7 +121,7 @@ class AprioriProgressToFile implements AprioriProgress
             $content = $template->render([
                 'currentCluster' => $this->currentCluster,
                 'analyzedClusters' => $this->analyzedClusters,
-                'clusters' => $this->clusters,
+                'KPrototypeResult' => $this->clusters,
                 'bookingsCount' => $this->clusters->getBookingsCount(),
                 'fieldTitles' => $this->fieldNameMapping,
                 'runtimeInSeconds' => $this->runtime->fromBeginning(),

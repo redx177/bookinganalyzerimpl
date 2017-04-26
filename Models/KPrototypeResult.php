@@ -1,12 +1,12 @@
 <?php
 
-class Clusters
+class KPrototypeResult
 {
     private $centerIds;
     private $iteration;
 
     /**
-     * @var Cluster[]
+     * @var KPrototypeCluster[]
      */
     private $clusters;
 
@@ -20,14 +20,14 @@ class Clusters
         return $this->iteration;
     }
 
-    public function addCluster(Cluster $cluster)
+    public function addCluster(KPrototypeCluster $cluster)
     {
         $this->clusters[] = $cluster;
         $this->centerIds[] = $cluster->getCenter()->getId();
     }
 
     /**
-     * @return Cluster[]
+     * @return KPrototypeCluster[]
      */
     public function getClusters()
     {

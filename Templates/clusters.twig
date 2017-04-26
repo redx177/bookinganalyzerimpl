@@ -67,8 +67,10 @@
                     <div class="panel panel-default">
                         <div class="panel-heading">
                             Cluster {{ index }}, Item Count: {{ analyzedCluster.cluster.associates|length }}, Error {{ analyzedCluster.cluster.totalCosts }}
+                            <span class="glyphicon glyphicon-eye-open" aria-hidden="true" data-cluster-id="cluster{{ index }}"></span>
+                            <span class="glyphicon glyphicon-eye-close" aria-hidden="true" data-cluster-id="cluster{{ index }}"></span>
                         </div>
-                        <div class="panel-body">
+                        <div class="panel-body cluster{{ index }}">
                             {{ include('candidatesAndFrequentSetsAsTable.twig', {
                                 'frequentSets': analyzedCluster.frequentSets,
                                 'candidates': analyzedCluster.candidates,
@@ -79,12 +81,21 @@
             {% endfor %}
             {% if currentCluster %}
                 {% set index = index + 1 %}
+
                 <div class="cluster">
-                    <h2>Cluster {{ index }}, Item Count: {{ currentCluster.cluster.associates|length }}, Error {{ currentCluster.cluster.totalCosts }}</h2>
-                    {{ include('candidatesAndFrequentSetsAsTable.twig', {
-                        'frequentSets': currentCluster.frequentSets,
-                        'candidates': currentCluster.candidates,
-                    }) }}
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            Cluster {{ index }}, Item Count: {{ currentCluster.cluster.associates|length }}, Error {{ currentCluster.cluster.totalCosts }}
+                            <span class="glyphicon glyphicon-eye-open" aria-hidden="true" data-cluster-id="cluster{{ index }}"></span>
+                            <span class="glyphicon glyphicon-eye-close" aria-hidden="true" data-cluster-id="cluster{{ index }}"></span>
+                        </div>
+                        <div class="panel-body cluster{{ index }}">
+                            {{ include('candidatesAndFrequentSetsAsTable.twig', {
+                                'frequentSets': currentCluster.frequentSets,
+                                'candidates': currentCluster.candidates,
+                            }) }}
+                        </div>
+                    </div>
                 </div>
             {% endif %}
         {% endif %}

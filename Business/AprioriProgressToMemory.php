@@ -56,7 +56,7 @@ class AprioriProgressToMemory implements AprioriProgress
         return $this->state;
     }
 
-    public function storeClusterState(Clusters $clusters, $status, Cluster $cluster = null)
+    public function storeClusterState(KPrototypeResult $clusters, $status, KPrototypeCluster $cluster = null)
     {
     }
 }

@@ -4,10 +4,6 @@ class KPrototypeAlgorithm
 {
     private $bookingsCount;
     private $bookingsCountCap;
-    private $outputFile;
-    private $outputInterval;
-    private $fieldNameMapping;
-    private $rootDir;
     private $maxIterations;
 
     /**
@@ -51,18 +47,14 @@ class KPrototypeAlgorithm
     {
         $this->distance = $distance;
         $this->bookingsCountCap = $config->get('bookingsCountCap');
-        $this->fieldNameMapping = $config->get('fieldNameMapping');
-        $this->rootDir = $config->get('rootDir');
         $this->redis = $redis;
         $this->bookingDataIterator = $bookingDataIterator;
         $this->bookingDataIterator2 = $bookingDataIterator2;
         $this->progress = $progress;
         $this->random = $random;
 
-        $kprototypeConfig = $config->get('kprototype');
+        $kprototypeConfig = $config->get('KPrototypeResult');
         $this->stopFile = $kprototypeConfig['serviceStopFile'];
-        $this->outputInterval = $kprototypeConfig['outputInterval'];
-        $this->outputFile = $kprototypeConfig['serviceOutput'];
         $this->maxIterations = $kprototypeConfig['maxIterations'];
 
         $this->bookingsCount = $this->bookingDataIterator->count();
@@ -73,10 +65,9 @@ class KPrototypeAlgorithm
     }
 
     /**
-     * Analyzes the bookings with the apriori algorithm.
-     * @return Clusters
+     * Runs the kprototype clustering algorithm.
      */
-    public function run(): Clusters
+    public function run(): KPrototypeResult
     {
         $k = 2;
         $iteration = 1;
@@ -159,15 +150,15 @@ class KPrototypeAlgorithm
     /**
      * Gets a Clusters object with $k clusters inside with no Associates added yet.
      * @param int $k Number of clusters.
-     * @return Clusters Clusters object with $k clusters inside.
+     * @return KPrototypeResult Clusters object with $k clusters inside.
      */
-    private function getInitialEmptyClusters(int $k): Clusters
+    private function getInitialEmptyClusters(int $k): KPrototypeResult
     {
         if ($k > $this->bookingsCount) {
             $k = $this->bookingsCount;
         }
 
-        $clusters = new Clusters(1);
+        $clusters = new KPrototypeResult(1);
         $clusterCenterIndices = [];
         for ($i = 0; $i < $k; $i++) {
             $clusterCenterIndex = $this->random->generate(100);
@@ -180,7 +171,7 @@ class KPrototypeAlgorithm
                 $clusterCenterIndices[] = $clusterCenterIndex;
                 $rawBooking = $this->redis->hGetAll($clusterCenterIndex);
                 $booking = $this->bookingBuilder->fromRawData($rawBooking);
-                $clusters->addCluster(new Cluster($booking));
+                $clusters->addCluster(new KPrototypeCluster($booking));
             }
         }
         return $clusters;
@@ -188,9 +179,9 @@ class KPrototypeAlgorithm
 
     /**
      * Assignes all bookings from the bookingsProvider to the $clusters.
-     * @param Clusters $clusters Clusters to add the bookings to.
+     * @param KPrototypeResult $clusters Clusters to add the bookings to.
      */
-    private function assignBookingsToClusters(Clusters $clusters)
+    private function assignBookingsToClusters(KPrototypeResult $clusters)
     {
         $clusterCenterIds = $clusters->getClusterCenterIds();
 
@@ -210,10 +201,10 @@ class KPrototypeAlgorithm
 
     /**
      * Adds the given $booking to the closest cluster in $clusters.
-     * @param Clusters $clusters Clusters to add the booking to.
+     * @param KPrototypeResult $clusters Clusters to add the booking to.
      * @param Booking $booking Booking to add to a cluster.
      */
-    private function assignBookingToCluster(Clusters $clusters, Booking $booking)
+    private function assignBookingToCluster(KPrototypeResult $clusters, Booking $booking)
     {
         $closestCluster = null;
         $closestDistance = null;
@@ -230,34 +221,34 @@ class KPrototypeAlgorithm
 
     /**
      * Creates a new Clusters object with one Cluster replaced.
-     * @param Clusters $oldClusters Old Clusters.
-     * @param Cluster $clusterToReplace Cluster in $oldClusters which should not be placed into the new Clusters object..
+     * @param KPrototypeResult $oldClusters Old Clusters.
+     * @param KPrototypeCluster $clusterToReplace Cluster in $oldClusters which should not be placed into the new Clusters object..
      * @param Booking $newCenter New Center to add to the new Clusters object and should replace the $clusterToReplace.
      * @param int $iteration Current iteration number.
-     * @return Clusters New Clusters object with one Cluster replaced.
+     * @return KPrototypeResult New Clusters object with one Cluster replaced.
      */
-    private function generateNewEmptyClustersWithSwapedCenter(Clusters $oldClusters, Cluster $clusterToReplace, Booking $newCenter, int $iteration)
+    private function generateNewEmptyClustersWithSwapedCenter(KPrototypeResult $oldClusters, KPrototypeCluster $clusterToReplace, Booking $newCenter, int $iteration)
     {
-        $newClusters = new Clusters($iteration);
+        $newClusters = new KPrototypeResult($iteration);
         foreach ($oldClusters->getClusters() as $oldCluster) {
             if ($oldCluster->getCenter()->getId() != $clusterToReplace->getCenter()->getId()) {
-                $newClusters->addCluster(new Cluster($oldCluster->getCenter()));
+                $newClusters->addCluster(new KPrototypeCluster($oldCluster->getCenter()));
             }
         }
-        $newClusters->addCluster(new Cluster($newCenter));
+        $newClusters->addCluster(new KPrototypeCluster($newCenter));
         return $newClusters;
     }
 
     /**
      * @param int $status 0 = Data caching done. 1 = Clustering done. 2 = Apriori done.
      */
-    private function storeState(Clusters $clusters, int $status)
+    private function storeState(KPrototypeResult $clusters, int $status)
     {
         $this->progress->storeState($this->bookingsCount, $clusters, $status);
     }
 
     /**
-     * @param Clusters $clusters
+     * @param KPrototypeResult $clusters
      * @return array
      */
     protected function debug($clusters): array

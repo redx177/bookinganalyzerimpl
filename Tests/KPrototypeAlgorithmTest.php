@@ -54,7 +54,7 @@ class KPrototypeAlgorithmTest //extends PHPUnit\Framework\TestCase
     protected function setUp()
     {
         $map = [
-            ['kprototype', ['gamma' => $this->gamma,
+            ['KPrototypeResult', ['gamma' => $this->gamma,
                 'serviceStopFile' => '',
                 'outputInterval' => '',
                 'serviceOutput' => '']],

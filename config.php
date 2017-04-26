@@ -43,22 +43,32 @@ $configContent = array(
     ],
     'filterButtonTitle' => 'Apply Fiters',
     'runButtonTitle' => 'Run analysis',
-    'bookingsCountCap' => 50, // Debugging only. int|null
+    'bookingsCountCap' => 50, // debugging only. int|null
     'ignoreFields' => ['SCTV'],
     'fileCacheDirectory' => '/fileCache/',
     'apriori' => [
-        'minSup' => 0.4, // percentage
         'serviceOutput' => '/Services/Apriori/wip/status.htm',
         'servicePidFile' => '/Services/Apriori/wip/pid.txt',
         'serviceStopFile' => '/Services/Apriori/wip/stop.txt',
-        'outputInterval' => 10, // Seconds
+        'minSup' => 0.4, // percentage
+        'outputInterval' => 1, // seconds
     ],
-    'kprototype' => [
+    'KPrototypeResult' => [
         'serviceOutput' => '/Services/KPrototype/wip/status.htm',
         'servicePidFile' => '/Services/KPrototype/wip/pid.txt',
         'serviceStopFile' => '/Services/KPrototype/wip/stop.txt',
-        'outputInterval' => 10, // Seconds
+        'runButtonTitle' => 'Run K-Prototype',
+        'outputInterval' => 1, // seconds
         'gamma' => 1, // value between 0-1.
         'maxIterations' => 10,
+    ],
+    'dbscan' => [
+        'serviceOutput' => '/Services/DBScan/wip/status.htm',
+        'servicePidFile' => '/Services/DBScan/wip/pid.txt',
+        'serviceStopFile' => '/Services/DBScan/wip/stop.txt',
+        'runButtonTitle' => 'Run DBSCAN',
+        'outputInterval' => 1, // seconds
+        'radius' => 1000,
+        'minPoints' => 0.1, // percentage
     ],
 );

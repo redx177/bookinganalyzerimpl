@@ -38,7 +38,7 @@ class AprioriProgressForClusters implements AprioriProgress
         return new AprioriState([], null, 0, [], 0);
     }
 
-    public function storeClusterState(Clusters $clusters, $status, Cluster $cluster = null)
+    public function storeClusterState(KPrototypeResult $clusters, $status, KPrototypeCluster $cluster = null)
     {
     }
 }

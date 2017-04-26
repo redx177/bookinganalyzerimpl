@@ -16,7 +16,7 @@ class LoadClusterDataIterator implements DataIterator
      */
     private $associates;
 
-    public function __construct(Cluster $cluster, Redis $redis)
+    public function __construct(KPrototypeCluster $cluster, Redis $redis)
     {
         $this->redis = $redis;
         $this->associates = array_values($cluster->getAssociates());

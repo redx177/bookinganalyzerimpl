@@ -2,6 +2,10 @@ $( document ).ready(function() {
     if (statusUrl && isRunning) {
         var intervalId = setInterval(function() { pull(intervalId) }, pullInterval * 1000)
     }
+
+    $('.cluster .panel-heading span').click(function (element) {
+       console.log(element);
+    });
 });
 
 function pull(intervalId) {
