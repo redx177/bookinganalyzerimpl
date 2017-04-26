@@ -1,0 +1,103 @@
+<div class="container clustersanalysis">
+    {% if status == 2 %}
+        <h1 id="done">Analysis done</h1>
+    {% else %}
+        <h1>Analysis in progress. Updates will come every {{ pullInterval }} seconds</h1>
+    {% endif %}
+
+    <div class="panel panel-default">
+        <div class="panel-heading">Progress</div>
+        <div class="panel-body">
+            <div class="progressbar">
+
+                <div class="alert alert-success" role="alert">
+                    <span class="glyphicon glyphicon-ok-sign" aria-hidden="true"></span>
+                    Cache data
+                </div>
+                <div class="alert alert-{% if status > 0 %}success{% else %}warning{% endif %}" role="alert">
+                    {% if status == 0 %}
+                        <span class="glyphicon glyphicon-refresh" aria-hidden="true"></span>
+                    {% elseif status > 0 %}
+                        <span class="glyphicon glyphicon-ok-sign" aria-hidden="true"></span>
+                    {% endif %}
+                    Grouping data
+                </div>
+
+                <div class="alert alert-{% if status > 1 %}success{% else %}warning{% endif %}" role="alert">
+                    {% if status == 1 %}
+                        <span class="glyphicon glyphicon-refresh" aria-hidden="true"></span>
+                    {% elseif status > 1 %}
+                        <span class="glyphicon glyphicon-ok-sign" aria-hidden="true"></span>
+                    {% endif %}
+                    Analyze data
+                </div>
+            </div>
+
+            {% if not status == 2 %}
+                <button type="button" class="btn btn-danger btn-abort">Abort</button><br />
+            {% endif %}
+            Runtime: {{ runtimeInSeconds }}<br />
+            Items count: {{ bookingsCount }}<br />
+            Overal error: {{ clusters.totalCosts }}<br />
+            Iteration: {{ clusters.iteration }}<br />
+            Best candidate{% if status == 0 %} so far{% endif %}:
+            {% if status == 2 %}
+                <ul>
+                    {% for cluster in clusters.clusters %}
+                        <li>Cluster {{ loop.index }}, Item Count: {{ cluster.clusterPoints|length }}, Error: {{ cluster.totalCosts }}</li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <ul>
+                    {% for cluster in clusters.clusters %}
+                        <li>Cluster {{ loop.index }}, Item Count: {{ cluster.clusterPoints|length }}, Error: {{ cluster.totalCosts }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="clusters">
+        {% if status > 0 %}
+
+            {% set index = 0 %}
+            {% for analyzedCluster in analyzedClusters %}
+                {% set index = index + 1 %}
+                <div class="cluster">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            Cluster {{ index }}, Item Count: {{ analyzedCluster.cluster.clusterPoints|length }}, Error {{ analyzedCluster.cluster.totalCosts }}
+                            <span class="glyphicon glyphicon-eye-open" aria-hidden="true" data-cluster-id="cluster{{ index }}"></span>
+                            <span class="glyphicon glyphicon-eye-close" aria-hidden="true" data-cluster-id="cluster{{ index }}"></span>
+                        </div>
+                        <div class="panel-body cluster{{ index }}">
+                            {{ include('candidatesAndFrequentSetsAsTable.twig', {
+                                'frequentSets': analyzedCluster.frequentSets,
+                                'candidates': analyzedCluster.candidates,
+                            }) }}
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+            {% if currentCluster %}
+                {% set index = index + 1 %}
+
+                <div class="cluster">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            Cluster {{ index }}, Item Count: {{ currentCluster.cluster.associates|length }}, Error {{ currentCluster.cluster.totalCosts }}
+                            <span class="glyphicon glyphicon-eye-open" aria-hidden="true" data-cluster-id="cluster{{ index }}"></span>
+                            <span class="glyphicon glyphicon-eye-close" aria-hidden="true" data-cluster-id="cluster{{ index }}"></span>
+                        </div>
+                        <div class="panel-body cluster{{ index }}">
+                            {{ include('candidatesAndFrequentSetsAsTable.twig', {
+                                'frequentSets': currentCluster.frequentSets,
+                                'candidates': currentCluster.candidates,
+                            }) }}
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        {% endif %}
+    </div>
+</div>

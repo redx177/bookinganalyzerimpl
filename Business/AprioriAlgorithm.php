@@ -74,12 +74,12 @@ class AprioriAlgorithm
      * @param KPrototypeResult $clusters Clusters to analyze. Each Cluster will be anaylzed with the apriori algorithm.
      * @return KPrototypeResult with attached histograms.
      */
-    public function runWithClusters(KPrototypeResult $clusters): KPrototypeResult {
+    public function runWithClusters(ClusteringResult $clusters): ClusteringResult {
         foreach ($clusters->getClusters() as $cluster) {
             $this->bookingDataIterator = $this->factory->make(
                 BookingDataIterator::class, [
-                    'DataIterator' =>
-                        $this->factory->make(LoadClusterDataIterator::class, ['KPrototypeCluster' => $cluster])
+                    'dataIterator' =>
+                        $this->factory->make(LoadClusterDataIterator::class, ['cluster' => $cluster])
             ]);
             $this->storeClusterState($clusters, 1, $cluster);
             $cluster->setHistograms($this->run());
@@ -169,7 +169,7 @@ class AprioriAlgorithm
     {
         $frequentSet = [];
         foreach ($candidates as $key => $value) {
-            if ($value[1] >= $bookingsCount * $this->minSup) {
+            if ($value[1] > ceil($bookingsCount * $this->minSup)) {
                 $frequentSet[$key] = $value;
             }
         }
@@ -222,7 +222,7 @@ class AprioriAlgorithm
         $this->progress->storeState($this->startTime, $this->bookingDataIterator->count(), $candidates, $frequentSets);
     }
 
-    private function storeClusterState(KPrototypeResult $clusters, $status, KPrototypeCluster $cluster = null)
+    private function storeClusterState(ClusteringResult $clusters, $status, Cluster $cluster = null)
     {
         $this->progress->storeClusterState($clusters, $status, $cluster);
         // If status is done, store the final state.

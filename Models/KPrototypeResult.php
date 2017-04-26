@@ -1,6 +1,6 @@
 <?php
 
-class KPrototypeResult
+class KPrototypeResult implements ClusteringResult
 {
     private $centerIds;
     private $iteration;
@@ -56,11 +56,15 @@ class KPrototypeResult
         return $this->centerIds;
     }
 
-    public function getBookingsCount()
+    /**
+     * Gets the count of points in all clusters.
+     * @return int
+     */
+    public function getPointCount(): int
     {
         $bookingsCount = 0;
         foreach ($this->getClusters() as $cluster) {
-            $bookingsCount += count($cluster->getAssociates());
+            $bookingsCount += count($cluster->getClusterPoints());
         }
         return $bookingsCount;
     }

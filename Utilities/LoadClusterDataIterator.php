@@ -12,14 +12,14 @@ class LoadClusterDataIterator implements DataIterator
      */
     private $redis;
     /**
-     * @var Associate[]
+     * @var ClusterPoint[]
      */
-    private $associates;
+    private $points;
 
-    public function __construct(KPrototypeCluster $cluster, Redis $redis)
+    public function __construct(Cluster $cluster, Redis $redis)
     {
         $this->redis = $redis;
-        $this->associates = array_values($cluster->getAssociates());
+        $this->points = array_values($cluster->getClusterPoints());
         $this->rewind();
     }
 
@@ -32,11 +32,11 @@ class LoadClusterDataIterator implements DataIterator
     {
         $this->currentRowNumber++;
 
-        if (!array_key_exists($this->currentRowNumber, $this->associates)) {
+        if (!array_key_exists($this->currentRowNumber, $this->points)) {
             $this->currentLine = false;
             return;
         }
-        $id = $this->associates[$this->currentRowNumber]->getId();
+        $id = $this->points[$this->currentRowNumber]->getId();
 
         $this->currentLine = $this->redis->hGetAll($id);
         if ($this->currentLine === null) {
@@ -69,6 +69,6 @@ class LoadClusterDataIterator implements DataIterator
 
     public function count(): int
     {
-        return count($this->associates);
+        return count($this->points);
     }
 }

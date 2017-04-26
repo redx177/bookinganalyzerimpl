@@ -34,7 +34,7 @@ class DistanceMeasurementTest extends TestCase
         $this->center = new Booking(1, $this->getDataTypeCluster());
 
         $map = [
-            ['KPrototypeResult', ['gamma' => 1]],
+            ['kprototype', ['gamma' => 1]],
         ];
         $this->configMock = $this->createMock(ConfigProvider::class);
         $this->configMock->method('get')->will($this->returnValueMap($map));
@@ -143,7 +143,7 @@ class DistanceMeasurementTest extends TestCase
     public function gammaShouldReduceCategoricalDistance() {
         $gamma = 0.5;
         $map = [
-            ['KPrototypeResult', ['gamma' => $gamma]],
+            ['kprototype', ['gamma' => $gamma]],
         ];
         $configMock = $this->createMock(ConfigProvider::class);
         $configMock->method('get')
@@ -164,7 +164,7 @@ class DistanceMeasurementTest extends TestCase
     public function gammaShouldEnlargeCategoricalDistance() {
         $gamma = 2;
         $map = [
-            ['KPrototypeResult', ['gamma' => $gamma]],
+            ['kprototype', ['gamma' => $gamma]],
         ];
         $configMock = $this->createMock(ConfigProvider::class);
         $configMock->method('get')

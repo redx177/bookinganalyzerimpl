@@ -24,7 +24,7 @@ class AttributanalysisWithGroupingController implements Controller
         $this->rootDir = $config->get('rootDir');
         $this->fieldNameMapping = $config->get('fieldNameMapping');
 
-        $this->kprototypeConfig = $config->get('KPrototypeResult');
+        $this->kprototypeConfig = $config->get('kprototype');
         $this->dbscanConfig = $config->get('dbscan');
     }
 

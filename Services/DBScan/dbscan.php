@@ -7,6 +7,8 @@ require_once $rootDir . '/Interfaces/AprioriProgress.php';
 require_once $rootDir . '/Interfaces/Field.php';
 require_once $rootDir . '/Interfaces/Random.php';
 require_once $rootDir . '/Interfaces/AprioriProgress.php';
+require_once $rootDir . '/Interfaces/ClusteringResult.php';
+require_once $rootDir . '/Interfaces/Cluster.php';
 require_once $rootDir . '/Utilities/ConfigProvider.php';
 require_once $rootDir . '/Utilities/LoadAllCsvDataIterator.php';
 require_once $rootDir . '/Utilities/LoadIncrementalCsvDataIterator.php';
@@ -16,19 +18,17 @@ require_once $rootDir . '/Utilities/Randomizer.php';
 require_once $rootDir . '/Utilities/Runtime.php';
 require_once $rootDir . '/Business/AprioriAlgorithm.php';
 require_once $rootDir . '/Business/AprioriProgressToFile.php';
-require_once $rootDir . '/Business/AprioriProgressToMemory.php';
-require_once $rootDir . '/Business/AprioriProgressForClusters.php';
 require_once $rootDir . '/Business/ClusteringProgress.php';
-require_once $rootDir . '/Business/KPrototypeClusteringProgress.php';
 require_once $rootDir . '/Business/BookingsProvider.php';
 require_once $rootDir . '/Business/DataTypeClusterer.php';
 require_once $rootDir . '/Business/Pagination.php';
 require_once $rootDir . '/Business/FiltersProvider.php';
-require_once $rootDir . '/Business/KPrototypeAlgorithm.php';
 require_once $rootDir . '/Business/DistanceMeasurement.php';
 require_once $rootDir . '/Business/DataCache.php';
 require_once $rootDir . '/Business/BookingDataIterator.php';
 require_once $rootDir . '/Business/BookingBuilder.php';
+require_once $rootDir . '/Business/DBScanClusteringProgress.php';
+require_once $rootDir . '/Business/DBScanAlgorithm.php';
 require_once $rootDir . '/Models/AprioriState.php';
 require_once $rootDir . '/Models/Booking.php';
 require_once $rootDir . '/Models/BooleanField.php';
@@ -46,9 +46,9 @@ require_once $rootDir . '/Models/IntegerField.php';
 require_once $rootDir . '/Models/Price.php';
 require_once $rootDir . '/Models/PriceField.php';
 require_once $rootDir . '/Models/StringField.php';
-require_once $rootDir . '/Models/Clusters.php';
-require_once $rootDir . '/Models/Cluster.php';
-require_once $rootDir . '/Models/Associate.php';
+require_once $rootDir . '/Models/DBScanResult.php';
+require_once $rootDir . '/Models/ClusterPoint.php';
+require_once $rootDir . '/Models/DBScanCluster.php';
 $config = new ConfigProvider($GLOBALS['configContent']);
 $config->set('rootDir', $rootDir);
 $dbscanConfig = $config->get('dbscan');
@@ -61,7 +61,7 @@ $twig = new Twig_Environment($loader, array(
 ));
 $twig->addFunction(new Twig_Function('sortHistogramBinsByCount', 'sortHistogramBinsByCount'));
 $twig->addExtension(new Twig_Extension_Debug());
-$template = $twig->load('clusters.twig');
+$template = $twig->load('dbscanClusters.twig');
 
 /* REDIS */
 $redis = new Redis();
@@ -73,10 +73,8 @@ $builder->addDefinitions([
     Twig_Environment::class => $twig,
     Twig_TemplateWrapper::class => $template,
     ConfigProvider::class => $config,
-    Twig_TemplateWrapper::class => $template,
     Redis::class => $redis,
     Random::class => \DI\object(Randomizer::class),
-    AprioriProgress::class => \DI\object(AprioriProgressToFile::class),
     BookingDataIterator::class => \DI\object(BookingDataIterator::class)->scope(\DI\Scope::PROTOTYPE),
 
     // Scope::PROTOTYPE is set so it creates a new instance everytime.
@@ -86,11 +84,20 @@ $builder->addDefinitions([
 
     // Create new instance here. It will start tracking time from the point of instantiation.
     Runtime::class => new Runtime(),
+
+    'clusteringConfig' => \DI\value($dbscanConfig),
+    AprioriProgress::class => \DI\object(AprioriProgressToFile::class)
+        ->constructor(
+            \DI\get(ConfigProvider::class),
+            \DI\get(Twig_Environment::class),
+            \DI\get(Runtime::class),
+            \DI\get('clusteringConfig'),
+            \DI\get(Twig_TemplateWrapper::class)),
 ]);
 $container = $builder->build();
 
-// Get a KPrototypeClusteringProcess class here. It will start to keep track of timings as soon as it instantiated.
-$container->set(ClusteringProgress::class, $container->get(KPrototypeClusteringProgress::class));
+// Get a DBScanClusteringProgress class here. It will start to keep track of timings as soon as it instantiated.
+$container->set(ClusteringProgress::class, $container->get(DBScanClusteringProgress::class));
 
 if (array_key_exists('abort', $_GET) && $_GET['abort']) {
     file_put_contents($rootDir . $dbscanConfig['serviceStopFile'], "");

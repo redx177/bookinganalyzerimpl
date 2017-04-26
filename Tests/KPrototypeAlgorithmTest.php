@@ -54,10 +54,11 @@ class KPrototypeAlgorithmTest //extends PHPUnit\Framework\TestCase
     protected function setUp()
     {
         $map = [
-            ['KPrototypeResult', ['gamma' => $this->gamma,
+            ['kprototype', [
                 'serviceStopFile' => '',
                 'outputInterval' => '',
-                'serviceOutput' => '']],
+                'serviceOutput' => ''],
+            'gamma' => $this->gamma],
         ];
         $this->configMock = $this->createMock(ConfigProvider::class);
         $this->configMock->method('get')->will($this->returnValueMap($map));
@@ -124,13 +125,13 @@ class KPrototypeAlgorithmTest //extends PHPUnit\Framework\TestCase
 
         $this->assertEquals(0, $clusters[0]->getTotalCosts());
         $this->assertEquals(1, $clusters[0]->getCenter()->getId());
-        $this->assertEquals(1, count($clusters[0]->getAssociates()));
-        $this->assertEquals(2, $clusters[0]->getAssociates()[2]->getId());
+        $this->assertEquals(1, count($clusters[0]->getClusterPoints()));
+        $this->assertEquals(2, $clusters[0]->getClusterPoints()[2]->getId());
 
         $this->assertEquals(0, $clusters[1]->getTotalCosts());
         $this->assertEquals(3, $clusters[1]->getCenter()->getId());
-        $this->assertEquals(1, count($clusters[1]->getAssociates()));
-        $this->assertEquals(4, $clusters[1]->getAssociates()[4]->getId());
+        $this->assertEquals(1, count($clusters[1]->getClusterPoints()));
+        $this->assertEquals(4, $clusters[1]->getClusterPoints()[4]->getId());
     }
 
     public function twoTimesTwoSimilarBookingsShouldCreate2ClustersWithLowCosts()
@@ -189,12 +190,12 @@ class KPrototypeAlgorithmTest //extends PHPUnit\Framework\TestCase
         // Total Costs calculation: (integer differences sum of squares) + gamma*(sum of categorical missmatches)
         $this->assertEquals((4+4+4) + $this->gamma*(1+1), $clusters[0]->getTotalCosts());
         $this->assertEquals(1, $clusters[0]->getCenter()->getId());
-        $this->assertEquals(1, count($clusters[0]->getAssociates()));
-        $this->assertEquals(2, $clusters[0]->getAssociates()[2]->getId());
+        $this->assertEquals(1, count($clusters[0]->getClusterPoints()));
+        $this->assertEquals(2, $clusters[0]->getClusterPoints()[2]->getId());
 
         $this->assertEquals((4+4+4) + $this->gamma*(1+1+1), $clusters[1]->getTotalCosts());
         $this->assertEquals(3, $clusters[1]->getCenter()->getId());
-        $this->assertEquals(1, count($clusters[1]->getAssociates()));
-        $this->assertEquals(4, $clusters[1]->getAssociates()[4]->getId());
+        $this->assertEquals(1, count($clusters[1]->getClusterPoints()));
+        $this->assertEquals(4, $clusters[1]->getClusterPoints()[4]->getId());
     }
 }

@@ -13,7 +13,7 @@ class DistanceMeasurement
      */
     public function __construct(ConfigProvider $config)
     {
-        $this->gamma = $config->get('KPrototypeResult')['gamma'];
+        $this->gamma = $config->get('gamma');
     }
 
     /**

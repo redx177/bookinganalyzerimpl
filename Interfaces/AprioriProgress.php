@@ -17,7 +17,7 @@ interface AprioriProgress
      * @param int $status 0 = Data caching done. 1 = Clustering done. 2 = Apriori done. ($status=2 will force an output, ignoring outputInterval from config)
      * @param KPrototypeCluster $cluster Current cluster to render.
      */
-    public function storeClusterState(KPrototypeResult $clusters, $status, KPrototypeCluster $cluster = null);
+    public function storeClusterState(ClusteringResult $clusters, $status, Cluster $cluster = null);
 
     /**
      * Gets the apriori state.

@@ -53,13 +53,12 @@ $configContent = array(
         'minSup' => 0.4, // percentage
         'outputInterval' => 1, // seconds
     ],
-    'KPrototypeResult' => [
+    'kprototype' => [
         'serviceOutput' => '/Services/KPrototype/wip/status.htm',
         'servicePidFile' => '/Services/KPrototype/wip/pid.txt',
         'serviceStopFile' => '/Services/KPrototype/wip/stop.txt',
         'runButtonTitle' => 'Run K-Prototype',
         'outputInterval' => 1, // seconds
-        'gamma' => 1, // value between 0-1.
         'maxIterations' => 10,
     ],
     'dbscan' => [
@@ -68,7 +67,8 @@ $configContent = array(
         'serviceStopFile' => '/Services/DBScan/wip/stop.txt',
         'runButtonTitle' => 'Run DBSCAN',
         'outputInterval' => 1, // seconds
-        'radius' => 1000,
+        'radius' => 6,
         'minPoints' => 0.1, // percentage
     ],
+    'gamma' => 1, // value between 0-1.
 );

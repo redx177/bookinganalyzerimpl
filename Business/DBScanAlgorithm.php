@@ -51,16 +51,18 @@ class DBScanAlgorithm
 
     /**
      * Runs the DBSCAN clustering algorithm.
-     * @return KPrototypeResult
+     * @return DBScanResult
      */
-    public function run(): KPrototypeResult
+    public function run(): DBScanResult
     {
         /** @var Booking[] $noise */
         $visitedIds = [];
         $idsInACluster = [];
         $noise = [];
         $clusters = [];
+        echo 1;
         foreach ($this->bookingDataIterator as $booking) {
+            echo 2;
 
             // If the point is already visited, skip it.
             if ($this->isVisited($booking, $visitedIds)) {
@@ -70,28 +72,45 @@ class DBScanAlgorithm
             $visitedIds[] = $booking->getId();
             $neighbours = $this->getNeighbours($booking);
             if (count($neighbours) >= $this->minPoints) {
+                echo 3;
                 $cluster = [$booking];
                 $idsInACluster[] = $booking->getId();
-                for ($i = 0; $i < count($neighbours); $i++) {
+                $neighboursCount = count($neighbours);
+                for ($i = 0; $i < $neighboursCount; $i++) {
+                    echo 4;
                     $neighbour = $neighbours[$i];
                     if (!$this->isVisited($neighbour, $visitedIds)) {
+                        echo 5;
                         $visitedIds[] = $neighbour->getId();
                         $neighbourCandidates = $this->getNeighbours($neighbour);
                         if (count($neighbours) >= $this->minPoints) {
+                            echo 6;
                             $neighbours = array_merge($neighbours, $neighbourCandidates);
-                            $i += count($neighbours);
+                            $neighboursCount += count($neighbourCandidates);
                         }
-                        if (!in_array($neighbour, $idsInACluster)) {
+                        if (!in_array($neighbour->getId(), $idsInACluster)) {
+                            echo 7;
+                            $idsInACluster[] = $neighbour->getId();
                             $cluster[] = $neighbour;
                         }
+                    }
+
+                    if ($this->bookingsCountCap && count($noise) + count($idsInACluster) >= $this->bookingsCountCap) {
+                        echo 8;
+                        break 2;
                     }
                 }
                 $clusters[] = $cluster;
             } else {
+                echo 9;
                 $noise[] = $booking;
             }
+
+            if ($this->bookingsCountCap && count($noise) + count($idsInACluster) >= $this->bookingsCountCap) {
+                break;
+            }
         }
-        return new DBScanResult($clusters, $noise);
+        return new DBScanResult($this->createClusters($clusters), $noise);
     }
 
     /**
@@ -100,9 +119,18 @@ class DBScanAlgorithm
     private function getNeighbours(Booking $booking)
     {
         $neighbours = [];
+        $i = 0;
         foreach ($this->bookingDataIterator2 as $possibleNeighbour) {
+            if ($booking->getId() === $possibleNeighbour->getId()) {
+                continue;
+            }
+
             if ($this->distance->measure($booking, $possibleNeighbour) < $this->radius) {
                 $neighbours[] = $possibleNeighbour;
+            }
+            $i++;
+            if ($i >= $this->bookingsCountCap) {
+                break;
             }
         }
         $this->bookingDataIterator2->rewind();
@@ -113,5 +141,20 @@ class DBScanAlgorithm
     protected function isVisited(Booking $booking, $visitedIds): bool
     {
         return in_array($booking->getId(), $visitedIds);
+    }
+
+    private function createClusters($clustersArray)
+    {
+        /** @var Cluster[] $clusters */
+        /** @var ClusterPoint[] $points */
+        $clusters = [];
+        foreach ($clustersArray as $cluster) {
+            $points = [];
+            foreach ($cluster as $point) {
+                $points[] = new ClusterPoint($point);
+            }
+            $clusters[] = new DBScanCluster($points);
+        }
+        return $clusters;
     }
 }

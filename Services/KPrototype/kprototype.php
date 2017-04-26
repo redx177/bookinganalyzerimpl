@@ -7,6 +7,8 @@ require_once $rootDir . '/Interfaces/AprioriProgress.php';
 require_once $rootDir . '/Interfaces/Field.php';
 require_once $rootDir . '/Interfaces/Random.php';
 require_once $rootDir . '/Interfaces/AprioriProgress.php';
+require_once $rootDir . '/Interfaces/ClusteringResult.php';
+require_once $rootDir . '/Interfaces/Cluster.php';
 require_once $rootDir . '/Utilities/ConfigProvider.php';
 require_once $rootDir . '/Utilities/LoadAllCsvDataIterator.php';
 require_once $rootDir . '/Utilities/LoadIncrementalCsvDataIterator.php';
@@ -46,12 +48,13 @@ require_once $rootDir . '/Models/IntegerField.php';
 require_once $rootDir . '/Models/Price.php';
 require_once $rootDir . '/Models/PriceField.php';
 require_once $rootDir . '/Models/StringField.php';
-require_once $rootDir . '/Models/Clusters.php';
-require_once $rootDir . '/Models/Cluster.php';
-require_once $rootDir . '/Models/Associate.php';
+require_once $rootDir . '/Models/KPrototypeResult.php';
+require_once $rootDir . '/Models/KPrototypeCluster.php';
+require_once $rootDir . '/Models/ClusterPoint.php';
+require_once $rootDir . '/Models/DistanceClusterPoint.php';
 $config = new ConfigProvider($GLOBALS['configContent']);
 $config->set('rootDir', $rootDir);
-$kprototypeConfig = $config->get('KPrototypeResult');
+$kprototypeConfig = $config->get('kprototype');
 
 /* TWIG */
 $loader = new Twig_Loader_Filesystem($rootDir . '/Templates');
@@ -61,7 +64,7 @@ $twig = new Twig_Environment($loader, array(
 ));
 $twig->addFunction(new Twig_Function('sortHistogramBinsByCount', 'sortHistogramBinsByCount'));
 $twig->addExtension(new Twig_Extension_Debug());
-$template = $twig->load('clusters.twig');
+$template = $twig->load('kprototypeClusters.twig');
 
 /* REDIS */
 $redis = new Redis();
@@ -76,7 +79,6 @@ $builder->addDefinitions([
     Twig_TemplateWrapper::class => $template,
     Redis::class => $redis,
     Random::class => \DI\object(Randomizer::class),
-    AprioriProgress::class => \DI\object(AprioriProgressToFile::class),
     BookingDataIterator::class => \DI\object(BookingDataIterator::class)->scope(\DI\Scope::PROTOTYPE),
 
     // Scope::PROTOTYPE is set so it creates a new instance everytime.
@@ -86,6 +88,15 @@ $builder->addDefinitions([
 
     // Create new instance here. It will start tracking time from the point of instantiation.
     Runtime::class => new Runtime(),
+
+    'clusteringConfig' => \DI\value($kprototypeConfig),
+    AprioriProgress::class => \DI\object(AprioriProgressToFile::class)
+        ->constructor(
+            \DI\get(ConfigProvider::class),
+            \DI\get(Twig_Environment::class),
+            \DI\get(Runtime::class),
+            \DI\get('clusteringConfig'),
+            \DI\get(Twig_TemplateWrapper::class)),
 ]);
 $container = $builder->build();
 

@@ -53,7 +53,7 @@ class KPrototypeAlgorithm
         $this->progress = $progress;
         $this->random = $random;
 
-        $kprototypeConfig = $config->get('KPrototypeResult');
+        $kprototypeConfig = $config->get('kprototype');
         $this->stopFile = $kprototypeConfig['serviceStopFile'];
         $this->maxIterations = $kprototypeConfig['maxIterations'];
 
@@ -106,7 +106,6 @@ class KPrototypeAlgorithm
                 foreach ($this->bookingDataIterator as $newClusterCenter) {
 //                    echo 1;
                     if ($this->bookingsCountCap && $offset >= $this->bookingsCountCap) {
-//                        echo "\nbookingsCountCap reached. Break!\n";
                         break;
                     }
                     $offset++;
@@ -216,7 +215,7 @@ class KPrototypeAlgorithm
                 $closestCluster = $cluster;
             }
         }
-        $closestCluster->addAssociate(new Associate($booking, $closestDistance));
+        $closestCluster->addClusterPoint(new DistanceClusterPoint($booking, $closestDistance));
     }
 
     /**
@@ -253,8 +252,8 @@ class KPrototypeAlgorithm
      */
     protected function debug($clusters): array
     {
-        $count0 = count($clusters->getClusters()[0]->getAssociates());
-        $count1 = count($clusters->getClusters()[1]->getAssociates());
+        $count0 = count($clusters->getClusters()[0]->getClusterPoints());
+        $count1 = count($clusters->getClusters()[1]->getClusterPoints());
         echo "ID1: {$clusters->getClusters()[0]->getCenter()->getId()}\n";
         echo "ID2: {$clusters->getClusters()[1]->getCenter()->getId()}\n";
         echo "Associates1: {$count0}\n";

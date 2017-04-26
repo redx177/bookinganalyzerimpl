@@ -38,19 +38,18 @@
             {% endif %}
             Runtime: {{ runtimeInSeconds }}<br />
             Items count: {{ bookingsCount }}<br />
-            Overal error: {{ clusters.totalCosts }}<br />
-            Iteration: {{ clusters.iteration }}<br />
+            Noise points: {{ clusters.noise|length }}
             Best candidate{% if status == 0 %} so far{% endif %}:
             {% if status == 2 %}
                 <ul>
                     {% for cluster in clusters.clusters %}
-                        <li>Cluster {{ loop.index }}, Item Count: {{ cluster.associates|length }}, Error: {{ cluster.totalCosts }}</li>
+                        <li>Cluster {{ loop.index }}, Item Count: {{ cluster.clusterPoints|length }}</li>
                     {% endfor %}
                 </ul>
             {% else %}
                 <ul>
                     {% for cluster in clusters.clusters %}
-                        <li>Cluster {{ loop.index }}, Item Count: {{ cluster.associates|length }}, Error: {{ cluster.totalCosts }}</li>
+                        <li>Cluster {{ loop.index }}, Item Count: {{ cluster.clusterPoints|length }}</li>
                     {% endfor %}
                 </ul>
             {% endif %}
@@ -66,7 +65,7 @@
                 <div class="cluster">
                     <div class="panel panel-default">
                         <div class="panel-heading">
-                            Cluster {{ index }}, Item Count: {{ analyzedCluster.cluster.associates|length }}, Error {{ analyzedCluster.cluster.totalCosts }}
+                            Cluster {{ index }}, Item Count: {{ analyzedCluster.cluster.clusterPoints|length }}
                             <span class="glyphicon glyphicon-eye-open" aria-hidden="true" data-cluster-id="cluster{{ index }}"></span>
                             <span class="glyphicon glyphicon-eye-close" aria-hidden="true" data-cluster-id="cluster{{ index }}"></span>
                         </div>
@@ -85,7 +84,7 @@
                 <div class="cluster">
                     <div class="panel panel-default">
                         <div class="panel-heading">
-                            Cluster {{ index }}, Item Count: {{ currentCluster.cluster.associates|length }}, Error {{ currentCluster.cluster.totalCosts }}
+                            Cluster {{ index }}, Item Count: {{ currentCluster.cluster.associates|length }}
                             <span class="glyphicon glyphicon-eye-open" aria-hidden="true" data-cluster-id="cluster{{ index }}"></span>
                             <span class="glyphicon glyphicon-eye-close" aria-hidden="true" data-cluster-id="cluster{{ index }}"></span>
                         </div>

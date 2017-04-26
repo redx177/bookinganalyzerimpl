@@ -1,11 +1,7 @@
 <?php
 
-class Associate
+class DistanceClusterPoint extends ClusterPoint
 {
-    /**
-     * @var int
-     */
-    private $bookingId;
     /**
      * @var float
      */
@@ -13,17 +9,12 @@ class Associate
 
     public function __construct(Booking $booking, float $distance)
     {
-        $this->bookingId = $booking->getId();
+        parent::__construct($booking);
         $this->distance = $distance;
     }
 
     public function getDistance(): float
     {
         return $this->distance;
-    }
-
-    public function getId(): int
-    {
-        return $this->bookingId;
     }
 }

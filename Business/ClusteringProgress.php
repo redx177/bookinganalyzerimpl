@@ -31,7 +31,6 @@ abstract class ClusteringProgress
         $clusteringConfig = $this->getClusteringConfig($config);
         $this->outputInterval = $clusteringConfig['outputInterval'];
         $this->outputFile = $clusteringConfig['serviceOutput'];
-        $this->maxIterations = $clusteringConfig['maxIterations'];
     }
 
     /**
@@ -45,7 +44,7 @@ abstract class ClusteringProgress
         if ($this->runtime->fromLastTick() > $this->outputInterval || $status == 2) {
             echo "clustering write output\n";
             $content = $this->template->render([
-                'KPrototypeResult' => $clusters,
+                'clusters' => $clusters,
                 'bookingsCount' => $bookingsCount,
                 'runtimeInSeconds' => $this->runtime->fromBeginning(),
                 'status' => $status,

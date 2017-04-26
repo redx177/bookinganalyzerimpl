@@ -1,12 +1,6 @@
 <?php
 
-/**
- * Created by PhpStorm.
- * User: slang
- * Date: 25.04.17
- * Time: 22:04
- */
-class DBScanResult
+class DBScanResult implements ClusteringResult
 {
     /**
      * @var array
@@ -42,5 +36,18 @@ class DBScanResult
     public function getNoise(): array
     {
         return $this->noise;
+    }
+
+    /**
+     * Gets the count of points in all clusters.
+     * @return int
+     */
+    public function getPointCount(): int
+    {
+        $bookingsCount = 0;
+        foreach ($this->getClusters() as $cluster) {
+            $bookingsCount += count($cluster->getClusterPoints());
+        }
+        return $bookingsCount;
     }
 }

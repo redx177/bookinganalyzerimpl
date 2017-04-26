@@ -36,11 +36,16 @@ class AprioriProgressToFile implements AprioriProgress
      * @var Runtime
      */
     private $runtime;
+    /**
+     * @var Twig_TemplateWrapper
+     */
+    private $clusterTemplate;
 
-    public function __construct(ConfigProvider $config, Twig_Environment $twig, Runtime $runtime)
+    public function __construct(ConfigProvider $config, Twig_Environment $twig, Runtime $runtime, $clusteringConfig, Twig_TemplateWrapper $clusterTemplate = null)
     {
         $this->twig = $twig;
         $this->runtime = $runtime;
+        $this->clusterTemplate = $clusterTemplate;
         $this->lastOutput = 0;
         $this->fieldNameMapping = $config->get('fieldNameMapping');
         $this->rootDir = $config->get('rootDir');
@@ -49,9 +54,8 @@ class AprioriProgressToFile implements AprioriProgress
         $this->aprioriOutputInterval = $aprioriConfig['outputInterval'];
         $this->aprioriOutputFile = $aprioriConfig['serviceOutput'];
 
-        $kprototypeConfig = $config->get('KPrototypeResult');
-        $this->kprototypeOutputInterval = $kprototypeConfig['outputInterval'];
-        $this->kprototypeOutputFile = $kprototypeConfig['serviceOutput'];
+        $this->kprototypeOutputInterval = $clusteringConfig['outputInterval'];
+        $this->kprototypeOutputFile = $clusteringConfig['serviceOutput'];
     }
 
     public function storeState(float $algorithmStartTime, int $bookingsCount, array $candidates = null, array $frequentSets = null)
@@ -92,7 +96,7 @@ class AprioriProgressToFile implements AprioriProgress
         return new AprioriState([], null, 0, [], 0);
     }
 
-    public function storeClusterState(KPrototypeResult $clusters, $status, KPrototypeCluster $cluster = null)
+    public function storeClusterState(ClusteringResult $clusters, $status, Cluster $cluster = null)
     {
         if ($this->currentCluster != null) {
             $this->analyzedClusters[] = $this->currentCluster;
@@ -100,7 +104,7 @@ class AprioriProgressToFile implements AprioriProgress
         if ($cluster == null) {
             $this->currentCluster = null;
         } else {
-            $this->currentCluster = ['KPrototypeCluster' => $cluster];
+            $this->currentCluster = ['cluster' => $cluster];
         }
         $this->clusters = $clusters;
         $this->status = $status;
@@ -117,12 +121,11 @@ class AprioriProgressToFile implements AprioriProgress
         if ($this->runtime->fromLastTick() > $this->kprototypeOutputInterval || $this->status == 2) {
             echo "clustering apriori write output\n";
 
-            $template = $this->twig->load('clusters.twig');
-            $content = $template->render([
+            $content = $this->clusterTemplate->render([
                 'currentCluster' => $this->currentCluster,
                 'analyzedClusters' => $this->analyzedClusters,
-                'KPrototypeResult' => $this->clusters,
-                'bookingsCount' => $this->clusters->getBookingsCount(),
+                'clusters' => $this->clusters,
+                'bookingsCount' => $this->clusters->getPointCount(),
                 'fieldTitles' => $this->fieldNameMapping,
                 'runtimeInSeconds' => $this->runtime->fromBeginning(),
                 'status' => 1,

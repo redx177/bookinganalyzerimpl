@@ -3,6 +3,6 @@
 class KPrototypeClusteringProgress extends ClusteringProgress
 {
     function getClusteringConfig(ConfigProvider $config): array {
-        return $config->get('KPrototypeResult');
+        return $config->get('kprototype');
     }
 }

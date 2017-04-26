@@ -1,6 +1,6 @@
 <?php
 
-class KPrototypeCluster
+class KPrototypeCluster implements Cluster
 {
     private $totalCosts;
 
@@ -10,9 +10,9 @@ class KPrototypeCluster
     private $center;
 
     /**
-     * @var Associate[]
+     * @var DistanceClusterPoint[]
      */
-    private $associates = [];
+    private $clusterPoints = [];
 
     /**
      * @var Histograms
@@ -25,23 +25,23 @@ class KPrototypeCluster
         $this->totalCosts = 0;
     }
 
-    public function addAssociate(Associate $associate)
+    public function addClusterPoint(DistanceClusterPoint $clusterPoint)
     {
-        $this->associates[$associate->getId()] = $associate;
-        $this->totalCosts += $associate->getDistance();
+        $this->clusterPoints[$clusterPoint->getId()] = $clusterPoint;
+        $this->totalCosts += $clusterPoint->getDistance();
     }
 
-    public function removeAssociate(Associate $associate)
+    public function removeClusterPoint(DistanceClusterPoint $associate)
     {
-        unset($this->associates[$associate->getId()]);
+        unset($this->clusterPoints[$associate->getId()]);
     }
 
     /**
-     * @return Associate[]
+     * @return DistanceClusterPoint[]
      */
-    public function getAssociates(): array
+    public function getClusterPoints(): array
     {
-        return $this->associates;
+        return $this->clusterPoints;
     }
 
     public function getCenter(): Booking
