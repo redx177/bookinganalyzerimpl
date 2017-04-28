@@ -8,15 +8,6 @@ class DBScanCluster implements Cluster
     private $clusterPoints;
 
     /**
-     * DBScanCluster constructor.
-     * @param ClusterPoint[] $clusterPoints
-     */
-    public function __construct($clusterPoints)
-    {
-        $this->clusterPoints = $clusterPoints;
-    }
-
-    /**
      * @return ClusterPoint[]
      */
     public function getClusterPoints(): array
@@ -31,5 +22,14 @@ class DBScanCluster implements Cluster
     public function setHistograms(Histograms $histograms)
     {
         $this->histograms = $histograms;
+    }
+
+    /**
+     * Adds a cluster point to the cluster.
+     * @param ClusterPoint $clusterPoint
+     */
+    public function addClusterPoint($clusterPoint)
+    {
+        $this->clusterPoints[] = $clusterPoint;
     }
 }

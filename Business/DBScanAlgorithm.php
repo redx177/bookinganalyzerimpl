@@ -41,12 +41,12 @@ class DBScanAlgorithm
 
         $dbscanConfig = $config->get('dbscan');
         $this->radius = $dbscanConfig['radius'];
-        $this->minPoints = $dbscanConfig['minPoints'];
 
         $this->bookingsCount = $this->bookingDataIterator->count();
         if ($this->bookingsCountCap) {
             $this->bookingsCount = $this->bookingsCountCap;
         }
+        $this->minPoints = $this->bookingsCount * $dbscanConfig['minPoints'];
     }
 
     /**
@@ -58,11 +58,11 @@ class DBScanAlgorithm
         /** @var Booking[] $noise */
         $visitedIds = [];
         $idsInACluster = [];
-        $noise = [];
-        $clusters = [];
-        echo 1;
+        $clusters = new DBScanResult();
+        $j = 0;
         foreach ($this->bookingDataIterator as $booking) {
-            echo 2;
+            $j++;
+            echo "1\n";
 
             // If the point is already visited, skip it.
             if ($this->isVisited($booking, $visitedIds)) {
@@ -72,45 +72,49 @@ class DBScanAlgorithm
             $visitedIds[] = $booking->getId();
             $neighbours = $this->getNeighbours($booking);
             if (count($neighbours) >= $this->minPoints) {
-                echo 3;
-                $cluster = [$booking];
+                $cluster = new DBScanCluster();
+                $cluster->addClusterPoint(new ClusterPoint($booking));
+                $clusters->addCluster($cluster);
                 $idsInACluster[] = $booking->getId();
                 $neighboursCount = count($neighbours);
                 for ($i = 0; $i < $neighboursCount; $i++) {
-                    echo 4;
+                    if ($i % 50 == 0) {
+                        $this->storeState($clusters, 0);
+                    }
+                    echo 2;
                     $neighbour = $neighbours[$i];
                     if (!$this->isVisited($neighbour, $visitedIds)) {
-                        echo 5;
                         $visitedIds[] = $neighbour->getId();
                         $neighbourCandidates = $this->getNeighbours($neighbour);
-                        if (count($neighbours) >= $this->minPoints) {
-                            echo 6;
+                        if (count($neighbourCandidates) >= $this->minPoints) {
+                            echo 3;
                             $neighbours = array_merge($neighbours, $neighbourCandidates);
                             $neighboursCount += count($neighbourCandidates);
                         }
-                        if (!in_array($neighbour->getId(), $idsInACluster)) {
-                            echo 7;
-                            $idsInACluster[] = $neighbour->getId();
-                            $cluster[] = $neighbour;
-                        }
+                    }
+                    if (!in_array($neighbour->getId(), $idsInACluster)) {
+                        $idsInACluster[] = $neighbour->getId();
+                        $cluster->addClusterPoint(new ClusterPoint($neighbour));
                     }
 
-                    if ($this->bookingsCountCap && count($noise) + count($idsInACluster) >= $this->bookingsCountCap) {
-                        echo 8;
+                    if ($this->bookingsCountCap && count($clusters->getNoise()) + count($idsInACluster) >= $this->bookingsCountCap) {
                         break 2;
                     }
                 }
-                $clusters[] = $cluster;
             } else {
-                echo 9;
-                $noise[] = $booking;
+                $clusters->addNoisePoint(new ClusterPoint($booking));
+            }
+            if ($j % 50 == 0) {
+                $this->storeState($clusters, 0);
             }
 
-            if ($this->bookingsCountCap && count($noise) + count($idsInACluster) >= $this->bookingsCountCap) {
+            if ($this->bookingsCountCap && count($clusters->getNoise()) + count($idsInACluster) >= $this->bookingsCountCap) {
                 break;
             }
         }
-        return new DBScanResult($this->createClusters($clusters), $noise);
+        $this->storeState($clusters, 1);
+        return $clusters;
+        //return new DBScanResult($this->createClusters($clusters), $noise);
     }
 
     /**
@@ -156,5 +160,14 @@ class DBScanAlgorithm
             $clusters[] = new DBScanCluster($points);
         }
         return $clusters;
+    }
+
+    /**
+     * @param int $status 0 = Data caching done. 1 = Clustering done. 2 = Apriori done.
+     */
+    private function storeState(DBScanResult $clusters, int $status)
+    {
+        echo "store state. Status: {$status}\n";
+        $this->progress->storeState($this->bookingsCount, $clusters, $status);
     }
 }

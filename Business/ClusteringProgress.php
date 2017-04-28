@@ -36,10 +36,10 @@ abstract class ClusteringProgress
     /**
      * Stores the state to a file every $config['kprototype/dbscan']['outputInterval'] seconds or if $force=true.
      * @param int $bookingsCount Count of bookings.
-     * @param KPrototypeResult $clusters Clustering state.
+     * @param ClusteringResult $clusters Clustering state.
      * @param int $status 0 = Data caching done. 1 = Clustering done. 2 = Apriori done. ($status=2 will force an output, ignoring outputInterval from config)
      */
-    public function storeState(int $bookingsCount, KPrototypeResult $clusters, int $status)
+    public function storeState(int $bookingsCount, ClusteringResult $clusters, int $status)
     {
         if ($this->runtime->fromLastTick() > $this->outputInterval || $status == 2) {
             echo "clustering write output\n";

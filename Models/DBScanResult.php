@@ -5,22 +5,11 @@ class DBScanResult implements ClusteringResult
     /**
      * @var array
      */
-    private $clusters;
+    private $clusters = [];
     /**
-     * @var Booking[]
+     * @var ClusterPoint[]
      */
-    private $noise;
-
-    /**
-     * DBScanResult constructor.
-     * @param array $clusters
-     * @param Booking[] $noise
-     */
-    public function __construct(array $clusters, array $noise)
-    {
-        $this->clusters = $clusters;
-        $this->noise = $noise;
-    }
+    private $noise = [];
 
     /**
      * @return array
@@ -31,7 +20,7 @@ class DBScanResult implements ClusteringResult
     }
 
     /**
-     * @return Booking[]
+     * @return ClusterPoint[]
      */
     public function getNoise(): array
     {
@@ -49,5 +38,23 @@ class DBScanResult implements ClusteringResult
             $bookingsCount += count($cluster->getClusterPoints());
         }
         return $bookingsCount;
+    }
+
+    /**
+     * Adds a cluster to the result.
+     * @param DBScanCluster $cluster
+     */
+    public function addCluster(DBScanCluster $cluster)
+    {
+        $this->clusters[] = $cluster;
+    }
+
+    /**
+     * Adds a noise point to the cluster.
+     * @param ClusterPoint $noise
+     */
+    public function addNoisePoint(ClusterPoint $noise)
+    {
+        $this->noise[] = $noise;
     }
 }

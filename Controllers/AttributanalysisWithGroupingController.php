@@ -47,6 +47,7 @@ class AttributanalysisWithGroupingController implements Controller
 
         $isDbScanRunning = false;
         if (array_key_exists('action', $_REQUEST) && $_REQUEST['action'] == 'rundbscan') {
+            $this->runDBScan();
             $isDbScanRunning = true;
             $serviceOutput = $this->dbscanConfig['serviceOutput'];
             $outputInterval = $this->dbscanConfig['outputInterval'];
