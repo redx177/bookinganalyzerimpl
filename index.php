@@ -16,6 +16,7 @@ require_once __DIR__ . '/Business/BookingBuilder.php';
 require_once __DIR__ . '/Controllers/ExploreController.php';
 require_once __DIR__ . '/Controllers/AttributanalysisController.php';
 require_once __DIR__ . '/Controllers/AttributanalysisWithGroupingController.php';
+require_once __DIR__ . '/Controllers/SettingsController.php';
 require_once __DIR__ . '/Models/Booking.php';
 require_once __DIR__ . '/Models/BooleanField.php';
 require_once __DIR__ . '/Models/ButtonConfig.php';

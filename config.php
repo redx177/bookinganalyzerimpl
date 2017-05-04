@@ -43,7 +43,7 @@ $configContent = array(
     ],
     'filterButtonTitle' => 'Apply Fiters',
     'runButtonTitle' => 'Run analysis',
-    'bookingsCountCap' => 600, // debugging only. int|null
+    'bookingsCountCap' => 100, // debugging only. int|null
     'ignoreFields' => ['SCTV'],
     'fileCacheDirectory' => '/fileCache/',
     'apriori' => [
@@ -71,4 +71,5 @@ $configContent = array(
         'minPoints' => 0.1, // percentage
     ],
     'gamma' => 1, // value between 0-1.
+    'editableConfigFile' => 'editableConfigFile.json',
 );

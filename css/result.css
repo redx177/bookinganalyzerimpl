@@ -77,6 +77,9 @@
 .clustersanalysis span.glyphicon-eye-open {
   display: none;
 }
+.settings button {
+  margin-bottom: 50px;
+}
 .glyphicon-refresh {
   -webkit-animation: spin 4s linear infinite;
   -moz-animation: spin 4s linear infinite;

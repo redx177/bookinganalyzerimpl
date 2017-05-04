@@ -1,0 +1,104 @@
+{% extends "base.twig" %}
+
+{% block content %}
+    <div class="container settings">
+        <form class="form-horizontal" action="?{{ view }}" method="post">
+            <fieldset>
+                <legend>General</legend>
+                <div class="form-group">
+                    <label for="bookingsCountCap" class="col-sm-3 control-label">Bookings count cap</label>
+                    <div class="col-sm-9">
+                        <input type="number" step="100" min="100" max="100000" class="form-control"
+                               id="bookingsCountCap" name="bookingsCountCap" value="{{ bookingsCountCap }}" aria-describedby="bookingsCountCap-help-block">
+                        <p class="help-block" id="bookingsCountCap-help-block">
+                            This value limits the items which will be analyzed.<br/>
+                            Set this number while the other numbers below are not yet final and need to be tried
+                            out.<br/>
+                            Set it to empty when a serious analysis should be performed.
+                        </p>
+                    </div>
+                </div>
+            </fieldset>
+            <fieldset>
+                <legend>Explore</legend>
+                <div class="form-group">
+                    <label for="pageSize" class="col-sm-3 control-label">Page size</label>
+                    <div class="col-sm-9">
+                        <input type="number" step="10" min="10" max="100" class="form-control" id="pageSize"
+                               name="pageSize" value="{{ pageSize }}" aria-describedby="pageSize-help-block">
+                        <p class="help-block" id="pageSize-help-block">How many items should be displayed in the explore view.</p>
+                    </div>
+                </div>
+            </fieldset>
+            <fieldset>
+                <legend>Attributanalysis</legend>
+                <div class="form-group">
+                    <label for="minSup" class="col-sm-3 control-label">Minimum support</label>
+                    <div class="col-sm-9">
+                        <input type="number" step="0.01" min="0.01" max="1" class="form-control" id="minSup"
+                               name="minSup" value="{{ minSup }}" aria-describedby="minSup-help-block">
+                        <p class="help-block" id="minSup-help-block">
+                            Percentage of how many items in the dataset must must match a attribute (combination) so the
+                            attribute (combination) is regarded as frequent.<br/>
+                            Low number means the attributanalysis runs longer and shows more combinations.<br/>
+                            High number means the attributanalysis is faster and shows fewer combinations.<br/>
+                            A to high number and no combinations are found.
+                        </p>
+                    </div>
+                </div>
+            </fieldset>
+            <fieldset>
+                <legend>Attributanalysis with grouping</legend>
+                <div class="form-group">
+                    <label for="gamma" class="col-sm-3 control-label">Gamma</label>
+                    <div class="col-sm-9">
+                        <input type="number" step="0.01" min="0.05" max="100" class="form-control"
+                               name="gamma" id="gamma" value="{{ gamma }}" aria-describedby="gamma-help-block">
+                        <p class="help-block" id="gamma-help-block">
+                            Difference between items compares numeric vs. categorical data. Gamma sets the weight
+                            between the two.<br/>
+                            Higher values (>1) leads to a higher weight of categorical data, which means two items with
+                            many similar categorical values are more likely to be put into the same group.<br/>
+                            Lower values (between 0 and 1) leads to a higher weight of numerical data.
+                            1 means the numeric and categorical data are weighted equally.
+                        </p>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="radius" class="col-sm-3 control-label">Radius</label>
+                    <div class="col-sm-9">
+                        <input type="number" step="1" min="1" max="1000" class="form-control" id="radius"
+                               name="radius" value="{{ radius }}" aria-describedby="radius-help-block">
+                        <p class="help-block" id="radius-help-block">
+                            DBSCAN searches similar items in a given radius.<br/>
+                            High number increases the radius and more items are put into one cluster which leads to
+                            fewer clusters.<br/>
+                            Low number decreases the radius and items in a cluster are more similar to eachother. But
+                            fewer clusters are found.<br/>
+                            A to high number leads to one cluster with all items in it.<br/>
+                            A to low number leads to no cluster at all.
+                        </p>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="minPoints" class="col-sm-3 control-label">Minimum Points</label>
+                    <div class="col-sm-9">
+                        <input type="number" step="0.01" min="0.01" max="1" class="form-control"
+                               name="minPoints" id="minPoints" value="{{ minPoints }}" aria-describedby="minPoints-help-block">
+                        <p class="help-block" id="minPoints-help-block">
+                            DBSCAN searches similar items in a given radius. A cluster is formed when the count of items
+                            around a point exceeds this minimum threshold.<br/>
+                            This value is measured as a percentage of the total amount of items which are currently
+                            analysed.<br/>
+                            High number means alot of items needs to be in a radius around an item for it to create a
+                            cluster. The clusters will be denser and more descriptive.<br/>
+                            Low number means fewer points are required in the radius. Clusters will be larger put less
+                            meaningful.
+                        </p>
+                    </div>
+                </div>
+            </fieldset>
+            <button type="submit" class="btn btn-primary" value="{{ buttonConfig.getAction() }}" name="action">{{ buttonConfig.getText() }}</button>
+        </form>
+    </div>
+{% endblock %}

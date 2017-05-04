@@ -14,6 +14,28 @@ class ConfigProvider {
     public function __construct($configs)
     {
         $this->configs = $configs;
+        if (file_exists($this->get('editableConfigFile'))) {
+            $editableConfigRaw = file_get_contents($this->get('editableConfigFile'));
+            $editableConfig = json_decode($editableConfigRaw);
+            if (isset($editableConfig->pageSize)) {
+                $this->set('pageSize', (int)$editableConfig->pageSize);
+            }
+            if (isset($editableConfig->gamma)) {
+                $this->set('gamma', (float)$editableConfig->gamma);
+            }
+            if (isset($editableConfig->bookingsCountCap)) {
+                $this->set('bookingsCountCap', (int)$editableConfig->bookingsCountCap);
+            }
+            if (isset($editableConfig->minSup)) {
+                $configs['apriori']['minSup'] = (float)$editableConfig->minSup;
+            }
+            if (isset($editableConfig->radius)) {
+                $configs['dbscan']['radius'] = (float)$editableConfig->radius;
+            }
+            if (isset($editableConfig->minPoints)) {
+                $configs['dbscan']['minPoints'] = (float)$editableConfig->minPoints;
+            }
+        }
     }
 
     /**

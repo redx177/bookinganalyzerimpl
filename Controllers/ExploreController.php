@@ -67,7 +67,7 @@
          $template = $this->twig->load('explore.twig');
          $indices = array_keys($data);
          $currentFirstIndexOnPage = reset($indices);
-         return $template->render(array(
+         return $template->render([
              'bookings' => $data,
              'view' => 'explore',
              'currentPage' => $this->pagination->fixPageValue($currentFirstIndexOnPage),
@@ -77,6 +77,6 @@
              'buttonConfigs' => [new ButtonConfig($this->config->get('filterButtonTitle'), 'apply')],
              '_REQUEST' => $_REQUEST,
              'searchUrlParameters' => $this->urlGenerator->getParameters($this->filters),
-            ));
+            ]);
      }
  }
