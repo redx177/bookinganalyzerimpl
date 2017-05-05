@@ -66,6 +66,7 @@ class AttributanalysisWithGroupingController implements Controller
             'pullInterval' => $outputInterval,
             'isRunning' => $isKPrototypeRunning || $isDbScanRunning,
             '_REQUEST' => $_REQUEST,
+            'destinations' => $this->filtersProvider->getDestinations(),
         ]);
     }
 

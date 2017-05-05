@@ -72,4 +72,5 @@ $configContent = array(
     ],
     'gamma' => 1, // value between 0-1.
     'editableConfigFile' => 'editableConfigFile.json',
+    'destinationFile' => 'destinations3.csv',
 );

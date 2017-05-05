@@ -1,73 +1,132 @@
-
 <div class="container filters">
     <form class="form-horizontal" action="?{{ view }}" method="post">
         <h2>Filters</h2>
-        <fieldset>
-            <legend>Price</legend>
-            <div>
-                <label class="radio"><input type="radio" name="PRICES" value="budget"
-                    {% if _REQUEST['PRICES'] == 'budget' %} checked{% endif %}>
-                    <span class="glyphicon glyphicon-piggy-bank" aria-hidden="true"></span> Budget</label>
-                <label class="radio"><input type="radio" name="PRICES" value="luxury"
-                    {% if _REQUEST['PRICES'] == 'luxury' %} checked{% endif %}>
-                    <span class="glyphicon glyphicon-usd" aria-hidden="true"></span> Luxury</label>
-            </div>
-        </fieldset>
-        <fieldset>
-            <legend>Distances</legend>
-            <label class="checkbox"><input type="checkbox" name="DISEA" value="close"{% if _REQUEST['DISEA'] %} checked{% endif %}> Close to sea</label>
-            <label class="checkbox"><input type="checkbox" name="DIWATER" value="close"{% if _REQUEST['DIWATER'] %} checked{% endif %}> Close to water</label>
-            <label class="checkbox"><input type="checkbox" name="DILAKE" value="close"{% if _REQUEST['DILAKE'] %} checked{% endif %}> Close to lake</label>
-            <label class="checkbox"><input type="checkbox" name="DIPUBT" value="close"{% if _REQUEST['DIPUBT'] %} checked{% endif %}> Close to public transport</label>
-            <label class="checkbox"><input type="checkbox" name="DICENTER" value="close"{% if _REQUEST['DICENTER'] %} checked{% endif %}> Close to center</label>
-            <label class="checkbox"><input type="checkbox" name="DISKI" value="close"{% if _REQUEST['DISKI'] %} checked{% endif %}> Close to ski</label>
-        </fieldset>
-        <fieldset class="inline quality">
-            <legend>Stars</legend>
-            <label class="checkbox-inline"><input type="checkbox" name="QUAL[]" value="1"{% if 1 in _REQUEST['QUAL'] %} checked{% endif %}> 1</label>
-            <label class="checkbox-inline"><input type="checkbox" name="QUAL[]" value="2"{% if 2 in _REQUEST['QUAL'] %} checked{% endif %}> 2</label>
-            <label class="checkbox-inline"><input type="checkbox" name="QUAL[]" value="3"{% if 2 in _REQUEST['QUAL'] %} checked{% endif %}> 3</label>
-            <label class="checkbox-inline"><input type="checkbox" name="QUAL[]" value="4"{% if 4 in _REQUEST['QUAL'] %} checked{% endif %}> 4</label>
-            <label class="checkbox-inline"><input type="checkbox" name="QUAL[]" value="5"{% if 5 in _REQUEST['QUAL'] %} checked{% endif %}> 5</label>
-        </fieldset>
-        <fieldset>
-            <legend>Rooms</legend>
-            <select name="ROOMS" class="form-control">
-                <option value="">Rooms</option>
-                <option value="1"{% if _REQUEST['ROOMS'] == '1' %} selected{% endif %}>1+</option>
-                <option value="2"{% if _REQUEST['ROOMS'] == '2' %} selected{% endif %}>2+</option>
-                <option value="3"{% if _REQUEST['ROOMS'] == '3' %} selected{% endif %}>3+</option>
-                <option value="4"{% if _REQUEST['ROOMS'] == '4' %} selected{% endif %}>4+</option>
-                <option value="5"{% if _REQUEST['ROOMS'] == '5' %} selected{% endif %}>5+</option>
-            </select>
-            <select name="BEDROOMS" class="form-control">
-                <option value="">Bedrooms</option>
-                <option value="1"{% if _REQUEST['BEDROOMS'] == '1' %} selected{% endif %}>1+</option>
-                <option value="2"{% if _REQUEST['BEDROOMS'] == '2' %} selected{% endif %}>2+</option>
-                <option value="3"{% if _REQUEST['BEDROOMS'] == '3' %} selected{% endif %}>3+</option>
-                <option value="4"{% if _REQUEST['BEDROOMS'] == '4' %} selected{% endif %}>4+</option>
-                <option value="5"{% if _REQUEST['BEDROOMS'] == '5' %} selected{% endif %}>5+</option>
-            </select>
-        </fieldset>
-        <fieldset class="inline attributes">
-            <legend>Attributes</legend>
-            <label class="checkbox-inline"><input type="checkbox" name="PETS"{% if _REQUEST['PETS'] %} checked{% endif %}> Pets allowed</label>
-            <label class="checkbox-inline"><input type="checkbox" name="CWASHMACHI"{% if _REQUEST['CWASHMACHI'] %} checked{% endif %}> Washingmachine</label>
-            <label class="checkbox-inline"><input type="checkbox" name="CAIRCOND"{% if _REQUEST['CAIRCOND'] %} checked{% endif %}> Aircondition</label>
-            <label class="checkbox-inline"><input type="checkbox" name="CDISHWASHE"{% if _REQUEST['CDISHWASHE'] %} checked{% endif %}> Dishwasher</label>
-            <label class="checkbox-inline"><input type="checkbox" name="CPOOL"{% if _REQUEST['CPOOL'] %} checked{% endif %}> Pool</label>
-            <label class="checkbox-inline"><input type="checkbox" name="CPARKING"{% if _REQUEST['CPARKING'] %} checked{% endif %}> Parking</label>
-            <label class="checkbox-inline"><input type="checkbox" name="CBBQ"{% if _REQUEST['CBBQ'] %} checked{% endif %}> BBQ</label>
-            <label class="checkbox-inline"><input type="checkbox" name="CFIREPLACE"{% if _REQUEST['CFIREPLACE'] %} checked{% endif %}> Fireplace</label>
-            <label class="checkbox-inline"><input type="checkbox" name="CSAUNA"{% if _REQUEST['CSAUNA'] %} checked{% endif %}> Sauna</label>
-            <label class="checkbox-inline"><input type="checkbox" name="SCTV"{% if _REQUEST['SCTV'] %} checked{% endif %}> TV</label>
-            <label class="checkbox-inline"><input type="checkbox" name="CJACUZZI"{% if _REQUEST['CJACUZZI'] %} checked{% endif %}> Jacuzzi</label>
-            <label class="checkbox-inline"><input type="checkbox" name="SCBALCONY"{% if _REQUEST['SCBALCONY'] %} checked{% endif %}> Balcony</label>
-            <label class="checkbox-inline"><input type="checkbox" name="SCNOSMOKE"{% if _REQUEST['SCNOSMOKE'] %} checked{% endif %}> Non smoking</label>
-            <label class="checkbox-inline"><input type="checkbox" name="INTERNET"{% if _REQUEST['INTERNET'] %} checked{% endif %}> Internet</label>
-        </fieldset>
+        <div class="filtersContainer">
+            <fieldset>
+                <legend>Price</legend>
+                <div>
+                    <label class="radio"><input type="radio" name="PRICES" value="budget"
+                                {% if _REQUEST['PRICES'] == 'budget' %} checked{% endif %}>
+                        <span class="glyphicon glyphicon-piggy-bank" aria-hidden="true"></span> Budget</label>
+                    <label class="radio"><input type="radio" name="PRICES" value="luxury"
+                                {% if _REQUEST['PRICES'] == 'luxury' %} checked{% endif %}>
+                        <span class="glyphicon glyphicon-usd" aria-hidden="true"></span> Luxury</label>
+                </div>
+            </fieldset>
+            <fieldset>
+                <legend>Distances</legend>
+                <label class="checkbox"><input type="checkbox" name="DISEA"
+                                               value="close"{% if _REQUEST['DISEA'] %} checked{% endif %}> Close to sea</label>
+                <label class="checkbox"><input type="checkbox" name="DIWATER"
+                                               value="close"{% if _REQUEST['DIWATER'] %} checked{% endif %}> Close to
+                    water</label>
+                <label class="checkbox"><input type="checkbox" name="DILAKE"
+                                               value="close"{% if _REQUEST['DILAKE'] %} checked{% endif %}> Close to
+                    lake</label>
+                <label class="checkbox"><input type="checkbox" name="DIPUBT"
+                                               value="close"{% if _REQUEST['DIPUBT'] %} checked{% endif %}> Close to
+                    public transport</label>
+                <label class="checkbox"><input type="checkbox" name="DICENTER"
+                                               value="close"{% if _REQUEST['DICENTER'] %} checked{% endif %}> Close to
+                    center</label>
+                <label class="checkbox"><input type="checkbox" name="DISKI"
+                                               value="close"{% if _REQUEST['DISKI'] %} checked{% endif %}> Close to ski</label>
+            </fieldset>
+            <fieldset class="inline quality">
+                <legend>Stars</legend>
+                <label class="checkbox-inline"><input type="checkbox" name="QUAL[]"
+                                                      value="1"{% if 1 in _REQUEST['QUAL'] %} checked{% endif %}>
+                    1</label>
+                <label class="checkbox-inline"><input type="checkbox" name="QUAL[]"
+                                                      value="2"{% if 2 in _REQUEST['QUAL'] %} checked{% endif %}>
+                    2</label>
+                <label class="checkbox-inline"><input type="checkbox" name="QUAL[]"
+                                                      value="3"{% if 2 in _REQUEST['QUAL'] %} checked{% endif %}>
+                    3</label>
+                <label class="checkbox-inline"><input type="checkbox" name="QUAL[]"
+                                                      value="4"{% if 4 in _REQUEST['QUAL'] %} checked{% endif %}>
+                    4</label>
+                <label class="checkbox-inline"><input type="checkbox" name="QUAL[]"
+                                                      value="5"{% if 5 in _REQUEST['QUAL'] %} checked{% endif %}>
+                    5</label>
+            </fieldset>
+            <fieldset>
+                <legend>Rooms</legend>
+                <select name="ROOMS" class="form-control">
+                    <option value="">Rooms</option>
+                    <option value="1"{% if _REQUEST['ROOMS'] == '1' %} selected{% endif %}>1+</option>
+                    <option value="2"{% if _REQUEST['ROOMS'] == '2' %} selected{% endif %}>2+</option>
+                    <option value="3"{% if _REQUEST['ROOMS'] == '3' %} selected{% endif %}>3+</option>
+                    <option value="4"{% if _REQUEST['ROOMS'] == '4' %} selected{% endif %}>4+</option>
+                    <option value="5"{% if _REQUEST['ROOMS'] == '5' %} selected{% endif %}>5+</option>
+                </select>
+                <select name="BEDROOMS" class="form-control">
+                    <option value="">Bedrooms</option>
+                    <option value="1"{% if _REQUEST['BEDROOMS'] == '1' %} selected{% endif %}>1+</option>
+                    <option value="2"{% if _REQUEST['BEDROOMS'] == '2' %} selected{% endif %}>2+</option>
+                    <option value="3"{% if _REQUEST['BEDROOMS'] == '3' %} selected{% endif %}>3+</option>
+                    <option value="4"{% if _REQUEST['BEDROOMS'] == '4' %} selected{% endif %}>4+</option>
+                    <option value="5"{% if _REQUEST['BEDROOMS'] == '5' %} selected{% endif %}>5+</option>
+                </select>
+            </fieldset>
+            <fieldset class="inline attributes">
+                <legend>Attributes</legend>
+                <label class="checkbox-inline"><input type="checkbox"
+                                                      name="PETS"{% if _REQUEST['PETS'] %} checked{% endif %}> Pets
+                    allowed</label>
+                <label class="checkbox-inline"><input type="checkbox"
+                                                      name="CWASHMACHI"{% if _REQUEST['CWASHMACHI'] %} checked{% endif %}>
+                    Washingmachine</label>
+                <label class="checkbox-inline"><input type="checkbox"
+                                                      name="CAIRCOND"{% if _REQUEST['CAIRCOND'] %} checked{% endif %}>
+                    Aircondition</label>
+                <label class="checkbox-inline"><input type="checkbox"
+                                                      name="CDISHWASHE"{% if _REQUEST['CDISHWASHE'] %} checked{% endif %}>
+                    Dishwasher</label>
+                <label class="checkbox-inline"><input type="checkbox"
+                                                      name="CPOOL"{% if _REQUEST['CPOOL'] %} checked{% endif %}>
+                    Pool</label>
+                <label class="checkbox-inline"><input type="checkbox"
+                                                      name="CPARKING"{% if _REQUEST['CPARKING'] %} checked{% endif %}>
+                    Parking</label>
+                <label class="checkbox-inline"><input type="checkbox"
+                                                      name="CBBQ"{% if _REQUEST['CBBQ'] %} checked{% endif %}>
+                    BBQ</label>
+                <label class="checkbox-inline"><input type="checkbox"
+                                                      name="CFIREPLACE"{% if _REQUEST['CFIREPLACE'] %} checked{% endif %}>
+                    Fireplace</label>
+                <label class="checkbox-inline"><input type="checkbox"
+                                                      name="CSAUNA"{% if _REQUEST['CSAUNA'] %} checked{% endif %}> Sauna</label>
+                <label class="checkbox-inline"><input type="checkbox"
+                                                      name="SCTV"{% if _REQUEST['SCTV'] %} checked{% endif %}>
+                    TV</label>
+                <label class="checkbox-inline"><input type="checkbox"
+                                                      name="CJACUZZI"{% if _REQUEST['CJACUZZI'] %} checked{% endif %}>
+                    Jacuzzi</label>
+                <label class="checkbox-inline"><input type="checkbox"
+                                                      name="SCBALCONY"{% if _REQUEST['SCBALCONY'] %} checked{% endif %}>
+                    Balcony</label>
+                <label class="checkbox-inline"><input type="checkbox"
+                                                      name="SCNOSMOKE"{% if _REQUEST['SCNOSMOKE'] %} checked{% endif %}>
+                    Non smoking</label>
+                <label class="checkbox-inline"><input type="checkbox"
+                                                      name="INTERNET"{% if _REQUEST['INTERNET'] %} checked{% endif %}>
+                    Internet</label>
+            </fieldset>
+
+
+            <fieldset class="inline destination">
+                <legend>Destination</legend>
+                <input type="text" class="form-control" id="destination" placeholder="Destination">
+                <input type="hidden" name="country" id="country">
+                <input type="hidden" name="region" id="region">
+                <input type="hidden" name="place" id="place">
+            </fieldset>
+        </div>
+
         {% for buttonConfig in buttonConfigs %}
-            <button type="submit" class="btn btn-primary" name="action" value="{{ buttonConfig.getAction() }}">{{ buttonConfig.getText() }}</button>
+            <button type="submit" class="btn btn-primary" name="action"
+                    value="{{ buttonConfig.getAction() }}">{{ buttonConfig.getText() }}</button>
         {% endfor %}
     </form>
 </div>

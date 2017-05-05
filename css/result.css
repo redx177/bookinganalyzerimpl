@@ -28,10 +28,25 @@
 .filters fieldset.inline.attributes label {
   width: 105px;
 }
+.filters .filtersContainer {
+  overflow: hidden;
+}
 .filters button {
-  float: left;
+  clear: both;
   display: block;
   margin: 20px 50px 0 0;
+}
+.ui-menu .ui-menu-item-wrapper {
+  padding: 0;
+}
+.ui-menu .ui-menu-item-wrapper.ui-state-active {
+  font-weight: bold;
+}
+.ui-autocomplete {
+  max-height: 300px;
+  overflow-y: auto;
+  /* prevent horizontal scrollbar */
+  overflow-x: hidden;
 }
 .paginationNavigation {
   display: flex;

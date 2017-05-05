@@ -53,12 +53,14 @@ $twig->addExtension(new Twig_Extension_Debug());
 
 /* DI CONTAINER */
 $builder = new DI\ContainerBuilder();
-$builder->addDefinitions(array(
+$builder->addDefinitions([
     Twig_Environment::class => $twig,
     DataIterator::class => new LoadIncrementalCsvDataIterator($config, $config->get('dataSource')),
     //BookingDataIterator::class => new LoadAllCsvDataIterator($config->get('dataSource')),
-    ConfigProvider::class => $config
-));
+    ConfigProvider::class => $config,
+    FiltersProvider::class => DI\object()
+        ->constructorParameter('destinationFile', $config->get('rootDir') . '/' . $config->get('destinationFile')),
+]);
 $container = $builder->build();
 
 /* FILTERS */
@@ -90,11 +92,9 @@ if (in_array('attributanalysis', $getKeys)) {
 echo $controller->render();
 
 
-
-
-
-function sortHistogramBinsByCount($histogramBins) {
-    usort($histogramBins, function(HistogramBin $a, HistogramBin $b) {
+function sortHistogramBinsByCount($histogramBins)
+{
+    usort($histogramBins, function (HistogramBin $a, HistogramBin $b) {
         $aCount = $a->getCount();
         $bCount = $b->getCount();
         if ($aCount == $bCount) {

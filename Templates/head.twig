@@ -9,8 +9,18 @@
 
     <title>{{ pageName }}</title>
 
+    <link href="/jquery-ui-1.12.1.custom/jquery-ui.css" rel="stylesheet">
     <link href="/vendor/twbs/bootstrap/dist/css/bootstrap.css" rel="stylesheet">
     <link href="/css/result.css" rel="stylesheet">
 
+    <script>
+        var destinations = [
+            {% for destination in destinations %}
+                {label: '<strong>{{ destination[0] }}</strong> &gt; {{ destination[1] }} &gt; {{ destination[2] }}', value: '{{ destination[0] }}', category: 'country'},
+                {label: '{{ destination[0] }} &gt; <strong>{{ destination[1] }}</strong> &gt; {{ destination[2] }}', value: '{{ destination[1] }}', category: 'region'},
+                {label: '{{ destination[0] }} &gt; {{ destination[1] }} &gt; <strong>{{ destination[2] }}</strong>', value: '{{ destination[2] }}', category: 'place'},
+            {% endfor %}
+        ];
+    </script>
 
 </head>

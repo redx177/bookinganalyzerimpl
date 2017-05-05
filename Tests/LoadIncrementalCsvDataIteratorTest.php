@@ -13,11 +13,11 @@ class LoadIncrementalCsvDataIteratorTest extends TestCase
     protected function setUp()
     {
         $this->configMock = $this->createMock(ConfigProvider::class);
-        $this->testfile = 'home/test.csv';
 
         // Creating mock data file with vfs (virtual file system).
+        $this->testfile = 'home/test.csv';
         vfsStream::setup('home');
-        $this->testfile = vfsStream::url('home/test.csv');
+        $this->testfile = vfsStream::url($this->testfile);
         file_put_contents($this->testfile, 'first;second;third
 1;2;3
 2;3;4');
