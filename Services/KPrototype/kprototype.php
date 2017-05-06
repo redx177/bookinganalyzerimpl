@@ -18,8 +18,7 @@ require_once $rootDir . '/Utilities/Randomizer.php';
 require_once $rootDir . '/Utilities/Runtime.php';
 require_once $rootDir . '/Business/AprioriAlgorithm.php';
 require_once $rootDir . '/Business/AprioriProgressToFile.php';
-require_once $rootDir . '/Business/AprioriProgressToMemory.php';
-require_once $rootDir . '/Business/AprioriProgressForClusters.php';
+require_once $rootDir . '/Business/KPrototypeProgressToFile.php';
 require_once $rootDir . '/Business/ClusteringProgress.php';
 require_once $rootDir . '/Business/KPrototypeClusteringProgress.php';
 require_once $rootDir . '/Business/BookingsProvider.php';
@@ -75,7 +74,6 @@ $builder->addDefinitions([
     Twig_Environment::class => $twig,
     Twig_TemplateWrapper::class => $template,
     ConfigProvider::class => $config,
-    Twig_TemplateWrapper::class => $template,
     Redis::class => $redis,
     Random::class => \DI\object(Randomizer::class),
     BookingDataIterator::class => \DI\object(BookingDataIterator::class)
@@ -91,9 +89,7 @@ $builder->addDefinitions([
     // Create new instance here. It will start tracking time from the point of instantiation.
     Runtime::class => new Runtime(),
 
-    'clusteringConfig' => \DI\value($kprototypeConfig),
-    AprioriProgress::class => \DI\object(AprioriProgressToFile::class)
-        ->constructorParameter('clusteringConfig', $kprototypeConfig)
+    AprioriProgress::class => \DI\object(KPrototypeProgressToFile::class)
 ]);
 $container = $builder->build();
 

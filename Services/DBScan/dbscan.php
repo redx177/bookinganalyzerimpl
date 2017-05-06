@@ -18,6 +18,7 @@ require_once $rootDir . '/Utilities/Randomizer.php';
 require_once $rootDir . '/Utilities/Runtime.php';
 require_once $rootDir . '/Business/AprioriAlgorithm.php';
 require_once $rootDir . '/Business/AprioriProgressToFile.php';
+require_once $rootDir . '/Business/DBScanProgressToFile.php';
 require_once $rootDir . '/Business/ClusteringProgress.php';
 require_once $rootDir . '/Business/BookingsProvider.php';
 require_once $rootDir . '/Business/DataTypeClusterer.php';
@@ -60,7 +61,6 @@ $twig = new Twig_Environment($loader, array(
 ));
 $twig->addFunction(new Twig_Function('sortHistogramBinsByCount', 'sortHistogramBinsByCount'));
 $twig->addExtension(new Twig_Extension_Debug());
-$template = $twig->load('dbscanClusters.twig');
 
 /* REDIS */
 $redis = new Redis();
@@ -70,7 +70,6 @@ $redis->connect('127.0.0.1');
 $builder = new DI\ContainerBuilder();
 $builder->addDefinitions([
     Twig_Environment::class => $twig,
-    Twig_TemplateWrapper::class => $template,
     ConfigProvider::class => $config,
     Redis::class => $redis,
     Random::class => \DI\object(Randomizer::class),
@@ -87,14 +86,7 @@ $builder->addDefinitions([
     // Create new instance here. It will start tracking time from the point of instantiation.
     Runtime::class => new Runtime(),
 
-    'clusteringConfig' => \DI\value($dbscanConfig),
-    AprioriProgress::class => \DI\object(AprioriProgressToFile::class)
-        ->constructor(
-            \DI\get(ConfigProvider::class),
-            \DI\get(Twig_Environment::class),
-            \DI\get(Runtime::class),
-            \DI\get('clusteringConfig'),
-            \DI\get(Twig_TemplateWrapper::class)),
+    AprioriProgress::class => \DI\object(DBScanProgressToFile::class)
 ]);
 $container = $builder->build();
 

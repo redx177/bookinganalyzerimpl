@@ -8,10 +8,6 @@
 class AprioriProgressToMemory implements AprioriProgress
 {
     /**
-     * @var Twig_TemplateWrapper
-     */
-    private $template;
-    /**
      * @var AprioriState
      */
     private $state;
@@ -21,9 +17,8 @@ class AprioriProgressToMemory implements AprioriProgress
     private $outputInterval;
     private $outputFile;
 
-    public function __construct(ConfigProvider $config, Twig_TemplateWrapper $template)
+    public function __construct(ConfigProvider $config)
     {
-        $this->template = $template;
         $this->lastOutput = 0;
         $this->fieldNameMapping = $config->get('fieldNameMapping');
         $this->rootDir = $config->get('rootDir');
@@ -56,7 +51,7 @@ class AprioriProgressToMemory implements AprioriProgress
         return $this->state;
     }
 
-    public function storeClusterState(KPrototypeResult $clusters, $status, KPrototypeCluster $cluster = null)
+    public function storeClusterState(ClusteringResult $clusters, $status, Cluster $cluster = null)
     {
     }
 }

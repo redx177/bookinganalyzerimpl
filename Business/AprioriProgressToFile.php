@@ -10,11 +10,11 @@ class AprioriProgressToFile implements AprioriProgress
     private $lastOutput;
     private $fieldNameMapping;
     private $rootDir;
+    private $status;
     private $aprioriOutputInterval;
     private $aprioriOutputFile;
-    private $kprototypeOutputInterval;
-    private $kprototypeOutputFile;
-    private $status;
+    protected $clusteringOutputInterval;
+    protected $clusteringOutputFile;
 
     /**
      * @var Twig_Environment
@@ -39,13 +39,12 @@ class AprioriProgressToFile implements AprioriProgress
     /**
      * @var Twig_TemplateWrapper
      */
-    private $clusterTemplate;
+    protected $clusterTemplate;
 
-    public function __construct(ConfigProvider $config, Twig_Environment $twig, Runtime $runtime, $clusteringConfig, Twig_TemplateWrapper $clusterTemplate = null)
+    public function __construct(ConfigProvider $config, Twig_Environment $twig, Runtime $runtime)
     {
         $this->twig = $twig;
         $this->runtime = $runtime;
-        $this->clusterTemplate = $clusterTemplate;
         $this->lastOutput = 0;
         $this->fieldNameMapping = $config->get('fieldNameMapping');
         $this->rootDir = $config->get('rootDir');
@@ -53,9 +52,6 @@ class AprioriProgressToFile implements AprioriProgress
         $aprioriConfig = $config->get('apriori');
         $this->aprioriOutputInterval = $aprioriConfig['outputInterval'];
         $this->aprioriOutputFile = $aprioriConfig['serviceOutput'];
-
-        $this->kprototypeOutputInterval = $clusteringConfig['outputInterval'];
-        $this->kprototypeOutputFile = $clusteringConfig['serviceOutput'];
     }
 
     public function storeState(float $algorithmStartTime, int $bookingsCount, array $candidates = null, array $frequentSets = null)
@@ -118,7 +114,7 @@ class AprioriProgressToFile implements AprioriProgress
             $this->currentCluster['frequentSets'] = $frequentSets;
         }
 
-        if ($this->runtime->fromLastTick() > $this->kprototypeOutputInterval || $this->status == 2) {
+        if ($this->runtime->fromLastTick() > $this->clusteringOutputInterval || $this->status == 2) {
             echo "clustering apriori write output\n";
 
             $content = $this->clusterTemplate->render([
@@ -129,10 +125,10 @@ class AprioriProgressToFile implements AprioriProgress
                 'fieldTitles' => $this->fieldNameMapping,
                 'runtimeInSeconds' => $this->runtime->fromBeginning(),
                 'status' => 1,
-                'pullInterval' => $this->kprototypeOutputInterval,
+                'pullInterval' => $this->clusteringOutputInterval,
                 'status' => $this->status,
             ]);
-            file_put_contents($this->rootDir . $this->kprototypeOutputFile, $content);
+            file_put_contents($this->rootDir . $this->clusteringOutputFile, $content);
             $this->runtime->tick();
         }
     }

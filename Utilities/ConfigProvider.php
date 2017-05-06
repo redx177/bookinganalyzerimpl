@@ -2,7 +2,6 @@
 
 /**
  * Provides application configuration.
- * Loads data from $GLOBALS['configContent'].
  */
 class ConfigProvider
 {

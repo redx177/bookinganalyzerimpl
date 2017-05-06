@@ -7,19 +7,14 @@
  */
 class AprioriProgressForClusters implements AprioriProgress
 {
-    /**
-     * @var Twig_TemplateWrapper
-     */
-    private $template;
     private $lastOutput;
     private $fieldNameMapping;
     private $rootDir;
     private $outputInterval;
     private $outputFile;
 
-    public function __construct(ConfigProvider $config, Twig_TemplateWrapper $template)
+    public function __construct(ConfigProvider $config)
     {
-        $this->template = $template;
         $this->lastOutput = 0;
         $this->fieldNameMapping = $config->get('fieldNameMapping');
         $this->rootDir = $config->get('rootDir');
@@ -38,7 +33,7 @@ class AprioriProgressForClusters implements AprioriProgress
         return new AprioriState([], null, 0, [], 0);
     }
 
-    public function storeClusterState(KPrototypeResult $clusters, $status, KPrototypeCluster $cluster = null)
+    public function storeClusterState(ClusteringResult $clusters, $status, Cluster $cluster = null)
     {
     }
 }

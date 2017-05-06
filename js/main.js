@@ -1,5 +1,10 @@
+String.prototype.replaceAll = function(search, replacement) {
+    var target = this;
+    return target.replace(new RegExp(search, 'g'), replacement);
+};
+
 $(document).ready(function () {
-    if (statusUrl && isRunning) {
+    if (typeof statusUrl !== 'undefined' && statusUrl != '' && isRunning) {
         var intervalId = setInterval(function () {
             pull(intervalId)
         }, pullInterval * 1000)
@@ -8,18 +13,37 @@ $(document).ready(function () {
     $('.cluster .panel-heading span').click(function (element) {
         console.log(element);
     });
+
+    // Remove duplicate destinations.
+    var uniqueDestinations = [];
+    var indices = [];
+    $.each(destinations, function(i, el){
+        if($.inArray(el.label, indices) === -1) {
+            indices.push(el.label)
+            uniqueDestinations.push(el);
+        }
+    });
+    destinations = uniqueDestinations;
+
+    if ($('#place').val() != '') {
+        $('#destination').val($('#country').val() + ' > ' + $('#place').val() + ' > ' + $('#region').val());
+    } else if ($('#region').val() != '') {
+        $('#destination').val($('#country').val() + ' > ' + $('#region').val());
+    } else if ($('#country').val() != '') {
+        $('#destination').val($('#country').val());
+    }
+
 });
 
 $(function () {
-    $("#destination").autocomplete({
+    $('#destination').autocomplete({
         source: destinations,
         minLength: 4,
         select: function (event, ui) {
-            $('#country').val('');
-            $('#region').val('');
-            $('#place').val('');
-            $('#' + ui.item.category).val(ui.item.value);
-            $('#destination').val(ui.item.value);
+            $('#country').val(ui.item.country);
+            $('#region').val(ui.item.region);
+            $('#place').val(ui.item.place);
+            $('#destination').val(ui.item.label.replaceAll('&gt;', '>'));
             return false;
         },
         close: function (event, ui) {
@@ -32,18 +56,18 @@ $(function () {
             }
             return false;
         },
-        response: function( event, ui ) {
+        response: function (event, ui) {
             // If nothing selected
             window.somethingFound = ui.content.length > 0;
             return false;
         }
     })
-        .autocomplete("instance")._renderItem = function (ul, item) {
-        return $("<li>")
+        .autocomplete('instance')._renderItem = function (ul, item) {
+        return $('<li>')
             .append(item.label)
             .appendTo(ul);
     };
-    $("#destination").blur(function() {
+    $('#destination').blur(function () {
         if (!window.somethingFound) {
             $('#country').val('');
             $('#region').val('');
@@ -55,12 +79,12 @@ $(function () {
 
 function pull(intervalId) {
     $.ajax({
-        method: "GET",
+        method: 'GET',
         url: statusUrl,
     })
         .done(function (msg) {
-            $("#results-container").html(msg);
-            $(".abort").click(abort);
+            $('#results-container').html(msg);
+            $('.abort').click(abort);
 
             if ($('#done').length > 0) {
                 clearInterval(intervalId);
@@ -70,7 +94,7 @@ function pull(intervalId) {
 
 function abort() {
     $.ajax({
-        method: "GET",
-        url: "/Services/Apriori/apriori.php?abort=1",
+        method: 'GET',
+        url: '/Services/Apriori/apriori.php?abort=1',
     });
 }

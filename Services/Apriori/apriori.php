@@ -63,8 +63,7 @@ $builder->addDefinitions([
     //BookingDataIterator::class => new LoadRedisDataIterator($redis),
     DataIterator::class => new LoadIncrementalCsvDataIterator($config, $rootDir . '/' . $config->get('dataSource')),
     //BookingDataIterator::class => new LoadAllCsvDataIterator($rootDir . '/' . $config->get('dataSource')),
-    AprioriProgress::class => \DI\object(AprioriProgressToFile::class)
-        ->constructorParameter('clusteringConfig', $kprototypeConfig),
+    AprioriProgress::class => \DI\object(AprioriProgressToFile::class),
 
     // Create new instance here. It will start tracking time from the point of instantiation.
     Runtime::class => new Runtime(),

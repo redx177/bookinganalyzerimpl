@@ -25,6 +25,10 @@
       * @var UrlGenerator
       */
      private $urlGenerator;
+     /**
+      * @var FiltersProvider
+      */
+     private $filtersProvider;
 
      /**
       * ExploreController constructor.
@@ -34,7 +38,7 @@
       * @param ConfigProvider $config Configuration provider.
       * @param Filters $filters Filters provided by the user.
       * @param UrlGenerator $urlGenerator Url generator to get parameters to pass to the template.
-      * @internal param ConfigProvider $config Configuration provider.
+      * @param FiltersProvider $filtersProvider Provides all filter related content.
       */
      public function __construct(
          Twig_Environment $twig,
@@ -42,6 +46,7 @@
          BookingsProvider $bookingsProvider,
          ConfigProvider $config,
          Filters $filters,
+         FiltersProvider $filtersProvider,
          UrlGenerator $urlGenerator)
      {
          $this->twig = $twig;
@@ -50,6 +55,7 @@
          $this->config = $config;
          $this->filters = $filters;
          $this->urlGenerator = $urlGenerator;
+         $this->filtersProvider = $filtersProvider;
      }
 
 

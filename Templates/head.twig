@@ -16,9 +16,9 @@
     <script>
         var destinations = [
             {% for destination in destinations %}
-                {label: '<strong>{{ destination[0] }}</strong> &gt; {{ destination[1] }} &gt; {{ destination[2] }}', value: '{{ destination[0] }}', category: 'country'},
-                {label: '{{ destination[0] }} &gt; <strong>{{ destination[1] }}</strong> &gt; {{ destination[2] }}', value: '{{ destination[1] }}', category: 'region'},
-                {label: '{{ destination[0] }} &gt; {{ destination[1] }} &gt; <strong>{{ destination[2] }}</strong>', value: '{{ destination[2] }}', category: 'place'},
+                {label: '{{ destination[0] }}', country: '{{ destination[0] }}', region: '', place: '', category: 'country'},
+                {label: '{{ destination[0] }} &gt; {{ destination[1] }}', country: '{{ destination[0] }}', region: '{{ destination[1] }}', place: '', category: 'region'},
+                {label: '{{ destination[0] }} &gt; {{ destination[1] }} &gt; {{ destination[2] }}', country: '{{ destination[0] }}', region: '{{ destination[1] }}', place: '{{ destination[2] }}', category: 'place'},
             {% endfor %}
         ];
     </script>

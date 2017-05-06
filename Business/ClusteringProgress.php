@@ -15,16 +15,17 @@ abstract class ClusteringProgress
      * @var Twig_TemplateWrapper
      */
     private $template;
+
     /**
      * @var Runtime
      */
     private $runtime;
 
     protected abstract function getClusteringConfig(ConfigProvider $config): array;
+    protected abstract function getClusteringTemplate(): Twig_TemplateWrapper;
 
-    public function __construct(ConfigProvider $config, Twig_TemplateWrapper $template, Runtime $runtime)
+    public function __construct(ConfigProvider $config, Runtime $runtime)
     {
-        $this->template = $template;
         $this->runtime = $runtime;
         $this->rootDir = $config->get('rootDir');
 
@@ -43,7 +44,7 @@ abstract class ClusteringProgress
     {
         if ($this->runtime->fromLastTick() > $this->outputInterval || $status == 2) {
             echo "clustering write output\n";
-            $content = $this->template->render([
+            $content = $this->getClusteringTemplate()->render([
                 'clusters' => $clusters,
                 'bookingsCount' => $bookingsCount,
                 'runtimeInSeconds' => $this->runtime->fromBeginning(),
