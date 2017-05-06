@@ -59,6 +59,8 @@ $builder->addDefinitions([
     Twig_Environment::class => $twig,
     ConfigProvider::class => $config,
     Redis::class => $redis,
+    FiltersProvider::class => DI\object()
+        ->constructorParameter('destinationFile', $config->get('rootDir') . '/' . $config->get('destinationFile')),
     //BookingDataIterator::class => new LoadRedisDataIterator($redis),
     DataIterator::class => new LoadIncrementalCsvDataIterator($config, $rootDir . '/' . $config->get('dataSource')),
     //BookingDataIterator::class => new LoadAllCsvDataIterator($rootDir . '/' . $config->get('dataSource')),

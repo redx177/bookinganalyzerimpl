@@ -79,7 +79,10 @@ $builder->addDefinitions([
     Twig_TemplateWrapper::class => $template,
     Redis::class => $redis,
     Random::class => \DI\object(Randomizer::class),
-    BookingDataIterator::class => \DI\object(BookingDataIterator::class)->scope(\DI\Scope::PROTOTYPE),
+    BookingDataIterator::class => \DI\object(BookingDataIterator::class)
+        ->scope(\DI\Scope::PROTOTYPE),
+    FiltersProvider::class => DI\object()
+        ->constructorParameter('destinationFile', $config->get('rootDir') . '/' . $config->get('destinationFile')),
 
     // Scope::PROTOTYPE is set so it creates a new instance everytime.
     DataIterator::class => \DI\factory(function () use ($rootDir, $config) {
