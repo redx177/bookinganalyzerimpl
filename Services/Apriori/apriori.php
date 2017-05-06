@@ -35,8 +35,7 @@ require_once $rootDir . '/Models/IntegerField.php';
 require_once $rootDir . '/Models/Price.php';
 require_once $rootDir . '/Models/PriceField.php';
 require_once $rootDir . '/Models/StringField.php';
-$config = new ConfigProvider($GLOBALS['configContent']);
-$config->set('rootDir', $rootDir);
+$config = new ConfigProvider($GLOBALS['configContent'], $rootDir);
 $aprioriConfig = $config->get('apriori');
 
 /* TWIG */
@@ -64,7 +63,8 @@ $builder->addDefinitions([
     //BookingDataIterator::class => new LoadRedisDataIterator($redis),
     DataIterator::class => new LoadIncrementalCsvDataIterator($config, $rootDir . '/' . $config->get('dataSource')),
     //BookingDataIterator::class => new LoadAllCsvDataIterator($rootDir . '/' . $config->get('dataSource')),
-    AprioriProgress::class => \DI\object(AprioriProgressToFile::class),
+    AprioriProgress::class => \DI\object(AprioriProgressToFile::class)
+        ->constructorParameter('clusteringConfig', $kprototypeConfig),
 
     // Create new instance here. It will start tracking time from the point of instantiation.
     Runtime::class => new Runtime(),

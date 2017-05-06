@@ -1,0 +1,7 @@
+#!/bin/bash
+# Setting permissions for slang
+sudo chown slang:slang editableConfigFile.json
+sudo chown slang:slang -R fileCache/
+sudo chown slang:slang -R Services/Apriori/wip/
+sudo chown slang:slang -R Services/KPrototype/wip/
+sudo chown slang:slang -R Services/DBScan/wip/

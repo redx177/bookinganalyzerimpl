@@ -52,8 +52,7 @@ require_once $rootDir . '/Models/KPrototypeResult.php';
 require_once $rootDir . '/Models/KPrototypeCluster.php';
 require_once $rootDir . '/Models/ClusterPoint.php';
 require_once $rootDir . '/Models/DistanceClusterPoint.php';
-$config = new ConfigProvider($GLOBALS['configContent']);
-$config->set('rootDir', $rootDir);
+$config = new ConfigProvider($GLOBALS['configContent'], $rootDir);
 $kprototypeConfig = $config->get('kprototype');
 
 /* TWIG */
@@ -94,12 +93,7 @@ $builder->addDefinitions([
 
     'clusteringConfig' => \DI\value($kprototypeConfig),
     AprioriProgress::class => \DI\object(AprioriProgressToFile::class)
-        ->constructor(
-            \DI\get(ConfigProvider::class),
-            \DI\get(Twig_Environment::class),
-            \DI\get(Runtime::class),
-            \DI\get('clusteringConfig'),
-            \DI\get(Twig_TemplateWrapper::class)),
+        ->constructorParameter('clusteringConfig', $kprototypeConfig)
 ]);
 $container = $builder->build();
 

@@ -4,18 +4,23 @@
  * Provides application configuration.
  * Loads data from $GLOBALS['configContent'].
  */
-class ConfigProvider {
+class ConfigProvider
+{
     private $configs;
 
     /**
      * ConfigProvider constructor.
-     * @param Array $configs Configuration data.
+     * @param array $configs Configuration data.
+     * @param string $rootDir Root directory.
      */
-    public function __construct($configs)
+    public function __construct($configs, $rootDir)
     {
         $this->configs = $configs;
-        if (file_exists($this->get('editableConfigFile'))) {
-            $editableConfigRaw = file_get_contents($this->get('editableConfigFile'));
+        $this->set('rootDir', $rootDir);
+
+        $editableConfigFile = $this->get('rootDir') . '/' . $this->get('editableConfigFile');
+        if (file_exists($editableConfigFile)) {
+            $editableConfigRaw = file_get_contents($editableConfigFile);
             $editableConfig = json_decode($editableConfigRaw);
             if (isset($editableConfig->pageSize)) {
                 $this->set('pageSize', (int)$editableConfig->pageSize);
@@ -43,7 +48,8 @@ class ConfigProvider {
      * @param string $key Key of the configuration value.
      * @return mixed String or integer value of the config.
      */
-    public function get($key) {
+    public function get($key)
+    {
         return $this->configs[$key];
     }
 

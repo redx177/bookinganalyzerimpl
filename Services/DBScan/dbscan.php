@@ -49,8 +49,7 @@ require_once $rootDir . '/Models/StringField.php';
 require_once $rootDir . '/Models/DBScanResult.php';
 require_once $rootDir . '/Models/ClusterPoint.php';
 require_once $rootDir . '/Models/DBScanCluster.php';
-$config = new ConfigProvider($GLOBALS['configContent']);
-$config->set('rootDir', $rootDir);
+$config = new ConfigProvider($GLOBALS['configContent'], $rootDir);
 $dbscanConfig = $config->get('dbscan');
 
 /* TWIG */
