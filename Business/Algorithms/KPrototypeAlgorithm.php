@@ -76,16 +76,7 @@ class KPrototypeAlgorithm
         $clusters = $this->getInitialEmptyClusters($k);
         $this->storeState($clusters, 0);
 
-//        echo "init\n";
-//        $this->debug($clusters);
-//        $start = microtime(true);
-
         $this->assignBookingsToClusters($clusters);
-
-//        echo "\nRuntime: " . (microtime(true) - $start);
-
-//        echo "first count\n";
-//        $this->debug($clusters);
 
         $currentTotalCosts = $clusters->getTotalCosts();
         $bestTotalCosts = $currentTotalCosts;
@@ -94,17 +85,10 @@ class KPrototypeAlgorithm
         while ($delta > 0 && $iteration <= $this->maxIterations) {
             $this->storeState($clusters, 0);
 
-//            echo "main loop\n";
-//            echo "Iteration: {$iteration}\n";
-//            $this->debug($clusters);
-
             foreach ($clusters->getClusters() as $clusterToReplace) {
-
-//                echo "\nCluster center id: {$cluster->getCenter()->getId()}\n";
 
                 $offset = 0;
                 foreach ($this->bookingDataIterator as $newClusterCenter) {
-//                    echo 1;
                     if ($this->bookingsCountCap && $offset >= $this->bookingsCountCap) {
                         break;
                     }
@@ -134,15 +118,8 @@ class KPrototypeAlgorithm
             $clusters = $bestClusters;
             $currentTotalCosts = $bestTotalCosts;
             $iteration++;
-
-//            echo "\nRuntime: " . (microtime(true) - $start);
-//            echo "\nCurrentTotalCosts: {$currentTotalCosts}";
-//            echo "\nBestTotalCosts: {$bestTotalCosts}";
-//            echo "\nDelta: {$delta}\n-------------------------------------\n";
         }
-//        echo "done!\n";
         $this->storeState($clusters, 1);
-//        echo "\nRuntime: " . (microtime(true) - $start);
         return $clusters;
     }
 
@@ -161,7 +138,6 @@ class KPrototypeAlgorithm
         $clusterCenterIndices = [];
         for ($i = 0; $i < $k; $i++) {
             $clusterCenterIndex = $this->random->generate(100);
-//            echo "Center index: {$clusterCenterIndex}\n";
 
             // If index is already set, rerun generation.
             if (in_array($clusterCenterIndex, $clusterCenterIndices)) {
@@ -244,21 +220,5 @@ class KPrototypeAlgorithm
     private function storeState(KPrototypeResult $clusters, int $status)
     {
         $this->progress->storeState($this->bookingsCount, $clusters, $status);
-    }
-
-    /**
-     * @param KPrototypeResult $clusters
-     * @return array
-     */
-    protected function debug($clusters): array
-    {
-        $count0 = count($clusters->getClusters()[0]->getClusterPoints());
-        $count1 = count($clusters->getClusters()[1]->getClusterPoints());
-        echo "ID1: {$clusters->getClusters()[0]->getCenter()->getId()}\n";
-        echo "ID2: {$clusters->getClusters()[1]->getCenter()->getId()}\n";
-        echo "Associates1: {$count0}\n";
-        echo "Associates2: {$count1}\n";
-        echo "TotalCosts: {$clusters->getTotalCosts()}\n----------------------------------\n";
-        return array($count0, $count1);
     }
 }
