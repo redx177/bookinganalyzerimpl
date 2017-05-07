@@ -10,10 +10,6 @@ $(document).ready(function () {
         }, pullInterval * 1000)
     }
 
-    $('.cluster .panel-heading span').click(function (element) {
-        console.log(element);
-    });
-
     // Remove duplicate destinations.
     var uniqueDestinations = [];
     var indices = [];
@@ -85,6 +81,13 @@ function pull(intervalId) {
         .done(function (msg) {
             $('#results-container').html(msg);
             $('.abort').click(abort);
+
+            $('.cluster .panel-heading').click(function (element) {
+                element = $(element.currentTarget);
+                element.siblings('.panel-body').toggle();
+                element.find('.glyphicon-eye-open').toggle();
+                element.find('.glyphicon-eye-close').toggle();
+            });
 
             if ($('#done').length > 0) {
                 clearInterval(intervalId);

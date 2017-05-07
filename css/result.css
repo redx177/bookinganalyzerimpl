@@ -86,10 +86,13 @@
   content: ' ';
   display: block;
 }
+.clustersanalysis .cluster .panel-heading {
+  cursor: pointer;
+}
 .clustersanalysis .cluster .panel-heading span {
   float: right;
 }
-.clustersanalysis span.glyphicon-eye-open {
+.clustersanalysis .cluster .panel-heading span.glyphicon-eye-open {
   display: none;
 }
 .settings button {
