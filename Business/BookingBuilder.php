@@ -10,7 +10,7 @@ class BookingBuilder
         $this->dataTypeClusterer = $dataTypeClusterer;
     }
 
-    public function fromRawData($rawData)
+    public function fromRawData($rawData) : Booking
     {
         $dataTypeCluster = $this->dataTypeClusterer->get($rawData);
         $id = $rawData[$this->idField];

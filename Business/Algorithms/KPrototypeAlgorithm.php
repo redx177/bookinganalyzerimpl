@@ -67,7 +67,7 @@ class KPrototypeAlgorithm
     /**
      * Runs the kprototype clustering algorithm.
      */
-    public function run(): KPrototypeResult
+    public function run(): ClusteringResult
     {
         $k = 2;
         $iteration = 1;

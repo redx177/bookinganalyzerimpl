@@ -27,8 +27,6 @@ class DBScanAlgorithm
     public function __construct(
         ConfigProvider $config,
         DistanceMeasurement $distance,
-        Random $random,
-        Redis $redis,
         BookingDataIterator $bookingDataIterator,
         BookingDataIterator $bookingDataIterator2,
         ClusteringProgress $progress)
@@ -51,9 +49,9 @@ class DBScanAlgorithm
 
     /**
      * Runs the DBSCAN clustering algorithm.
-     * @return DBScanResult
+     * @return ClusteringResult
      */
-    public function run(): DBScanResult
+    public function run(): ClusteringResult
     {
         /** @var Booking[] $noise */
         $visitedIds = [];
