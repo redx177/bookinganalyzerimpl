@@ -31,9 +31,9 @@ class KPrototypeCluster implements Cluster
         $this->totalCosts += $clusterPoint->getDistance();
     }
 
-    public function removeClusterPoint(DistanceClusterPoint $associate)
+    public function removeClusterPoint(DistanceClusterPoint $clusterPoint)
     {
-        unset($this->clusterPoints[$associate->getId()]);
+        unset($this->clusterPoints[$clusterPoint->getId()]);
     }
 
     /**

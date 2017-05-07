@@ -2,6 +2,9 @@
 
 class Histograms
 {
+    /**
+     * @var Histogram[]
+     */
     private $histograms = [];
 
     public function addHistogram(Histogram $histogram) {

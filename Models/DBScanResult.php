@@ -3,7 +3,7 @@
 class DBScanResult implements ClusteringResult
 {
     /**
-     * @var array
+     * @var DBScanCluster[]
      */
     private $clusters = [];
     /**
@@ -12,7 +12,7 @@ class DBScanResult implements ClusteringResult
     private $noise = [];
 
     /**
-     * @return array
+     * @return DBScanCluster[]
      */
     public function getClusters(): array
     {

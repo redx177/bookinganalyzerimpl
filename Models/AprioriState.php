@@ -1,11 +1,5 @@
 <?php
 
-/**
- * Created by PhpStorm.
- * User: slang
- * Date: 09.04.17
- * Time: 14:43
- */
 class AprioriState
 {
     /**

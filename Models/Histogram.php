@@ -2,6 +2,9 @@
 
 class Histogram
 {
+    /**
+     * @var HistogramBin[]
+     */
     private $histogramBins = [];
     private $setSize;
 
