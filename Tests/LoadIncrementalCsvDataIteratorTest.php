@@ -3,7 +3,7 @@ use \PHPUnit\Framework\TestCase,
     org\bovigo\vfs\vfsStream;
 
 require_once dirname(__DIR__) . "/Interfaces/DataIterator.php";
-require_once dirname(__DIR__) . "/Utilities/LoadIncrementalCsvDataIterator.php";
+require_once dirname(__DIR__) . "/Utilities/Iterators/LoadIncrementalCsvDataIterator.php";
 
 class LoadIncrementalCsvDataIteratorTest extends TestCase
 {

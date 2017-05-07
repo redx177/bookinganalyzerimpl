@@ -15,7 +15,7 @@ require_once dirname(__DIR__) . "/Models/FloatField.php";
 require_once dirname(__DIR__) . "/Models/StringField.php";
 require_once dirname(__DIR__) . "/Models/PriceField.php";
 require_once dirname(__DIR__) . "/Models/DistanceField.php";
-require_once dirname(__DIR__) . "/Utilities/LoadIncrementalCsvDataIterator.php";
+require_once dirname(__DIR__) . "/Utilities/Iterators/LoadIncrementalCsvDataIterator.php";
 require_once dirname(__DIR__) . "/Utilities/ConfigProvider.php";
 require_once __DIR__ . "/BookingDataIteratorMock.php";
 

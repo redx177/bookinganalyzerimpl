@@ -1,5 +1,5 @@
 <?php
-require_once dirname(__DIR__) . '/Business/KPrototypeAlgorithm.php';
+require_once dirname(__DIR__) . '/Business/Algorithms/KPrototypeAlgorithm.php';
 require_once dirname(__DIR__) . '/Business/DistanceMeasurement.php';
 require_once dirname(__DIR__) . '/Business/BookingsProvider.php';
 require_once dirname(__DIR__) . '/Business/DataTypeClusterer.php';
@@ -17,11 +17,8 @@ require_once dirname(__DIR__) . '/Models/FloatField.php';
 require_once dirname(__DIR__) . '/Models/StringField.php';
 require_once dirname(__DIR__) . '/Models/DistanceField.php';
 require_once dirname(__DIR__) . '/Models/PriceField.php';
-require_once dirname(__DIR__) . '/Models/Clusters.php';
-require_once dirname(__DIR__) . '/Models/Cluster.php';
-require_once dirname(__DIR__) . '/Models/Associate.php';
 require_once dirname(__DIR__) . '/Utilities/ConfigProvider.php';
-require_once dirname(__DIR__) . '/Utilities/LoadRedisDataIterator.php';
+require_once dirname(__DIR__) . '/Utilities/Iterators/LoadRedisDataIterator.php';
 
 
 class KPrototypeAlgorithmTest //extends PHPUnit\Framework\TestCase

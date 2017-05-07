@@ -1,6 +1,6 @@
 <?php
 require_once dirname(__DIR__) . "/Interfaces/DataIterator.php";
-require_once dirname(__DIR__) . "/Utilities/LoadRedisDataIterator.php";
+require_once dirname(__DIR__) . "/Utilities/Iterators/LoadRedisDataIterator.php";
 
 use \PHPUnit\Framework\TestCase;
 

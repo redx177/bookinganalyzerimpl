@@ -5,7 +5,7 @@ require_once __DIR__ . '/config.php';
 require_once __DIR__ . '/Interfaces/DataIterator.php';
 require_once __DIR__ . '/Interfaces/Controller.php';
 require_once __DIR__ . '/Interfaces/Field.php';
-require_once __DIR__ . '/Business/AprioriAlgorithm.php';
+require_once __DIR__ . '/Business/Algorithms/AprioriAlgorithm.php';
 require_once __DIR__ . '/Business/BookingsProvider.php';
 require_once __DIR__ . '/Business/DataTypeClusterer.php';
 require_once __DIR__ . '/Business/FiltersProvider.php';
@@ -34,8 +34,8 @@ require_once __DIR__ . '/Models/Price.php';
 require_once __DIR__ . '/Models/PriceField.php';
 require_once __DIR__ . '/Models/StringField.php';
 require_once __DIR__ . '/Utilities/ConfigProvider.php';
-require_once __DIR__ . '/Utilities/LoadAllCsvDataIterator.php';
-require_once __DIR__ . '/Utilities/LoadIncrementalCsvDataIterator.php';
+require_once __DIR__ . '/Utilities/Iterators/LoadAllCsvDataIterator.php';
+require_once __DIR__ . '/Utilities/Iterators/LoadIncrementalCsvDataIterator.php';
 require_once __DIR__ . '/Utilities/UrlGenerator.php';
 
 /* CONFIG */

@@ -3,7 +3,6 @@
 require_once dirname(__DIR__) . '/Business/DistanceMeasurement.php';
 require_once dirname(__DIR__) . '/Business/DataTypeClusterer.php';
 require_once dirname(__DIR__) . '/Interfaces/Field.php';
-require_once dirname(__DIR__) . '/Models/Cluster.php';
 require_once dirname(__DIR__) . '/Models/Booking.php';
 require_once dirname(__DIR__) . '/Models/DataTypeCluster.php';
 require_once dirname(__DIR__) . '/Models/IntegerField.php';
@@ -34,7 +33,7 @@ class DistanceMeasurementTest extends TestCase
         $this->center = new Booking(1, $this->getDataTypeCluster());
 
         $map = [
-            ['kprototype', ['gamma' => 1]],
+            ['gamma', 1],
         ];
         $this->configMock = $this->createMock(ConfigProvider::class);
         $this->configMock->method('get')->will($this->returnValueMap($map));
@@ -143,7 +142,7 @@ class DistanceMeasurementTest extends TestCase
     public function gammaShouldReduceCategoricalDistance() {
         $gamma = 0.5;
         $map = [
-            ['kprototype', ['gamma' => $gamma]],
+            ['gamma', $gamma],
         ];
         $configMock = $this->createMock(ConfigProvider::class);
         $configMock->method('get')
@@ -164,7 +163,7 @@ class DistanceMeasurementTest extends TestCase
     public function gammaShouldEnlargeCategoricalDistance() {
         $gamma = 2;
         $map = [
-            ['kprototype', ['gamma' => $gamma]],
+            ['gamma', $gamma],
         ];
         $configMock = $this->createMock(ConfigProvider::class);
         $configMock->method('get')

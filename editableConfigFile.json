@@ -1,1 +1,1 @@
-{"bookingsCountCap":"100","pageSize":"10","minSup":"0.4","gamma":"1","radius":"6","minPoints":"0.1"}
+{"bookingsCountCap":"100","pageSize":"30","minSup":"0.4","gamma":"1","radius":"6","minPoints":"0.1"}
