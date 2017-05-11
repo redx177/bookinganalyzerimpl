@@ -6,13 +6,13 @@ require_once $rootDir . '/config.php';
 require_once $rootDir . '/Utilities/Autoloader.php';
 
 /* CONFIG */
-$config = new ConfigProvider($GLOBALS['configContent']);
+$config = new ConfigProvider($GLOBALS['configContent'], $rootDir);
 $config->set('rootDir', $rootDir);
 
 $bookingsProvider = new BookingsProvider(
-    new LoadIncrementalCsvDataIterator($rootDir . '/' . $config->get('dataSource')),
-    new DataTypeClusterer($config),
-    $config
+    new BookingDataIterator(
+        new LoadIncrementalCsvDataIterator($config, $rootDir . '/' . $config->get('dataSource')),
+        new BookingBuilder($config, new DataTypeClusterer($config)))
 );
 
 $redis = new Redis();

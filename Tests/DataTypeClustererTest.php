@@ -1,8 +1,15 @@
 <?php
+require_once dirname(__DIR__) . "/Interfaces/Field.php";
 require_once dirname(__DIR__) . "/Business/DataTypeClusterer.php";
 require_once dirname(__DIR__) . "/Models/DataTypeCluster.php";
 require_once dirname(__DIR__) . "/Models/Distance.php";
 require_once dirname(__DIR__) . "/Models/Price.php";
+require_once dirname(__DIR__) . "/Models/FloatField.php";
+require_once dirname(__DIR__) . "/Models/StringField.php";
+require_once dirname(__DIR__) . "/Models/BooleanField.php";
+require_once dirname(__DIR__) . "/Models/IntegerField.php";
+require_once dirname(__DIR__) . "/Models/DistanceField.php";
+require_once dirname(__DIR__) . "/Models/PriceField.php";
 require_once dirname(__DIR__) . "/Utilities/ConfigProvider.php";
 
 use PHPUnit\Framework\TestCase;

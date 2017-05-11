@@ -8,10 +8,12 @@ use \PHPUnit\Framework\TestCase,
 class LoadAllCsvDataIteratorTest extends TestCase
 {
     private $testfile;
+    private $configMock;
 
     protected function setUp()
     {
-        $this->testfile = 'home/test.csv';
+        $this->configMock = $this->createMock(ConfigProvider::class);
+
 
         // Creating mock data file with vfs (virtual file system).
         vfsStream::setup('home');
@@ -25,7 +27,7 @@ class LoadAllCsvDataIteratorTest extends TestCase
      * @test
      */
     public function validFileShouldBeOpened() {
-        new LoadAllCsvDataIterator($this->testfile);
+        new LoadAllCsvDataIterator($this->configMock, $this->testfile);
         $this->assertTrue(true);
     }
 
@@ -34,14 +36,14 @@ class LoadAllCsvDataIteratorTest extends TestCase
      * @expectedException Exception
      */
     public function invalidFileShouldThrowException() {
-        new LoadAllCsvDataIterator("invalidFile");
+        new LoadAllCsvDataIterator($this->configMock, "invalidFile");
     }
 
     /**
      * @test
      */
     public function gettingFirstLineShouldReturnCorrectData() {
-        $sut = new LoadAllCsvDataIterator($this->testfile);
+        $sut = new LoadAllCsvDataIterator($this->configMock, $this->testfile);
         $line = $sut->current();
         $this->assertEquals(array('first' => '1','second' => '2','third' => '3'), $line);
     }
@@ -50,7 +52,7 @@ class LoadAllCsvDataIteratorTest extends TestCase
      * @test
      */
     public function gettingSecondLineShouldReturnCorrectData() {
-        $sut = new LoadAllCsvDataIterator($this->testfile);
+        $sut = new LoadAllCsvDataIterator($this->configMock, $this->testfile);
         $sut->next();
         $line = $sut->current();
         $this->assertEquals(array('first' => '2','second' => '3','third' => '4'), $line);
@@ -60,7 +62,7 @@ class LoadAllCsvDataIteratorTest extends TestCase
      * @test
      */
     public function gettingThirdLineShouldReturnFalse() {
-        $sut = new LoadAllCsvDataIterator($this->testfile);
+        $sut = new LoadAllCsvDataIterator($this->configMock, $this->testfile);
         $sut->next();
         $sut->next();
         $line = $sut->current();
@@ -71,7 +73,7 @@ class LoadAllCsvDataIteratorTest extends TestCase
      * @test
      */
     public function validFieldOnFirstLineShouldReturnTrue() {
-        $sut = new LoadAllCsvDataIterator($this->testfile);
+        $sut = new LoadAllCsvDataIterator($this->configMock, $this->testfile);
         $valid = $sut->valid();
         $this->assertTrue($valid);
     }
@@ -80,7 +82,7 @@ class LoadAllCsvDataIteratorTest extends TestCase
      * @test
      */
     public function validFieldForSecondLineShouldReturnTrue() {
-        $sut = new LoadAllCsvDataIterator($this->testfile);
+        $sut = new LoadAllCsvDataIterator($this->configMock, $this->testfile);
         $sut->next();
         $valid = $sut->valid();
         $this->assertTrue($valid);
@@ -90,7 +92,7 @@ class LoadAllCsvDataIteratorTest extends TestCase
      * @test
      */
     public function validFieldForThirdLineShouldReturnFalse() {
-        $sut = new LoadAllCsvDataIterator($this->testfile);
+        $sut = new LoadAllCsvDataIterator($this->configMock, $this->testfile);
         $sut->next();
         $sut->next();
         $valid = $sut->valid();
@@ -101,7 +103,7 @@ class LoadAllCsvDataIteratorTest extends TestCase
      * @test
      */
     public function afterARewindItShouldReturnFirstLine() {
-        $sut = new LoadAllCsvDataIterator($this->testfile);
+        $sut = new LoadAllCsvDataIterator($this->configMock, $this->testfile);
         $sut->next();
         $sut->rewind();
         $line = $sut->current();
@@ -112,7 +114,7 @@ class LoadAllCsvDataIteratorTest extends TestCase
      * @test
      */
     public function afterARewindAndANextItShouldReturnTheSecondElement() {
-        $sut = new LoadAllCsvDataIterator($this->testfile);
+        $sut = new LoadAllCsvDataIterator($this->configMock, $this->testfile);
         $sut->next();
         $sut->next();
         $sut->rewind();
@@ -125,7 +127,7 @@ class LoadAllCsvDataIteratorTest extends TestCase
      * @test
      */
     public function providingDiffernentDeliminiterShouldReturnSingleString() {
-        $sut = new LoadAllCsvDataIterator($this->testfile, ',');
+        $sut = new LoadAllCsvDataIterator($this->configMock, $this->testfile, ',');
         $line = $sut->current();
         $this->assertEquals(array('first;second;third' => '1;2;3'), $line);
     }
@@ -134,7 +136,7 @@ class LoadAllCsvDataIteratorTest extends TestCase
      * @test
      */
     public function loopingThroughShouldReturnAllElements() {
-        $sut = new LoadAllCsvDataIterator($this->testfile);
+        $sut = new LoadAllCsvDataIterator($this->configMock, $this->testfile);
 
         $result = [];
         foreach($sut as $key => $value) {
@@ -145,5 +147,16 @@ class LoadAllCsvDataIteratorTest extends TestCase
             1 => ['first' => '1','second' => '2','third' => '3'],
             2 => ['first' => '2','second' => '3','third' => '4'],
         ], $result);
+    }
+
+    /**
+     * @test
+     */
+    public function gettingCountShouldReturn2() {
+        $sut = new LoadAllCsvDataIterator($this->configMock, $this->testfile);
+
+        $bookingsCount = $sut->count();
+
+        $this->assertEquals(2, $bookingsCount);
     }
 }

@@ -9,10 +9,9 @@ class Pagination {
      * @param ConfigProvider $config Configuration provider.
      * @param BookingsProvider $bookingsProvider Data provider to paginate.
      */
-    public function __construct(ConfigProvider $config/*, BookingsProvider $bookingsProvider*/)
+    public function __construct(ConfigProvider $config)
     {
         $this->pageSize = $config->get('pageSize');
-//        $this->bookingsProvider = $bookingProvider;
     }
 
     /**
@@ -31,21 +30,9 @@ class Pagination {
     {
         if ($currentPage < 1) {
             return 1;
-//        } elseif ($currentPage > $this->getPageCount()) {
-//            return $this->getPageCount();
         }
         return $currentPage;
     }
-
-//    /**
-//     * Calculates the total page count.
-//     * @return float
-//     */
-//    public function getPageCount()
-//    {
-//        $itemCount = $this->dataProvider->getItemCount();
-//        return ceil($itemCount / $this->pageSize);
-//    }
 
     /**
      * Gets the page size.

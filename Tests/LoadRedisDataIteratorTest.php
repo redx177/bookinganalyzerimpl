@@ -2,7 +2,7 @@
 require_once dirname(__DIR__) . "/Interfaces/DataIterator.php";
 require_once dirname(__DIR__) . "/Utilities/Iterators/LoadRedisDataIterator.php";
 
-use \PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\TestCase;
 
 class LoadRedisDataIteratorTest extends TestCase
 {
@@ -12,7 +12,7 @@ class LoadRedisDataIteratorTest extends TestCase
     {
         //$this->redisMock = $this->createMock(Redis::class);
         $this->redisMock = $this->getMockBuilder(Redis::class)
-            ->setMethods(['hGetAll'])
+            ->setMethods(['hGetAll', 'get'])
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -24,12 +24,17 @@ class LoadRedisDataIteratorTest extends TestCase
         $this->redisMock
             ->method('hGetAll')
             ->will($this->returnValueMap($map));
+
+        $this->redisMock
+            ->method('get')
+            ->will($this->returnValue(2));
     }
 
     /**
      * @test
      */
-    public function gettingFirstLineShouldReturnCorrectData() {
+    public function gettingFirstLineShouldReturnCorrectData()
+    {
         $this->redisMock
             ->expects($this->once())
             ->method('hGetAll')
@@ -43,7 +48,8 @@ class LoadRedisDataIteratorTest extends TestCase
     /**
      * @test
      */
-    public function gettingSecondLineShouldReturnCorrectData() {
+    public function gettingSecondLineShouldReturnCorrectData()
+    {
         $this->redisMock
             ->expects($this->exactly(2))
             ->method('hGetAll');
@@ -57,7 +63,8 @@ class LoadRedisDataIteratorTest extends TestCase
     /**
      * @test
      */
-    public function gettingThirdLineShouldReturnFalse() {
+    public function gettingThirdLineShouldReturnFalse()
+    {
         $this->redisMock
             ->expects($this->exactly(3))
             ->method('hGetAll');
@@ -72,7 +79,8 @@ class LoadRedisDataIteratorTest extends TestCase
     /**
      * @test
      */
-    public function validFieldOnFirstLineShouldReturnTrue() {
+    public function validFieldOnFirstLineShouldReturnTrue()
+    {
         $sut = new LoadRedisDataIterator($this->redisMock);
         $valid = $sut->valid();
         $this->assertTrue($valid);
@@ -81,7 +89,8 @@ class LoadRedisDataIteratorTest extends TestCase
     /**
      * @test
      */
-    public function validFieldForSecondLineShouldReturnTrue() {
+    public function validFieldForSecondLineShouldReturnTrue()
+    {
         $sut = new LoadRedisDataIterator($this->redisMock);
         $sut->next();
         $valid = $sut->valid();
@@ -91,7 +100,8 @@ class LoadRedisDataIteratorTest extends TestCase
     /**
      * @test
      */
-    public function validFieldForForthLineShouldReturnFalse() {
+    public function validFieldForForthLineShouldReturnFalse()
+    {
         $sut = new LoadRedisDataIterator($this->redisMock);
         $sut->next();
         $sut->next();
@@ -103,7 +113,8 @@ class LoadRedisDataIteratorTest extends TestCase
     /**
      * @test
      */
-    public function afterARewindItShouldReturnFirstLine() {
+    public function afterARewindItShouldReturnFirstLine()
+    {
         $sut = new LoadRedisDataIterator($this->redisMock);
         $sut->next();
         $sut->rewind();
@@ -114,7 +125,8 @@ class LoadRedisDataIteratorTest extends TestCase
     /**
      * @test
      */
-    public function afterARewindAndANextItShouldReturnTheSecondElement() {
+    public function afterARewindAndANextItShouldReturnTheSecondElement()
+    {
         $sut = new LoadRedisDataIterator($this->redisMock);
         $sut->next();
         $sut->next();
@@ -124,14 +136,15 @@ class LoadRedisDataIteratorTest extends TestCase
         $this->assertEquals([102], $line);
     }
 
-     /**
+    /**
      * @test
      */
-    public function loopingThroughShouldReturnAllElements() {
+    public function loopingThroughShouldReturnAllElements()
+    {
         $sut = new LoadRedisDataIterator($this->redisMock);
 
         $result = [];
-        foreach($sut as $key => $value) {
+        foreach ($sut as $key => $value) {
             $result[$key] = $value;
         }
 
@@ -139,5 +152,17 @@ class LoadRedisDataIteratorTest extends TestCase
             1 => [101],
             2 => [102],
         ], $result);
+    }
+
+    /**
+     * @test
+     */
+    public function gettingCountShouldReturn2()
+    {
+        $sut = new LoadRedisDataIterator($this->redisMock);
+        $bookingsCount = $sut->count();
+
+
+        $this->assertEquals(2, $bookingsCount);
     }
 }

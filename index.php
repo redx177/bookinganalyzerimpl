@@ -9,7 +9,6 @@ require_once __DIR__ . '/Business/Algorithms/AprioriAlgorithm.php';
 require_once __DIR__ . '/Business/BookingsProvider.php';
 require_once __DIR__ . '/Business/DataTypeClusterer.php';
 require_once __DIR__ . '/Business/FiltersProvider.php';
-require_once __DIR__ . '/Business/Pagination.php';
 require_once __DIR__ . '/Business/DataCache.php';
 require_once __DIR__ . '/Business/BookingDataIterator.php';
 require_once __DIR__ . '/Business/BookingBuilder.php';
@@ -37,6 +36,7 @@ require_once __DIR__ . '/Utilities/ConfigProvider.php';
 require_once __DIR__ . '/Utilities/Iterators/LoadAllCsvDataIterator.php';
 require_once __DIR__ . '/Utilities/Iterators/LoadIncrementalCsvDataIterator.php';
 require_once __DIR__ . '/Utilities/UrlGenerator.php';
+require_once __DIR__ . '/Utilities/Pagination.php';
 
 /* CONFIG */
 $config = new ConfigProvider($GLOBALS['configContent'], __DIR__);

@@ -14,7 +14,6 @@ require_once $rootDir . '/Business/Algorithms/AprioriAlgorithm.php';
 require_once $rootDir . '/Business/Progress/AprioriProgressToFile.php';
 require_once $rootDir . '/Business/BookingsProvider.php';
 require_once $rootDir . '/Business/DataTypeClusterer.php';
-require_once $rootDir . '/Business/Pagination.php';
 require_once $rootDir . '/Business/FiltersProvider.php';
 require_once $rootDir . '/Business/DataCache.php';
 require_once $rootDir . '/Business/BookingDataIterator.php';
@@ -60,8 +59,9 @@ $builder->addDefinitions([
     Redis::class => $redis,
     FiltersProvider::class => DI\object()
         ->constructorParameter('destinationFile', $config->get('rootDir') . '/' . $config->get('destinationFile')),
-    //BookingDataIterator::class => new LoadRedisDataIterator($redis),
-    DataIterator::class => new LoadIncrementalCsvDataIterator($config, $rootDir . '/' . $config->get('dataSource')),
+    //DataIterator::class => new LoadIncrementalCsvDataIterator($config, $rootDir . '/' . $config->get('dataSource')),
+    DataIterator::class => new LoadAllCsvDataIterator($config, $rootDir . '/' . $config->get('dataSource')),
+    //DataIterator::class => \DI\object(LoadRedisDataIterator::class),
     //BookingDataIterator::class => new LoadAllCsvDataIterator($rootDir . '/' . $config->get('dataSource')),
     AprioriProgress::class => \DI\object(AprioriProgressToFile::class),
 
@@ -88,11 +88,17 @@ if (array_key_exists('abort', $_GET) && $_GET['abort']) {
 
     // Cache file
     $cache = $container->get(DataCache::class);
-    $container->set('dataFile', \DI\value($cache->getCacheFile($filters)));
-    $container->set('countFile', \DI\value($cache->getCountFile($filters)));
+    $dataFile = $cache->getCacheFile($filters);
+    $countFile = $cache->getCountFile($filters);
+
     $container->set(DataIterator::class, \DI\object(LoadIncrementalCsvDataIterator::class)
-        ->constructor(\DI\get(ConfigProvider::class), \DI\get('dataFile'), \DI\get('countFile'))
+        ->constructorParameter('dataFile', $dataFile)
+        ->constructorParameter('countFile', $countFile)
         ->scope(\DI\Scope::PROTOTYPE));
+//    $container->set(DataIterator::class, \DI\object(LoadAllCsvDataIterator::class)
+//        ->constructorParameter('dataFile', $dataFile)
+//        ->scope(\DI\Scope::PROTOTYPE));
+//    $container->set(DataIterator::class, \DI\object(LoadRedisDataIterator::class));
 
     // Run algorithm
     $apriori = $container->get('AprioriAlgorithm');

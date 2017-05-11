@@ -16,6 +16,7 @@ class LoadIncrementalCsvDataIterator implements DataIterator {
 
     /**
      * CsvIterator constructor.
+     * @param ConfigProvider $config Provides configurations.
      * @param string $dataFile File (incl. path) to load.
      * @param string|null $countFile File with the count.
      * @param string|null $delimiter The optional delimiter parameter sets the field delimiter (one character only).

@@ -1,7 +1,7 @@
 <?php
-require_once dirname(__DIR__) . '/Business/Pagination.php';
-require_once dirname(__DIR__) . '/Business/BookingsProvider.php';
+require_once dirname(__DIR__) . '/Utilities/Pagination.php';
 require_once dirname(__DIR__) . '/Utilities/ConfigProvider.php';
+require_once dirname(__DIR__) . '/Business/BookingsProvider.php';
 use PHPUnit\Framework\TestCase;
 
 class PageinationTest extends TestCase

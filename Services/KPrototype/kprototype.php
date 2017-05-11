@@ -23,7 +23,6 @@ require_once $rootDir . '/Business/Progress/ClusteringProgress.php';
 require_once $rootDir . '/Business/Progress/KPrototypeClusteringProgress.php';
 require_once $rootDir . '/Business/BookingsProvider.php';
 require_once $rootDir . '/Business/DataTypeClusterer.php';
-require_once $rootDir . '/Business/Pagination.php';
 require_once $rootDir . '/Business/FiltersProvider.php';
 require_once $rootDir . '/Business/Algorithms/KPrototypeAlgorithm.php';
 require_once $rootDir . '/Business/DistanceMeasurement.php';

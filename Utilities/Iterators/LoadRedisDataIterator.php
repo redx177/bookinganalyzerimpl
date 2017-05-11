@@ -12,10 +12,15 @@ class LoadRedisDataIterator implements DataIterator
      */
     private $redis;
 
+    /**
+     * LoadRedisDataIterator constructor.
+     * @param Redis $redis InMemory database to store the data to.
+     */
     public function __construct(Redis $redis)
     {
         $this->redis = $redis;
         $this->rewind();
+        echo "Woho redis!{$this->count()}\n";
     }
 
     /**
