@@ -27,6 +27,9 @@ class ConfigProvider
             if (isset($editableConfig->gamma)) {
                 $this->set('gamma', (float)$editableConfig->gamma);
             }
+            if (isset($editableConfig->ignoreFields)) {
+                $this->set('ignoreFields', $editableConfig->ignoreFields);
+            }
             if (isset($editableConfig->bookingsCountCap)) {
                 $this->set('bookingsCountCap', (int)$editableConfig->bookingsCountCap);
             }

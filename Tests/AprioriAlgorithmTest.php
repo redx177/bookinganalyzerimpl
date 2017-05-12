@@ -18,6 +18,7 @@ require_once dirname(__DIR__) . '/Models/StringField.php';
 require_once dirname(__DIR__) . '/Models/PriceField.php';
 require_once dirname(__DIR__) . '/Models/DistanceField.php';
 require_once dirname(__DIR__) . '/Utilities/ConfigProvider.php';
+require_once __DIR__ . '/BookingDataIteratorMock.php';
 
 use PHPUnit\Framework\TestCase;
 
@@ -108,7 +109,6 @@ class AprioriAlgorithmTest extends TestCase
      */
     public function checkBooleansInSetSize1() {
         $tv = true;
-
 
         $bookingDataIteratorMock = BookingDataIteratorMock::get($this, [
                 $this->GetBooking(
@@ -293,5 +293,57 @@ class AprioriAlgorithmTest extends TestCase
         $this->assertEquals(['ROOMS' => 7,'BEDROOMS' => 8, 'STARS' => 9], $histogramBins3[0]->getFields());
         $this->assertEquals(3, $histogramBins3[0]->getCount());
         $this->assertEquals(3, $histogramBins3[0]->getTotal());
+    }
+
+    /**
+     * @test
+     */
+    public function ignoreFieldConfigShouldIgnoreFields() {
+        $rooms = 7;
+        $price = Price::Budget;
+        $ignoreFields = ['PRICE'];
+
+        $map = [
+            ['ignoreFields', $ignoreFields],
+            ['apriori', [
+                'minSup' => 0.6,
+                'serviceStopFile' => '',
+                'outputInterval' => '',
+                'serviceOutput' => '',
+            ]],
+        ];
+        $this->configMock = $this->createMock(ConfigProvider::class);
+        $this->configMock->method('get')
+            ->will($this->returnValueMap($map));
+
+        $bookingDataIteratorMock = BookingDataIteratorMock::get($this, [
+            $this->GetBooking(
+                $rooms, 1, 1,
+                false, false, false, false, false,
+                40.45538, -3.79278,
+                $price,
+                Distance::Empty, Distance::Empty, Distance::Empty),
+            $this->GetBooking(
+                $rooms, 2, 2,
+                false, false, false, false, false,
+                40.45538, -3.79278,
+                $price,
+                Distance::Close, Distance::Empty, Distance::Empty),
+            $this->GetBooking(
+                $rooms, 3, 3,
+                false, false, false, false, false,
+                40.45538, -3.79278,
+                $price,
+                Distance::Empty, Distance::Empty, Distance::Empty)]);
+
+        $sut = new AprioriAlgorithm($bookingDataIteratorMock, $this->configMock, $this->aprioriProgressMock, $this->factoryMock);
+        $histograms = $sut->run();
+        $histogram = $histograms->getHistogram(1);
+        $histogramBins = $histogram->getHistogramBins();
+
+        $this->assertEquals(1, count($histogramBins));
+        $this->assertEquals(['ROOMS'=>$rooms], $histogramBins[0]->getFields());
+        $this->assertEquals(3, $histogramBins[0]->getCount());
+        $this->assertEquals(3, $histogramBins[0]->getTotal());
     }
 }

@@ -8,6 +8,10 @@ class SettingsController implements Controller
     private $radius;
     private $minPoints;
     private $editableConfigFile;
+    private $bookingsCountCap;
+    private $fieldNames;
+    private $ignoreFields;
+    private $fieldNameMapping;
 
     /**
      * @var Twig_Environment
@@ -28,8 +32,19 @@ class SettingsController implements Controller
         $this->pageSize = $config->get('pageSize');
         $this->gamma = $config->get('gamma');
         $this->bookingsCountCap = $config->get('bookingsCountCap');
+        $this->fieldNames = [
+            'booleanFields' => $config->get('booleanFields'),
+            'integerFields' => $config->get('integerFields'),
+            'floatFields' => $config->get('floatFields'),
+            'stringFields' => $config->get('stringFields'),
+            'priceFields' => $config->get('priceFields'),
+            'distanceFields' => $config->get('distanceFields'),
+        ];
+        $this->ignoreFields = $config->get('ignoreFields');
+        $this->fieldNameMapping = $config->get('fieldNameMapping');
         $rootDir = $config->get('rootDir');
         $this->editableConfigFile = $rootDir . '/' . $config->get('editableConfigFile');
+
 
         $apriori = $config->get('apriori');
         $this->minSup = $apriori['minSup'];
@@ -63,6 +78,9 @@ class SettingsController implements Controller
             'minSup' => $this->minSup,
             'radius' => $this->radius,
             'minPoints' => $this->minPoints,
+            'fieldNames' => $this->fieldNames,
+            'ignoreFields' => $this->ignoreFields,
+            'fieldNameMapping' => $this->fieldNameMapping,
             'saved' => $saved,
             'buttonConfig' => new ButtonConfig('Save', 'save'),
         ]);

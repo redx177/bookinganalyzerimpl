@@ -22,7 +22,7 @@ $(document).ready(function () {
     destinations = uniqueDestinations;
 
     if ($('#place').val() != '') {
-        $('#destination').val($('#country').val() + ' > ' + $('#place').val() + ' > ' + $('#region').val());
+        $('#destination').val($('#country').val() + ' > ' + $('#region').val() + ' > ' + $('#place').val());
     } else if ($('#region').val() != '') {
         $('#destination').val($('#country').val() + ' > ' + $('#region').val());
     } else if ($('#country').val() != '') {

@@ -10,6 +10,7 @@ class AprioriAlgorithm
     private $startTime;
     private $fieldNameMapping;
     private $rootDir;
+    private $ignoreFields;
     /**
      * @var AprioriProgress
      */
@@ -37,6 +38,7 @@ class AprioriAlgorithm
 
         $this->bookingsCountCap = $config->get('bookingsCountCap');
         $this->fieldNameMapping = $config->get('fieldNameMapping');
+        $this->ignoreFields = $config->get('ignoreFields');
         $this->rootDir = $config->get('rootDir');
 
         $aprioriConfig = $config->get('apriori');
@@ -106,7 +108,7 @@ class AprioriAlgorithm
                 $booking->getFieldsByType(PriceField::class));
 
             foreach ($fields as $field) {
-                if ($field->hasValue()) {
+                if ($field->hasValue() && !in_array($field->getName(), $this->ignoreFields)) {
                     $name = $field->getName();
                     $value = $field->getValue();
                     if (!array_key_exists($name . $value, $candidates)) {

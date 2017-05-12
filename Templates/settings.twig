@@ -8,8 +8,9 @@
                 <div class="form-group">
                     <label for="bookingsCountCap" class="col-sm-3 control-label">Bookings count cap</label>
                     <div class="col-sm-9">
-                        <input type="number" step="100" min="100" max="100000" class="form-control"
-                               id="bookingsCountCap" name="bookingsCountCap" value="{{ bookingsCountCap }}" aria-describedby="bookingsCountCap-help-block">
+                        <input type="number" step="100" min="0" max="100000" class="form-control"
+                               id="bookingsCountCap" name="bookingsCountCap" value="{{ bookingsCountCap }}"
+                               aria-describedby="bookingsCountCap-help-block">
                         <p class="help-block" id="bookingsCountCap-help-block">
                             This value limits the items which will be analyzed.<br/>
                             Set this number while the other numbers below are not yet final and need to be tried
@@ -26,7 +27,8 @@
                     <div class="col-sm-9">
                         <input type="number" step="10" min="10" max="100" class="form-control" id="pageSize"
                                name="pageSize" value="{{ pageSize }}" aria-describedby="pageSize-help-block">
-                        <p class="help-block" id="pageSize-help-block">How many items should be displayed in the explore view.</p>
+                        <p class="help-block" id="pageSize-help-block">How many items should be displayed in the explore
+                            view.</p>
                     </div>
                 </div>
             </fieldset>
@@ -43,6 +45,25 @@
                             Low number means the attributanalysis runs longer and shows more combinations.<br/>
                             High number means the attributanalysis is faster and shows fewer combinations.<br/>
                             A to high number and no combinations are found.
+                        </p>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-3 control-label">Ignore fields</label>
+                    <div class="col-sm-9">
+
+                        {% for groupName,fields in fieldNames %}
+                            {% for fieldName in fields %}
+                                <label class="checkbox-inline" for="ignoreFields-{{ groupName }}-{{ fieldName }}">
+
+                                    <input type="checkbox" id="ignoreFields-{{ groupName }}-{{ fieldName }}" name="ignoreFields[]"
+                                           value="{{ fieldName }}"{{ (fieldName in ignoreFields) ? ' checked' : '' }}>
+                                        {{ fieldNameMapping[fieldName] }}
+                                </label>
+                            {% endfor %}
+                        {% endfor %}
+                        <p class="help-block" id="minSup-help-block">
+                            Above are all fields listed. Check those which should be ignored in the attributanalysis.
                         </p>
                     </div>
                 </div>
@@ -84,7 +105,8 @@
                     <label for="minPoints" class="col-sm-3 control-label">Minimum Points</label>
                     <div class="col-sm-9">
                         <input type="number" step="0.01" min="0.01" max="1" class="form-control"
-                               name="minPoints" id="minPoints" value="{{ minPoints }}" aria-describedby="minPoints-help-block">
+                               name="minPoints" id="minPoints" value="{{ minPoints }}"
+                               aria-describedby="minPoints-help-block">
                         <p class="help-block" id="minPoints-help-block">
                             DBSCAN searches similar items in a given radius. A cluster is formed when the count of items
                             around a point exceeds this minimum threshold.<br/>
@@ -98,7 +120,8 @@
                     </div>
                 </div>
             </fieldset>
-            <button type="submit" class="btn btn-primary" value="{{ buttonConfig.getAction() }}" name="action">{{ buttonConfig.getText() }}</button>
+            <button type="submit" class="btn btn-primary" value="{{ buttonConfig.getAction() }}"
+                    name="action">{{ buttonConfig.getText() }}</button>
         </form>
     </div>
 {% endblock %}
