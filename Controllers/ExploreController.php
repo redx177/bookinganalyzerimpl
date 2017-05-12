@@ -84,6 +84,7 @@
              '_REQUEST' => $_REQUEST,
              'searchUrlParameters' => $this->urlGenerator->getParameters($this->filters),
              'destinations' => $this->filtersProvider->getDestinations(),
+             'customerDestinations' => $this->filtersProvider->getCustomerDestinations(),
             ]);
      }
  }

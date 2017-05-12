@@ -58,7 +58,8 @@ $builder->addDefinitions([
     ConfigProvider::class => $config,
     Redis::class => $redis,
     FiltersProvider::class => DI\object()
-        ->constructorParameter('destinationFile', $config->get('rootDir') . '/' . $config->get('destinationFile')),
+        ->constructorParameter('destinationFile', $config->get('rootDir') . '/' . $config->get('destinationFile'))
+        ->constructorParameter('customerDestinationFile', $config->get('rootDir') . '/' . $config->get('customerDestinationFile')),
     //DataIterator::class => new LoadIncrementalCsvDataIterator($config, $rootDir . '/' . $config->get('dataSource')),
     DataIterator::class => new LoadAllCsvDataIterator($config, $rootDir . '/' . $config->get('dataSource')),
     //DataIterator::class => \DI\object(LoadRedisDataIterator::class),

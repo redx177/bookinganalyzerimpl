@@ -1,4 +1,4 @@
-String.prototype.replaceAll = function(search, replacement) {
+String.prototype.replaceAll = function (search, replacement) {
     var target = this;
     return target.replace(new RegExp(search, 'g'), replacement);
 };
@@ -10,17 +10,6 @@ $(document).ready(function () {
         }, pullInterval * 1000)
     }
 
-    // Remove duplicate destinations.
-    var uniqueDestinations = [];
-    var indices = [];
-    $.each(destinations, function(i, el){
-        if($.inArray(el.label, indices) === -1) {
-            indices.push(el.label)
-            uniqueDestinations.push(el);
-        }
-    });
-    destinations = uniqueDestinations;
-
     if ($('#place').val() != '') {
         $('#destination').val($('#country').val() + ' > ' + $('#region').val() + ' > ' + $('#place').val());
     } else if ($('#region').val() != '') {
@@ -28,13 +17,19 @@ $(document).ready(function () {
     } else if ($('#country').val() != '') {
         $('#destination').val($('#country').val());
     }
+    if ($('#CUORT').val() != '') {
+        $('#customerDestination').val($('#CUCNTRY').val() + ' > ' + $('#CUORT').val());
+    } else if ($('#CUCNTRY').val() != '') {
+        $('#customerDestination').val($('#CUCNTRY').val());
+    }
 
 });
 
 $(function () {
     $('#destination').autocomplete({
-        source: destinations,
+        source: 'destinations.php',
         minLength: 4,
+        dataType: 'json',
         select: function (event, ui) {
             $('#country').val(ui.item.country);
             $('#region').val(ui.item.region);
@@ -57,18 +52,58 @@ $(function () {
             window.somethingFound = ui.content.length > 0;
             return false;
         }
-    })
-        .autocomplete('instance')._renderItem = function (ul, item) {
-        return $('<li>')
-            .append(item.label)
-            .appendTo(ul);
-    };
+    });
     $('#destination').blur(function () {
         if (!window.somethingFound) {
             $('#country').val('');
             $('#region').val('');
             $('#place').val('');
             $('#destination').val('');
+        }
+    });
+});
+
+$(function () {
+    $('#customerDestination').autocomplete({
+        source: 'customerDestinations.php',
+        minLength: 2,
+        select: function (event, ui) {
+            $('#CUCNTRY').val(ui.item.CUCNTRY);
+            $('#CUORT').val(ui.item.CUORT);
+            $('#customerDestination').val(ui.item.label.replaceAll('&gt;', '>'));
+            return false;
+        },
+        close: function (event, ui) {
+            // If nothing selected
+            if (!event.toElement) {
+                $('#CUCNTRY').val('');
+                $('#CUORT').val('');
+                $('#customerDestination').val('');
+            }
+            return false;
+        },
+        response: function (event, ui) {
+            // If nothing selected
+            window.somethingFound = ui.content.length > 0;
+            return false;
+        }
+    })
+        .autocomplete('instance')._renderItem = function (ul, item) {
+        var fieldValue = $('#customerDestination').val();
+        if ($('#customerDestination').val().length < 4) {
+            if (!item.label.startsWith(fieldValue)) {
+                return ;
+            }
+        }
+        return $('<li>')
+            .append(item.label)
+            .appendTo(ul);
+    };
+    $('#customerDestination').blur(function () {
+        if (!window.somethingFound) {
+            $('#CUCNTRY').val('');
+            $('#CUORT').val('');
+            $('#customerDestination').val('');
         }
     });
 });

@@ -117,10 +117,19 @@
 
             <fieldset class="inline destination">
                 <legend>Destination</legend>
-                <input type="text" class="form-control" id="destination" placeholder="Destination">
-                <input type="hidden" name="country" id="country" value="{{ _REQUEST['country'] }}">
-                <input type="hidden" name="region" id="region" value="{{ _REQUEST['region'] }}">
-                <input type="hidden" name="place" id="place" value="{{ _REQUEST['place'] }}">
+                <div class="form-group">
+                    <label for="destination">Object</label>
+                    <input type="text" class="form-control" id="destination" placeholder="Destination">
+                    <input type="hidden" name="country" id="country" value="{{ _REQUEST['country'] }}">
+                    <input type="hidden" name="region" id="region" value="{{ _REQUEST['region'] }}">
+                    <input type="hidden" name="place" id="place" value="{{ _REQUEST['place'] }}">
+                </div>
+                <div class="form-group">
+                    <label for="destination">Customer</label>
+                    <input type="text" class="form-control" id="customerDestination" placeholder="Destination">
+                    <input type="hidden" name="CUCNTRY" id="CUCNTRY" value="{{ _REQUEST['CUCNTRY'] }}">
+                    <input type="hidden" name="CUORT" id="CUORT" value="{{ _REQUEST['CUORT'] }}">
+                </div>
             </fieldset>
         </div>
 

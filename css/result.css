@@ -28,6 +28,9 @@
 .filters fieldset.inline.attributes label {
   width: 105px;
 }
+.filters fieldset.destination input {
+  margin-left: 20px;
+}
 .filters .filtersContainer {
   overflow: hidden;
 }

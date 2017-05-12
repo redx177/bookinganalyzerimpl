@@ -58,7 +58,8 @@ $builder->addDefinitions([
     //BookingDataIterator::class => new LoadAllCsvDataIterator($config->get('dataSource')),
     ConfigProvider::class => $config,
     FiltersProvider::class => DI\object()
-        ->constructorParameter('destinationFile', $config->get('rootDir') . '/' . $config->get('destinationFile')),
+        ->constructorParameter('destinationFile', $config->get('rootDir') . '/' . $config->get('destinationFile'))
+        ->constructorParameter('customerDestinationFile', $config->get('rootDir') . '/' . $config->get('customerDestinationFile')),
 ]);
 $container = $builder->build();
 
@@ -79,13 +80,13 @@ $container->set(DataIterator::class, new LoadIncrementalCsvDataIterator($config,
 $controller = null;
 $getKeys = array_keys($_REQUEST);
 if (in_array('attributanalysis', $getKeys)) {
-    $controller = $container->get('AttributanalysisController');
+    $controller = $container->get(AttributanalysisController::class);
 } elseif (in_array('attributanalysisWithGrouping', $getKeys)) {
-    $controller = $container->get('AttributanalysisWithGroupingController');
+    $controller = $container->get(AttributanalysisWithGroupingController::class);
 } elseif (in_array('settings', $getKeys)) {
-    $controller = $container->get('SettingsController');
+    $controller = $container->get(SettingsController::class);
 } else {
-    $controller = $container->get('ExploreController');
+    $controller = $container->get(ExploreController::class);
 }
 
 echo $controller->render();

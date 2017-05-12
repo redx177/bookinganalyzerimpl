@@ -67,6 +67,7 @@ class AttributanalysisWithGroupingController implements Controller
             'isRunning' => $isKPrototypeRunning || $isDbScanRunning,
             '_REQUEST' => $_REQUEST,
             'destinations' => $this->filtersProvider->getDestinations(),
+            'customerDestinations' => $this->filtersProvider->getCustomerDestinations(),
         ]);
     }
 

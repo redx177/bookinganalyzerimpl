@@ -13,14 +13,33 @@
     <link href="/vendor/twbs/bootstrap/dist/css/bootstrap.css" rel="stylesheet">
     <link href="/css/result.css" rel="stylesheet">
 
-    <script>
+    {#<script>
         var destinations = [
+            {% set doneCountry = [] %}
+            {% set doneRegion = [] %}
             {% for destination in destinations %}
-                {label: '{{ destination[0] }}', country: '{{ destination[0] }}', region: '', place: '', category: 'country'},
-                {label: '{{ destination[0] }} &gt; {{ destination[1] }}', country: '{{ destination[0] }}', region: '{{ destination[1] }}', place: '', category: 'region'},
+                {% if destination[0] not in doneCountry %}
+                    {label: '{{ destination[0] }}', country: '{{ destination[0] }}', region: '', place: '', category: 'country'},
+                    {% set doneCountry = doneCountry|merge([destination[0]]) %}
+                {% endif %}
+                {% if destination[0]~destination[1] not in doneRegion %}
+                    {label: '{{ destination[0] }} &gt; {{ destination[1] }}', country: '{{ destination[0] }}', region: '{{ destination[1] }}', place: '', category: 'region'},
+                    {% set doneRegion = doneRegion|merge([destination[0]~destination[1]]) %}
+                {% endif %}
                 {label: '{{ destination[0] }} &gt; {{ destination[1] }} &gt; {{ destination[2] }}', country: '{{ destination[0] }}', region: '{{ destination[1] }}', place: '{{ destination[2] }}', category: 'place'},
             {% endfor %}
         ];
-    </script>
+
+        var customerDestination = [
+            {% set done = [] %}
+            {% for destination in customerDestinations %}
+            {% if destination[0] not in done %}
+            {label: '{{ destination[0] }}', CUCNTRY: '{{ destination[0] }}', CUORT: '', category: 'CUCNTRY'},
+            {% set done = done|merge([destination[0]]) %}
+            {% endif %}
+            {label: '{{ destination[0] }} &gt; {{ destination[1] }}', CUCNTRY: '{{ destination[0] }}', CUORT: '{{ destination[1] }}', category: 'CUORT'},
+            {% endfor %}
+        ];
+</script>#}
 
 </head>

@@ -4,16 +4,19 @@ class FiltersProvider
 {
     private $dataTypeClusterer;
     private $destinationFile;
+    private $customerDestinationFile;
 
     /**
      * FilterConfigs constructor.
      * @param DataTypeClusterer $dataTypeClusterer Data type clusterer to group raw booking data.
-     * @param string $destinationFile File containing all destination as a CSV (; as separator)
+     * @param string $destinationFile File containing all destination as a CSV (; as separator).
+     * @param string $customerDestinationFile File containing all customer destinations as a CSV (; as separator).
      */
-    public function __construct(DataTypeClusterer $dataTypeClusterer, $destinationFile)
+    public function __construct(DataTypeClusterer $dataTypeClusterer, $destinationFile, $customerDestinationFile)
     {
         $this->dataTypeClusterer = $dataTypeClusterer;
         $this->destinationFile = $destinationFile;
+        $this->customerDestinationFile = $customerDestinationFile;
     }
 
     /**
@@ -29,7 +32,7 @@ class FiltersProvider
     }
 
     /**
-     * Gets all destinations (array of countries, regions and places).
+     * Gets all destinations of objects (array of countries, regions and places).
      * @return array Country, regions and places of all accommodations.
      */
     public function getDestinations()
@@ -41,6 +44,29 @@ class FiltersProvider
         {
             $destinations = [];
             while (($data = fgetcsv($handle, 1000, ';')) !== FALSE)
+            {
+                $destinations[] = $data;
+            }
+            return $destinations;
+        }
+        return [];
+    }
+
+    /**
+     * Gets all destinations of customers (array of countries and places).
+     * @return array Country and places of all accommodations.
+     */
+    public function getCustomerDestinations()
+    {
+        if (!file_exists($this->customerDestinationFile)) {
+            return [];
+        }
+        if (($handle = fopen($this->customerDestinationFile, 'r')) !== FALSE)
+        {
+            // Discard first row. It contains the field names.
+            fgetcsv($handle, 1000, ';', '"');
+            $destinations = [];
+            while (($data = fgetcsv($handle, 1000, ';', '"')) !== FALSE)
             {
                 $destinations[] = $data;
             }

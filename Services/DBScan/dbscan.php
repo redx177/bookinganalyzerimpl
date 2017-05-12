@@ -75,7 +75,8 @@ $builder->addDefinitions([
     BookingDataIterator::class => \DI\object(BookingDataIterator::class)
         ->scope(\DI\Scope::PROTOTYPE),
     FiltersProvider::class => DI\object()
-        ->constructorParameter('destinationFile', $config->get('rootDir') . '/' . $config->get('destinationFile')),
+        ->constructorParameter('destinationFile', $config->get('rootDir') . '/' . $config->get('destinationFile'))
+        ->constructorParameter('customerDestinationFile', $config->get('rootDir') . '/' . $config->get('customerDestinationFile')),
 
     // Scope::PROTOTYPE is set so it creates a new instance everytime.
     DataIterator::class => \DI\factory(function () use ($rootDir, $config) {

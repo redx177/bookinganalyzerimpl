@@ -65,6 +65,7 @@ class AttributanalysisController implements Controller
             'isRunning' => $isRunning,
             '_REQUEST' => $_REQUEST,
             'destinations' => $this->filtersProvider->getDestinations(),
+            'customerDestinations' => $this->filtersProvider->getCustomerDestinations(),
         ]);
     }
 }
