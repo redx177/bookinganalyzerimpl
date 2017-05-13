@@ -5,11 +5,11 @@
             <fieldset>
                 <legend>Weekly price</legend>
                 <div>
-                    <label class="radio"><input type="radio" name="PRICES" value="budget"
-                                {% if _REQUEST['PRICES'] == 'budget' %} checked{% endif %}>
+                    <label class="radio"><input type="radio" name="weeklyprice" value="budget"
+                                {% if _REQUEST['weeklyprice'] == 'budget' %} checked{% endif %}>
                         <span class="glyphicon glyphicon-piggy-bank" aria-hidden="true"></span> Budget</label>
-                    <label class="radio"><input type="radio" name="PRICES" value="luxury"
-                                {% if _REQUEST['PRICES'] == 'luxury' %} checked{% endif %}>
+                    <label class="radio"><input type="radio" name="weeklyprice" value="luxury"
+                                {% if _REQUEST['weeklyprice'] == 'luxury' %} checked{% endif %}>
                         <span class="glyphicon glyphicon-usd" aria-hidden="true"></span> Luxury</label>
                 </div>
             </fieldset>
