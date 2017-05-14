@@ -49,7 +49,7 @@ $configContent = array(
     'filterButtonTitle' => 'Apply Fiters',
     'runButtonTitle' => 'Run analysis',
     'bookingsCountCap' => 100, // debugging only. int|null
-    'ignoreFields' => ['SCTV'],
+    'ignoreFields' => ['NREF','SCTV'], // for apriori algorithm.
     'fileCacheDirectory' => '/fileCache/',
     'apriori' => [
         'serviceOutput' => '/Services/Apriori/wip/status.htm',
@@ -63,7 +63,7 @@ $configContent = array(
         'servicePidFile' => '/Services/KPrototype/wip/pid.txt',
         'serviceStopFile' => '/Services/KPrototype/wip/stop.txt',
         'runButtonTitle' => 'Run K-Prototype',
-        'outputInterval' => 1, // seconds
+        'outputInterval' => 10, // seconds
         'maxIterations' => 10,
     ],
     'dbscan' => [
@@ -71,7 +71,7 @@ $configContent = array(
         'servicePidFile' => '/Services/DBScan/wip/pid.txt',
         'serviceStopFile' => '/Services/DBScan/wip/stop.txt',
         'runButtonTitle' => 'Run DBSCAN',
-        'outputInterval' => 1, // seconds
+        'outputInterval' => 10, // seconds
         'radius' => 6,
         'minPoints' => 0.1, // percentage
     ],

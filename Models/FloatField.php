@@ -26,7 +26,12 @@ class FloatField implements Field
         return $this->value > 0;
     }
 
-    public static function getType()
+    public function getType()
+    {
+        return self::Type();
+    }
+
+    public static function Type()
     {
         return FloatField::class;
     }

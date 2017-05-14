@@ -21,26 +21,26 @@ class ConfigProvider
         if (file_exists($editableConfigFile)) {
             $editableConfigRaw = file_get_contents($editableConfigFile);
             $editableConfig = json_decode($editableConfigRaw);
+            if (isset($editableConfig->bookingsCountCap)) {
+                $this->set('bookingsCountCap', (int)$editableConfig->bookingsCountCap);
+            }
             if (isset($editableConfig->pageSize)) {
                 $this->set('pageSize', (int)$editableConfig->pageSize);
-            }
-            if (isset($editableConfig->gamma)) {
-                $this->set('gamma', (float)$editableConfig->gamma);
             }
             if (isset($editableConfig->ignoreFields)) {
                 $this->set('ignoreFields', $editableConfig->ignoreFields);
             }
-            if (isset($editableConfig->bookingsCountCap)) {
-                $this->set('bookingsCountCap', (int)$editableConfig->bookingsCountCap);
+            if (isset($editableConfig->gamma)) {
+                $this->set('gamma', (float)$editableConfig->gamma);
             }
             if (isset($editableConfig->minSup)) {
-                $configs['apriori']['minSup'] = (float)$editableConfig->minSup;
+                $this->configs['apriori']['minSup'] = (float)$editableConfig->minSup;
             }
             if (isset($editableConfig->radius)) {
-                $configs['dbscan']['radius'] = (float)$editableConfig->radius;
+                $this->configs['dbscan']['radius'] = (float)$editableConfig->radius;
             }
             if (isset($editableConfig->minPoints)) {
-                $configs['dbscan']['minPoints'] = (float)$editableConfig->minPoints;
+                $this->configs['dbscan']['minPoints'] = (float)$editableConfig->minPoints;
             }
         }
     }

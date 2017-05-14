@@ -3,6 +3,10 @@
 class Filters
 {
     private $action;
+
+    /**
+     * @var Filter[]
+     */
     private $filters = [];
 
     /**
@@ -14,26 +18,44 @@ class Filters
     {
         $this->action = $action;
         foreach ($dataTypeCluster->getIntegerFields() as $value) {
-            array_push($this->filters, new Filter($value, int::class));
+            $filter = new Filter($value, int::class);
+            if ($filter->hasValue()) {
+                array_push($this->filters, $filter);
+            }
         }
-        foreach ($dataTypeCluster->getBooleanFields() as  $value) {
-            array_push($this->filters, new Filter($value, bool::class));
+        foreach ($dataTypeCluster->getBooleanFields() as $value) {
+            $filter = new Filter($value, bool::class);
+            if ($filter->hasValue()) {
+                array_push($this->filters, $filter);
+            }
         }
-        foreach ($dataTypeCluster->getFloatFields() as  $value) {
-            array_push($this->filters, new Filter($value, float::class));
+        foreach ($dataTypeCluster->getFloatFields() as $value) {
+            $filter = new Filter($value, float::class);
+            if ($filter->hasValue()) {
+                array_push($this->filters, $filter);
+            }
         }
-        foreach ($dataTypeCluster->getStringFields() as  $value) {
-            array_push($this->filters, new Filter($value, string::class));
+        foreach ($dataTypeCluster->getStringFields() as $value) {
+            $filter = new Filter($value, string::class);
+            if ($filter->hasValue()) {
+                array_push($this->filters, $filter);
+            }
         }
-        foreach ($dataTypeCluster->getPriceFields() as  $value) {
-            array_push($this->filters, new Filter($value, Price::class));
+        foreach ($dataTypeCluster->getPriceFields() as $value) {
+            $filter = new Filter($value, Price::class);
+            if ($filter->hasValue()) {
+                array_push($this->filters, $filter);
+            }
         }
         foreach ($dataTypeCluster->getDistanceFields() as $value) {
-            array_push($this->filters, new Filter($value, Distance::class));
+            $filter = new Filter($value, Distance::class);
+            if ($filter->hasValue()) {
+                array_push($this->filters, $filter);
+            }
         }
     }
 
-    public function getAction() : string
+    public function getAction(): string
     {
         return $this->action;
     }
@@ -47,7 +69,17 @@ class Filters
         return $this->filters;
     }
 
-    public function getFiltersByType(string $type) : array
+    public function hasFilter($name)
+    {
+        foreach ($this->filters as $filter) {
+            if ($filter->getName() == $name) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public function getFiltersByType(string $type): array
     {
         $filters = [];
         foreach ($this->filters as $filter) {

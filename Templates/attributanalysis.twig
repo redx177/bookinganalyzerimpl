@@ -21,7 +21,7 @@
 
     <div class="container" id="results-container">
         {% if isRunning %}
-            <h1>Analysis in progress. Updates will come every 10 seconds</h1>
+            <h1>Analysis in progress. Updates will come every {{ pullInterval }} seconds</h1>
         {% endif %}
     </div>
 {% endblock %}

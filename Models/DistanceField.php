@@ -26,7 +26,12 @@ class DistanceField implements Field
         return $this->value != Distance::Empty;
     }
 
-    public static function getType()
+    public function getType()
+    {
+        return self::Type();
+    }
+
+    public static function Type()
     {
         return DistanceField::class;
     }

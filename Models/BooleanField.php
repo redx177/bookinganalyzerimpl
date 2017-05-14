@@ -26,7 +26,12 @@ class BooleanField implements Field
         return $this->value;
     }
 
-    public static function getType()
+    public function getType()
+    {
+        return self::Type();
+    }
+
+    public static function Type()
     {
         return BooleanField::class;
     }

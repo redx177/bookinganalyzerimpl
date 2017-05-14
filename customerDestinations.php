@@ -21,18 +21,21 @@ $destinations = $filtersProvider->getCustomerDestinations();
 
 $done = [];
 $result = [];
+$term = strtolower($_GET['term']);
 foreach ($destinations as $destination) {
 
-    if (strpos($destination[0], $_GET['term']) !== false && !in_array($destination[0], $done)) {
+    $country = strtolower($destination[0]);
+    if (strpos($country, $term) !== false && !in_array($country, $done)) {
         $result[] = "{\"label\": \"$destination[0]\", \"CUCNTRY\": \"$destination[0]\", \"CUORT\": \"\", \"category\": \"CUCNTRY\"}";
-        $done[] = $destination[0];
+        $done[] = $country;
     }
-    if (strlen($_GET['term']) < 4) {
+    if (strlen($term) < 4) {
         continue;
     }
-    if (strpos($destination[0], $_GET['term']) !== false || strpos($destination[1], $_GET['term']) !== false) {
+    $place = strtolower($destination[1]);
+    if ((strpos($country, $term) !== false || strpos($place, $term) !== false)  && !in_array($country . $place, $done)) {
         $result[] = "{\"label\": \"$destination[0] > $destination[1]\", \"CUCNTRY\": \"$destination[0]\", \"CUORT\": \"$destination[1]\", \"category\": \"CUORT\"}";
-        $done[] = $destination[0].$destination[1];
+        $done[] = $country . $place;
     }
 }
 echo '[' . implode(',', $result) . ']';

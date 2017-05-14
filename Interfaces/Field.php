@@ -5,5 +5,6 @@ interface Field
     public function getName();
     public function getValue();
     public function hasValue();
-    public static function getType();
+    public function getType();
+    public static function Type();
 }

@@ -87,18 +87,7 @@ $(function () {
             window.somethingFound = ui.content.length > 0;
             return false;
         }
-    })
-        .autocomplete('instance')._renderItem = function (ul, item) {
-        var fieldValue = $('#customerDestination').val();
-        if ($('#customerDestination').val().length < 4) {
-            if (!item.label.startsWith(fieldValue)) {
-                return ;
-            }
-        }
-        return $('<li>')
-            .append(item.label)
-            .appendTo(ul);
-    };
+    });
     $('#customerDestination').blur(function () {
         if (!window.somethingFound) {
             $('#CUCNTRY').val('');

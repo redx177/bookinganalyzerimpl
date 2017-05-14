@@ -14,19 +14,19 @@ class Booking
     {
         $this->id = $id;
 
-        $this->fieldsByType[IntegerField::getType()] = $dataTypeCluster->getIntegerFields();
-        $this->fieldsByType[BooleanField::getType()] = $dataTypeCluster->getBooleanFields();
-        $this->fieldsByType[FloatField::getType()] = $dataTypeCluster->getFloatFields();
-        $this->fieldsByType[StringField::getType()] = $dataTypeCluster->getStringFields();
-        $this->fieldsByType[PriceField::getType()] = $dataTypeCluster->getPriceFields();
-        $this->fieldsByType[DistanceField::getType()] = $dataTypeCluster->getDistanceFields();
+        $this->fieldsByType[IntegerField::Type()] = $dataTypeCluster->getIntegerFields();
+        $this->fieldsByType[BooleanField::Type()] = $dataTypeCluster->getBooleanFields();
+        $this->fieldsByType[FloatField::Type()] = $dataTypeCluster->getFloatFields();
+        $this->fieldsByType[StringField::Type()] = $dataTypeCluster->getStringFields();
+        $this->fieldsByType[PriceField::Type()] = $dataTypeCluster->getPriceFields();
+        $this->fieldsByType[DistanceField::Type()] = $dataTypeCluster->getDistanceFields();
 
-        $this->fields = array_merge($this->fieldsByType[IntegerField::getType()],
-            $this->fieldsByType[BooleanField::getType()],
-            $this->fieldsByType[FloatField::getType()],
-            $this->fieldsByType[StringField::getType()],
-            $this->fieldsByType[PriceField::getType()],
-            $this->fieldsByType[DistanceField::getType()]);
+        $this->fields = array_merge($this->fieldsByType[IntegerField::Type()],
+            $this->fieldsByType[BooleanField::Type()],
+            $this->fieldsByType[FloatField::Type()],
+            $this->fieldsByType[StringField::Type()],
+            $this->fieldsByType[PriceField::Type()],
+            $this->fieldsByType[DistanceField::Type()]);
     }
 
     public function getId() : int

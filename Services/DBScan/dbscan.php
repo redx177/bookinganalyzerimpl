@@ -109,6 +109,7 @@ if (array_key_exists('abort', $_GET) && $_GET['abort']) {
     $filtersProvider = $container->get('FiltersProvider');
     parse_str(trim($args, "'"), $params);
     $filters = $filtersProvider->get($params);
+    $container->set(Filters::class, $filters);
 
     // Cache file
     $cache = $container->get(DataCache::class);

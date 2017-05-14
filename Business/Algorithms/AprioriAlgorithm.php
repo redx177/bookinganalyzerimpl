@@ -23,15 +23,21 @@ class AprioriAlgorithm
      * @var FactoryInterface
      */
     private $factory;
+    /**
+     * @var Filters
+     */
+    private $filters;
 
     public function __construct(BookingDataIterator $bookingDataIterator,
                                 ConfigProvider $config,
                                 AprioriProgress $progress,
-                                FactoryInterface $factory)
+                                FactoryInterface $factory,
+                                Filters $filters)
     {
         $this->progress = $progress;
         $this->bookingDataIterator = $bookingDataIterator;
         $this->factory = $factory;
+        $this->filters = $filters;
 
         $this->lastOutput = microtime(TRUE);
         $this->startTime = microtime(TRUE);
@@ -105,9 +111,15 @@ class AprioriAlgorithm
                 $booking->getFieldsByType(BooleanField::class),
                 $booking->getFieldsByType(IntegerField::class),
                 $booking->getFieldsByType(DistanceField::class),
-                $booking->getFieldsByType(PriceField::class));
+                $booking->getFieldsByType(PriceField::class),
+                $booking->getFieldsByType(StringField::class));
 
             foreach ($fields as $field) {
+                // Skip fields which are in the filters.
+                if ($this->filters->hasFilter($field->getName())) {
+                    continue;
+                }
+
                 if ($field->hasValue() && !in_array($field->getName(), $this->ignoreFields)) {
                     $name = $field->getName();
                     $value = $field->getValue();
@@ -144,6 +156,9 @@ class AprioriAlgorithm
                 $c = [];
                 foreach ($candidate as $key => $value) {
                     $field = $booking->getFieldByName($key);
+                    if (StringField::Type() == $field->getType()) {
+                        $value = strtolower($value);
+                    }
                     if (!$field->hasValue() || $field->getValue() != $value) {
                         // This candidate does not match this booking, so go to next candidate.
                         continue 2;

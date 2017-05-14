@@ -36,7 +36,7 @@
             {% if not status == 2 %}
                 <button type="button" class="btn btn-danger btn-abort">Abort</button><br />
             {% endif %}
-            Runtime: {{ runtimeInSeconds }}<br />
+            Runtime: {{ runtimeInSeconds }} seconds<br />
             Items count: {{ bookingsCount }}<br />
             Noise points: {{ clusters.noise|length }}
             Best candidate{% if status == 0 %} so far{% endif %}:

@@ -26,7 +26,12 @@ class PriceField implements Field
         return $this->value != Price::Empty;
     }
 
-    public static function getType()
+    public function getType()
+    {
+        return self::Type();
+    }
+
+    public static function Type()
     {
         return PriceField::class;
     }

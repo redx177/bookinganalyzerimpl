@@ -8,7 +8,7 @@ class StringField implements Field
     public function __construct(string $name, string $value)
     {
         $this->name = $name;
-        $this->value = $value;
+        $this->value = strtolower($value);
     }
 
     public function getName()
@@ -26,7 +26,12 @@ class StringField implements Field
         return $this->value != '';
     }
 
-    public static function getType()
+    public function getType()
+    {
+        return self::Type();
+    }
+
+    public static function Type()
     {
         return StringField::class;
     }

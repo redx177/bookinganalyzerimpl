@@ -1,1 +1,1 @@
-{"bookingsCountCap":"0","pageSize":"30","minSup":"0.4","ignoreFields":["SCTV","INTERNET"],"gamma":"1","radius":"6","minPoints":"0.1"}
+{"bookingsCountCap":"0","pageSize":"30","minSup":"0.2","ignoreFields":["CAIRCOND","CPOOL","CBBQ","CSAUNA","CJACUZZI","CWASHMACHI","CPARKING","CDISHWASHE","CFIREPLACE","SCTV","SCBALCONY","PETS","SCNOSMOKE","INTERNET","QUAL","ROOMS","BEDROOMS","NREF"],"gamma":"1","radius":"6","minPoints":"0.1"}

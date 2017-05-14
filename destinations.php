@@ -21,16 +21,20 @@ $destinations = $filtersProvider->getDestinations();
 
 $done = [];
 $result = [];
+$term = strtolower($_GET['term']);
 foreach ($destinations as $destination) {
-    if (strpos($destination[0], $_GET['term']) !== false && !in_array($destination[0], $done)) {
+    $country = strtolower($destination[0]);
+    $region = strtolower($destination[1]);
+    $place = strtolower($destination[2]);
+    if (strpos($country, $term) !== false && !in_array($country, $done)) {
         $result[] = "{\"label\": \"$destination[0]\", \"country\": \"$destination[0]\", \"region\": \"\", \"place\": \"\", \"category\": \"country\"}";
-        $done[] = $destination[0];
+        $done[] = $country;
     }
-    if ((strpos($destination[0], $_GET['term']) !== false || strpos($destination[1], $_GET['term']) !== false) && !in_array($destination[0].$destination[1], $done)) {
+    if ((strpos($country, $term) !== false || strpos($region, $term) !== false) && !in_array($country . $region, $done)) {
         $result[] = "{\"label\": \"$destination[0] > $destination[1]\", \"country\": \"$destination[0]\", \"region\": \"$destination[1]\", \"place\": \"\", \"category\": \"region\"}";
-        $done[] = $destination[0].$destination[1];
+        $done[] = $country . $region;
     }
-    if (strpos($destination[0], $_GET['term']) !== false || strpos($destination[1], $_GET['term']) !== false || strpos($destination[2], $_GET['term']) !== false) {
+    if (strpos($country, $term) !== false || strpos($region, $term) !== false || strpos($place, $term) !== false) {
         $result[] = "{\"label\": \"$destination[0] > $destination[1] > $destination[2]\", \"country\": \"$destination[0]\", \"region\": \"$destination[1]\", \"place\": \"$destination[2]\", \"category\": \"place\"}";
     }
 }
