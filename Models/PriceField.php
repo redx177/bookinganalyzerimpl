@@ -21,6 +21,11 @@ class PriceField implements Field
         return $this->value;
     }
 
+    public function getDisplayValue()
+    {
+        return $this->value;
+    }
+
     public function hasValue()
     {
         return $this->value != Price::Empty;

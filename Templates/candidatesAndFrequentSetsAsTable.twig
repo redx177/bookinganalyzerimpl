@@ -23,7 +23,7 @@
                                         {{ fieldTitles[fieldName] }}={{ fieldValue }}<br/>
                                     {% endfor %}
                                 </td>
-                                <td>{{ item[1] }}</td>
+                                <td>{{ item[1] }} - {{ (item[1]*100/bookingsCount)|number_format(2,'.') }}%</td>
                             </tr>
                         {% endfor %}
                     </tbody>

@@ -21,6 +21,7 @@ class DataTypeClusterer
         $this->stringFields = $config->get('stringFields');
         $this->priceFields = $config->get('priceFields');
         $this->distanceFields = $config->get('distanceFields');
+        $this->floatFieldsBoundaries = $config->get('floatFieldsBoundaries');
     }
 
     public function get($rawData)
@@ -34,7 +35,7 @@ class DataTypeClusterer
         foreach ($this->floatFields as $fieldName) {
             if (array_key_exists($fieldName, $rawData)) {
                 $floatValue = (float)$rawData[$fieldName];
-                $floatFields[$fieldName] = new FloatField($fieldName, $floatValue);
+                $floatFields[$fieldName] = new FloatField($fieldName, $floatValue, $this->getDisplayValue($floatValue, $this->floatFieldsBoundaries[$fieldName]));
             }
         }
         foreach ($this->booleanFields as $fieldName) {
@@ -97,5 +98,14 @@ class DataTypeClusterer
         } else {
             return Distance::Empty;
         }
+    }
+
+    private function getDisplayValue($value, $config)
+    {
+        $displayValue = $value / $config['increment'];
+        if ($config['lowest'] === 0) {
+            $displayValue += 1;
+        }
+        return round($displayValue);
     }
 }

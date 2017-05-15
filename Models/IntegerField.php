@@ -21,6 +21,11 @@ class IntegerField implements Field
         return $this->value;
     }
 
+    public function getDisplayValue()
+    {
+        return $this->value;
+    }
+
     public function hasValue()
     {
         return $this->value > 0;

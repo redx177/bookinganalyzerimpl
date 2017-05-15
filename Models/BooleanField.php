@@ -21,6 +21,11 @@ class BooleanField implements Field
         return $this->value;
     }
 
+    public function getDisplayValue()
+    {
+        return $this->value ? '1' : '0';
+    }
+
     public function hasValue()
     {
         return $this->value;

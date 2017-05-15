@@ -4,11 +4,13 @@ class FloatField implements Field
 {
     private $name;
     private $value;
+    private $displayValue;
 
-    public function __construct(string $name, float $value)
+    public function __construct(string $name, float $value, float $displayValue)
     {
         $this->name = $name;
         $this->value = $value;
+        $this->displayValue = $displayValue;
     }
 
     public function getName()
@@ -19,6 +21,11 @@ class FloatField implements Field
     public function getValue()
     {
         return $this->value;
+    }
+
+    public function getDisplayValue()
+    {
+        return $this->displayValue;
     }
 
     public function hasValue()

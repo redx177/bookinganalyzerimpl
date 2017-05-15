@@ -1,65 +1,79 @@
 <table class="table bookingListing">
     <thead>
-        <tr>
-            <th><div>ID</div></th>
-            {% set firstBooking = bookings|first %}
-            {% for field in firstBooking.getFieldsByType('StringField') %}
-                <th><div>{{ fieldTitles[field.getName()] }}</div></th>
-            {% endfor %}
-            {% for field in firstBooking.getFieldsByType('PriceField') %}
-                <th><div>{{ fieldTitles[field.getName()] }}</div></th>
-            {% endfor %}
-            {% for field in firstBooking.getFieldsByType('IntegerField') %}
-                <th><div>{{ fieldTitles[field.getName()] }}</div></th>
-            {% endfor %}
-            {% for field in firstBooking.getFieldsByType('DistanceField') %}
-                <th><div>{{ fieldTitles[field.getName()] }}</div></th>
-            {% endfor %}
-            {% for field in firstBooking.getFieldsByType('BooleanField') %}
-                <th><div>{{ fieldTitles[field.getName()] }}</div></th>
-            {% endfor %}
-            {% for field in firstBooking.getFieldsByType('FloatField') %}
-                <th><div>{{ fieldTitles[field.getName()] }}</div></th>
-            {% endfor %}
-        </tr>
+    <tr>
+        <th>
+            <div>ID</div>
+        </th>
+        {% set firstBooking = bookings|first %}
+        {% for field in firstBooking.getFieldsByType('StringField') %}
+            <th>
+                <div>{{ fieldTitles[field.getName()] }}</div>
+            </th>
+        {% endfor %}
+        {% for field in firstBooking.getFieldsByType('FloatField') %}
+            <th>
+                <div>{{ fieldTitles[field.getName()] }}</div>
+            </th>
+        {% endfor %}
+        {% for field in firstBooking.getFieldsByType('PriceField') %}
+            <th>
+                <div>{{ fieldTitles[field.getName()] }}</div>
+            </th>
+        {% endfor %}
+        {% for field in firstBooking.getFieldsByType('IntegerField') %}
+            <th>
+                <div>{{ fieldTitles[field.getName()] }}</div>
+            </th>
+        {% endfor %}
+        {% for field in firstBooking.getFieldsByType('DistanceField') %}
+            <th>
+                <div>{{ fieldTitles[field.getName()] }}</div>
+            </th>
+        {% endfor %}
+        {% for field in firstBooking.getFieldsByType('BooleanField') %}
+            <th>
+                <div>{{ fieldTitles[field.getName()] }}</div>
+            </th>
+        {% endfor %}
+    </tr>
     </thead>
     <tbody>
-        {% for booking in bookings %}
-            <tr>
-                <td>{{ booking.getId() }}</td>
-                {% for field in booking.getFieldsByType('StringField') %}
-                    <td>{{ field.getValue() }}</td>
-                {% endfor %}
-                {% for field in booking.getFieldsByType('PriceField') %}
-                    <td>
-                        {% if field.getValue() == constant('Price::Budget') %}
-                            <span class="glyphicon glyphicon-piggy-bank" aria-hidden="true"></span>
-                        {% elseif field.getValue() == constant('Price::Luxury') %}
-                            <span class="glyphicon glyphicon-usd" aria-hidden="true"></span>
-                        {% endif %}
-                    </td>
-                {% endfor %}
-                {% for field in booking.getFieldsByType('IntegerField') %}
-                    <td>{{ field.getValue() }}</td>
-                {% endfor %}
-                {% for field in booking.getFieldsByType('DistanceField') %}
-                    <td>
-                        {% if field.getValue() == constant('Distance::Close') %}
-                            <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
-                        {% endif %}
-                    </td>
-                {% endfor %}
-                {% for field in booking.getFieldsByType('BooleanField') %}
-                    <td>
-                        {% if field.getValue() %}
-                            <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
-                        {% endif %}
-                    </td>
-                {% endfor %}
-                {% for field in booking.getFieldsByType('FloatField') %}
-                    <td>{{ field.getValue() }}</td>
-                {% endfor %}
-            </tr>
-        {% endfor %}
+    {% for booking in bookings %}
+        <tr>
+            <td>{{ booking.id }}</td>
+            {% for field in booking.getFieldsByType('StringField') %}
+                <td>{{ field.displayValue }}</td>
+            {% endfor %}
+            {% for field in booking.getFieldsByType('FloatField') %}
+                <td>{{ field.displayValue }}</td>
+            {% endfor %}
+            {% for field in booking.getFieldsByType('PriceField') %}
+                <td>
+                    {% if field.displayValue == constant('Price::Budget') %}
+                        <span class="glyphicon glyphicon-piggy-bank" aria-hidden="true"></span>
+                    {% elseif field.displayValue == constant('Price::Luxury') %}
+                        <span class="glyphicon glyphicon-usd" aria-hidden="true"></span>
+                    {% endif %}
+                </td>
+            {% endfor %}
+            {% for field in booking.getFieldsByType('IntegerField') %}
+                <td>{{ field.displayValue }}</td>
+            {% endfor %}
+            {% for field in booking.getFieldsByType('DistanceField') %}
+                <td>
+                    {% if field.displayValue == constant('Distance::Close') %}
+                        <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
+                    {% endif %}
+                </td>
+            {% endfor %}
+            {% for field in booking.getFieldsByType('BooleanField') %}
+                <td>
+                    {% if field.displayValue %}
+                        <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
+                    {% endif %}
+                </td>
+            {% endfor %}
+        </tr>
+    {% endfor %}
     </tbody>
 </table>

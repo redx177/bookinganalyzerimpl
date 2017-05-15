@@ -9,6 +9,7 @@ class StringField implements Field
     {
         $this->name = $name;
         $this->value = strtolower($value);
+        $this->displayValue = $value;
     }
 
     public function getName()
@@ -17,6 +18,11 @@ class StringField implements Field
     }
 
     public function getValue()
+    {
+        return $this->value;
+    }
+
+    public function getDisplayValue()
     {
         return $this->value;
     }

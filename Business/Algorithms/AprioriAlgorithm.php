@@ -112,7 +112,8 @@ class AprioriAlgorithm
                 $booking->getFieldsByType(IntegerField::class),
                 $booking->getFieldsByType(DistanceField::class),
                 $booking->getFieldsByType(PriceField::class),
-                $booking->getFieldsByType(StringField::class));
+                $booking->getFieldsByType(StringField::class),
+                $booking->getFieldsByType(FloatField::class));
 
             foreach ($fields as $field) {
                 // Skip fields which are in the filters.
@@ -122,11 +123,11 @@ class AprioriAlgorithm
 
                 if ($field->hasValue() && !in_array($field->getName(), $this->ignoreFields)) {
                     $name = $field->getName();
-                    $value = $field->getValue();
-                    if (!array_key_exists($name . $value, $candidates)) {
-                        $candidates[$name . $value] = [[$name=>$value], 0];
+                    $displayValue = $field->getDisplayValue();
+                    if (!array_key_exists($name . $displayValue, $candidates)) {
+                        $candidates[$name . $displayValue] = [[$name=>$displayValue], 0];
                     }
-                    $candidates[$name . $value] = [[$name=>$value], $candidates[$name . $value][1]+1];
+                    $candidates[$name . $displayValue] = [[$name=>$displayValue], $candidates[$name . $displayValue][1]+1];
                 }
             }
 
@@ -159,7 +160,7 @@ class AprioriAlgorithm
                     if (StringField::Type() == $field->getType()) {
                         $value = strtolower($value);
                     }
-                    if (!$field->hasValue() || $field->getValue() != $value) {
+                    if (!$field->hasValue() || $field->getDisplayValue() != $value) {
                         // This candidate does not match this booking, so go to next candidate.
                         continue 2;
                     }
