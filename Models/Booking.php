@@ -20,13 +20,17 @@ class Booking
         $this->fieldsByType[StringField::Type()] = $dataTypeCluster->getStringFields();
         $this->fieldsByType[PriceField::Type()] = $dataTypeCluster->getPriceFields();
         $this->fieldsByType[DistanceField::Type()] = $dataTypeCluster->getDistanceFields();
+        $this->fieldsByType[DayOfWeekField::Type()] = $dataTypeCluster->getDayOfWeekFields();
+        $this->fieldsByType[MonthOfYearField::Type()] = $dataTypeCluster->getMonthOfYearFields();
 
         $this->fields = array_merge($this->fieldsByType[IntegerField::Type()],
             $this->fieldsByType[BooleanField::Type()],
             $this->fieldsByType[FloatField::Type()],
             $this->fieldsByType[StringField::Type()],
             $this->fieldsByType[PriceField::Type()],
-            $this->fieldsByType[DistanceField::Type()]);
+            $this->fieldsByType[DistanceField::Type()],
+            $this->fieldsByType[DayOfWeekField::Type()],
+            $this->fieldsByType[MonthOfYearField::Type()]);
     }
 
     public function getId() : int

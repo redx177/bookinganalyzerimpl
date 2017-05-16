@@ -3,9 +3,20 @@
   border-radius: 5px;
   padding-bottom: 20px;
 
+  .group {
+    float: left;
+    fieldset {
+      float: none;
+    }
+  }
+
   fieldset {
     float: left;
     margin-right: 20px;
+
+    &:nth-child(2) {
+      margin-top: 20px;
+    }
 
     legend {
       margin-bottom: 5px;
@@ -28,12 +39,22 @@
         width: 100px;
       }
 
+      &.dayOfWeek, &.monthOfYear {
+        width: 130px;
+        label {
+          width: 50px;
+        }
+      }
+
       &.attributes {
         width: 280px;
 
         label {
           width: 105px;
         }
+      }
+      .form-control {
+        width: 80%;
       }
     }
 

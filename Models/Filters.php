@@ -53,6 +53,18 @@ class Filters
                 array_push($this->filters, $filter);
             }
         }
+        foreach ($dataTypeCluster->getDayOfWeekFields() as $value) {
+            $filter = new Filter($value, DayOfWeek::class);
+            if ($filter->hasValue()) {
+                array_push($this->filters, $filter);
+            }
+        }
+        foreach ($dataTypeCluster->getMonthOfYearFields() as $value) {
+            $filter = new Filter($value, MonthOfYear::class);
+            if ($filter->hasValue()) {
+                array_push($this->filters, $filter);
+            }
+        }
     }
 
     public function getAction(): string

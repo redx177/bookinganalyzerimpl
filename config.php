@@ -9,6 +9,8 @@ $configContent = array(
     'stringFields' => ['NREF','country','region','place', 'CUCNTRY', 'CUORT'],
     'priceFields' => ['weeklyprice'],
     'distanceFields' => ['DIWATER','DISKI','DICENTER','DISEA','DILAKE', 'DIPUBT'],
+    'dayOfWeekFields' => ['dayOfWeek'],
+    'monthOfYearFields' => ['monthOfYear'],
     'floatFieldsBoundaries' => [
         'QUAL' => ['lowest' => 0.2, 'increment' => 0.2],
         'ROOMS' => ['lowest' => 0, 'increment' => 0.053],
@@ -52,6 +54,8 @@ $configContent = array(
         'CUCNTRY' => 'Customer Country',
         'CUORT' => 'Customer Place',
         'REPAX' => 'Pax',
+        'dayOfWeek' => 'Booking Weekday',
+        'monthOfYear' => 'Booking Month',
     ],
     'filterButtonTitle' => 'Apply Fiters',
     'runButtonTitle' => 'Run analysis',

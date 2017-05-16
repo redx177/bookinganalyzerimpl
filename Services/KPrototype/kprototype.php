@@ -50,6 +50,10 @@ require_once $rootDir . '/Models/KPrototypeResult.php';
 require_once $rootDir . '/Models/KPrototypeCluster.php';
 require_once $rootDir . '/Models/ClusterPoint.php';
 require_once $rootDir . '/Models/DistanceClusterPoint.php';
+require_once $rootDir . '/Models/DayOfWeekField.php';
+require_once $rootDir . '/Models/DayOfWeek.php';
+require_once $rootDir . '/Models/MonthOfYearField.php';
+require_once $rootDir . '/Models/MonthOfYear.php';
 $config = new ConfigProvider($GLOBALS['configContent'], $rootDir);
 $kprototypeConfig = $config->get('kprototype');
 

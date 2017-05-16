@@ -113,7 +113,9 @@ class AprioriAlgorithm
                 $booking->getFieldsByType(DistanceField::class),
                 $booking->getFieldsByType(PriceField::class),
                 $booking->getFieldsByType(StringField::class),
-                $booking->getFieldsByType(FloatField::class));
+                $booking->getFieldsByType(FloatField::class),
+                $booking->getFieldsByType(DayOfWeekField::class),
+                $booking->getFieldsByType(MonthOfYearField::class));
 
             foreach ($fields as $field) {
                 // Skip fields which are in the filters.

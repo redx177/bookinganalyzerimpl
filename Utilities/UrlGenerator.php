@@ -18,6 +18,8 @@ class UrlGenerator
             $this->getFilterParameter($filters->getFiltersByType(string::class)),
             $this->getPriceParameters($filters->getFiltersByType(Price::class)),
             $this->getDistanceParameters($filters->getFiltersByType(Distance::class)),
+            $this->getDayOfWeekParameters($filters->getFiltersByType(DayOfWeek::class)),
+            $this->getFilterParameter($filters->getFiltersByType(MonthOfYear::class)),
         ]);
 
         // Remove multiple &&
@@ -37,6 +39,11 @@ class UrlGenerator
         return $this->getParamsForEnums($filters, Distance::class);
     }
 
+    private function getDayOfWeekParameters($filters)
+    {
+        return $this->getParamsForEnums($filters, DayOfWeek::class);
+    }
+
     private function getParamsForEnums($filters, $className)
     {
         $params = [];
@@ -45,8 +52,16 @@ class UrlGenerator
             $rawValue = $filter->getValue();
             $class = new ReflectionClass($className);
             foreach ($class->getConstants() as $name => $value) {
-                if ($value > 0 && $value === $rawValue) {
-                    array_push($params, $filterName . '=' . strtolower($name));
+                if (is_array($rawValue)) {
+                    foreach ($rawValue as $singleRawValue) {
+                        if ($value > 0 && $value === $singleRawValue) {
+                            array_push($params, $filterName . '[]=' . strtolower($name));
+                        }
+                    }
+                } else {
+                    if ($value > 0 && $value === $rawValue) {
+                        array_push($params, $filterName . '=' . strtolower($name));
+                    }
                 }
             }
         }

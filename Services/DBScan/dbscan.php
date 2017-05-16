@@ -49,6 +49,10 @@ require_once $rootDir . '/Models/StringField.php';
 require_once $rootDir . '/Models/DBScanResult.php';
 require_once $rootDir . '/Models/ClusterPoint.php';
 require_once $rootDir . '/Models/DBScanCluster.php';
+require_once $rootDir . '/Models/DayOfWeekField.php';
+require_once $rootDir . '/Models/DayOfWeek.php';
+require_once $rootDir . '/Models/MonthOfYearField.php';
+require_once $rootDir . '/Models/MonthOfYear.php';
 $config = new ConfigProvider($GLOBALS['configContent'], $rootDir);
 $dbscanConfig = $config->get('dbscan');
 

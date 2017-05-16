@@ -34,6 +34,10 @@ require_once $rootDir . '/Models/IntegerField.php';
 require_once $rootDir . '/Models/Price.php';
 require_once $rootDir . '/Models/PriceField.php';
 require_once $rootDir . '/Models/StringField.php';
+require_once $rootDir . '/Models/DayOfWeekField.php';
+require_once $rootDir . '/Models/DayOfWeek.php';
+require_once $rootDir . '/Models/MonthOfYearField.php';
+require_once $rootDir . '/Models/MonthOfYear.php';
 $config = new ConfigProvider($GLOBALS['configContent'], $rootDir);
 $aprioriConfig = $config->get('apriori');
 

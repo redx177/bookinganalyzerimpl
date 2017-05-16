@@ -39,6 +39,8 @@ class SettingsController implements Controller
             'stringFields' => $config->get('stringFields'),
             'priceFields' => $config->get('priceFields'),
             'distanceFields' => $config->get('distanceFields'),
+            'dayOfWeekFields' => $config->get('dayOfWeekFields'),
+            'monthOfYearFields' => $config->get('monthOfYearFields'),
         ];
         $this->ignoreFields = $config->get('ignoreFields');
         $this->fieldNameMapping = $config->get('fieldNameMapping');

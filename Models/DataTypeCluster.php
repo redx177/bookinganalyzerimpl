@@ -8,18 +8,23 @@ class DataTypeCluster
     private $stringFields;
     private $priceFields;
     private $distanceFields;
+    private $dayOfWeekFields;
+    private $monthOfYearFields;
 
     /**
      * DataTypeCluster constructor.
-     * @param $integerFields array Integer typed fields.
-     * @param $booleanFields array Boolean typed fields.
-     * @param $floatFields array Float typed fields.
-     * @param $stringFields array String typed fields.
-     * @param $priceFields array Price fields.
-     * @param $distanceFields array Distance fields.
+     * @param array $integerFields Integer typed fields.
+     * @param array $booleanFields Boolean typed fields.
+     * @param array $floatFields Float typed fields.
+     * @param array $stringFields String typed fields.
+     * @param array $priceFields Price fields.
+     * @param array $distanceFields Distance fields.
+     * @param array $dayOfWeekFields Day of week fields.
+     * @param array $monthOfYearFields Month of year fields
      */
     public function __construct(array $integerFields, array $booleanFields, array $floatFields,
-                                array $stringFields, array $priceFields, array $distanceFields)
+                                array $stringFields, array $priceFields, array $distanceFields,
+                                array $dayOfWeekFields, array $monthOfYearFields)
     {
         $this->integerFields = $integerFields;
         $this->booleanFields = $booleanFields;
@@ -27,6 +32,8 @@ class DataTypeCluster
         $this->stringFields = $stringFields;
         $this->priceFields = $priceFields;
         $this->distanceFields = $distanceFields;
+        $this->dayOfWeekFields = $dayOfWeekFields;
+        $this->monthOfYearFields = $monthOfYearFields;
     }
 
     public function getIntegerFields(): array
@@ -57,5 +64,15 @@ class DataTypeCluster
     public function getDistanceFields(): array
     {
         return $this->distanceFields;
+    }
+
+    public function getDayOfWeekFields(): array
+    {
+        return $this->dayOfWeekFields;
+    }
+
+    public function getMonthOfYearFields(): array
+    {
+        return $this->monthOfYearFields;
     }
 }

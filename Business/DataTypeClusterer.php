@@ -8,6 +8,8 @@ class DataTypeClusterer
     private $stringFields;
     private $priceFields;
     private $distanceFields;
+    private $dayOfWeekFields;
+    private $monthOfYearFields;
 
     /**
      * DataTypeClusterer constructor.
@@ -21,6 +23,8 @@ class DataTypeClusterer
         $this->stringFields = $config->get('stringFields');
         $this->priceFields = $config->get('priceFields');
         $this->distanceFields = $config->get('distanceFields');
+        $this->dayOfWeekFields = $config->get('dayOfWeekFields');
+        $this->monthOfYearFields = $config->get('monthOfYearFields');
         $this->floatFieldsBoundaries = $config->get('floatFieldsBoundaries');
     }
 
@@ -32,6 +36,8 @@ class DataTypeClusterer
         $stringFields = [];
         $priceFields = [];
         $distanceFields = [];
+        $dayOfWeekFields = [];
+        $monthOfYearFields = [];
         foreach ($this->floatFields as $fieldName) {
             if (array_key_exists($fieldName, $rawData)) {
                 $floatValue = (float)$rawData[$fieldName];
@@ -76,7 +82,35 @@ class DataTypeClusterer
                 $distanceFields[$fieldName] = new DistanceField($fieldName, $distanceValue);
             }
         }
-        return new DataTypeCluster($integerFields, $booleanFields, $floatFields, $stringFields, $priceFields, $distanceFields);
+        foreach ($this->dayOfWeekFields as $fieldName) {
+            if (array_key_exists($fieldName, $rawData)) {
+                if (is_array($rawData[$fieldName])) {
+                    $dayOfWeekValues = [];
+                    foreach ($rawData[$fieldName] as $value) {
+                        $dayOfWeekValues[] = $this->getDayOfWeek($value);
+                    }
+                    $dayOfWeekFields[$fieldName] = new DayOfWeekField($fieldName, $dayOfWeekValues);
+                } else {
+                    $dayOfWeekValue = $this->getDayOfWeek($rawData[$fieldName]);
+                    $dayOfWeekFields[$fieldName] = new DayOfWeekField($fieldName, $dayOfWeekValue, $rawData[$fieldName]);
+                }
+            }
+        }
+        foreach ($this->monthOfYearFields as $fieldName) {
+            if (array_key_exists($fieldName, $rawData)) {
+                if (is_array($rawData[$fieldName])) {
+                    $monthOfYearValues = [];
+                    foreach ($rawData[$fieldName] as $value) {
+                        $monthOfYearValues[] = (int)$value;
+                    }
+                    $monthOfYearFields[$fieldName] = new MonthOfYearField($fieldName, $monthOfYearValues);
+                } else {
+                    $monthOfYearValue = (int)$rawData[$fieldName];
+                    $monthOfYearFields[$fieldName] = new MonthOfYearField($fieldName, $monthOfYearValue, $rawData[$fieldName]);
+                }
+            }
+        }
+        return new DataTypeCluster($integerFields, $booleanFields, $floatFields, $stringFields, $priceFields, $distanceFields, $dayOfWeekFields, $monthOfYearFields);
     }
 
     private function getPrice($value)
@@ -97,6 +131,25 @@ class DataTypeClusterer
             return Distance::Close;
         } else {
             return Distance::Empty;
+        }
+    }
+
+    private function getDayOfWeek($value)
+    {
+        if (strtolower($value) == 'mon') {
+            return DayOfWeek::Mon;
+        } else if (strtolower($value) == 'tue') {
+            return DayOfWeek::Tue;
+        } else if (strtolower($value) == 'wed') {
+            return DayOfWeek::Wed;
+        } else if (strtolower($value) == 'thu') {
+            return DayOfWeek::Thu;
+        } else if (strtolower($value) == 'fri') {
+            return DayOfWeek::Fri;
+        } else if (strtolower($value) == 'sat') {
+            return DayOfWeek::Sat;
+        } else if (strtolower($value) == 'sun') {
+            return DayOfWeek::Sun;
         }
     }
 

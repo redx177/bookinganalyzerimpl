@@ -3,9 +3,18 @@
   border-radius: 5px;
   padding-bottom: 20px;
 }
+.filters .group {
+  float: left;
+}
+.filters .group fieldset {
+  float: none;
+}
 .filters fieldset {
   float: left;
   margin-right: 20px;
+}
+.filters fieldset:nth-child(2) {
+  margin-top: 20px;
 }
 .filters fieldset legend {
   margin-bottom: 5px;
@@ -22,11 +31,22 @@
 .filters fieldset.inline.quality {
   width: 100px;
 }
+.filters fieldset.inline.dayOfWeek,
+.filters fieldset.inline.monthOfYear {
+  width: 130px;
+}
+.filters fieldset.inline.dayOfWeek label,
+.filters fieldset.inline.monthOfYear label {
+  width: 50px;
+}
 .filters fieldset.inline.attributes {
   width: 280px;
 }
 .filters fieldset.inline.attributes label {
   width: 105px;
+}
+.filters fieldset.inline .form-control {
+  width: 80%;
 }
 .filters fieldset.destination input {
   margin-left: 20px;

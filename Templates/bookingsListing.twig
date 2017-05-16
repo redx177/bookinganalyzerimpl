@@ -15,6 +15,16 @@
                 <div>{{ fieldTitles[field.getName()] }}</div>
             </th>
         {% endfor %}
+        {% for field in firstBooking.getFieldsByType('DayOfWeekField') %}
+            <th>
+                <div>{{ fieldTitles[field.getName()] }}</div>
+            </th>
+        {% endfor %}
+        {% for field in firstBooking.getFieldsByType('MonthOfYearField') %}
+            <th>
+                <div>{{ fieldTitles[field.getName()] }}</div>
+            </th>
+        {% endfor %}
         {% for field in firstBooking.getFieldsByType('PriceField') %}
             <th>
                 <div>{{ fieldTitles[field.getName()] }}</div>
@@ -45,6 +55,12 @@
                 <td>{{ field.displayValue }}</td>
             {% endfor %}
             {% for field in booking.getFieldsByType('FloatField') %}
+                <td>{{ field.displayValue }}</td>
+            {% endfor %}
+            {% for field in booking.getFieldsByType('DayOfWeekField') %}
+                <td>{{ field.displayValue }}</td>
+            {% endfor %}
+            {% for field in booking.getFieldsByType('MonthOfYearField') %}
                 <td>{{ field.displayValue }}</td>
             {% endfor %}
             {% for field in booking.getFieldsByType('PriceField') %}
