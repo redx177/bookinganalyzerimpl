@@ -131,7 +131,7 @@ class DBScanAlgorithm
                 $neighbours[] = $possibleNeighbour;
             }
             $i++;
-            if ($i >= $this->bookingsCountCap) {
+            if ($this->bookingsCountCap && $i >= $this->bookingsCountCap) {
                 break;
             }
         }

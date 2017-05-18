@@ -1,6 +1,7 @@
 <?php
 $configContent = array(
-    'dataSource' => 'rapidminerdata.csv',
+    //'dataSource' => 'rapidminerdata.csv',
+    'dataSource' => 'IntegrationTests/data-cluster-minor-differences-2-entries--2-clusters--5-and-5--0-distance.csv',
     'pageSize' => 10,
     'paginationWindow' => 3,
     'booleanFields' => ['CAIRCOND','CPOOL','CBBQ','CSAUNA','CJACUZZI','CWASHMACHI','CPARKING','CDISHWASHE','CFIREPLACE','SCTV','SCBALCONY','PETS','SCNOSMOKE','INTERNET'],
@@ -74,15 +75,16 @@ $configContent = array(
         'servicePidFile' => '/Services/KPrototype/wip/pid.txt',
         'serviceStopFile' => '/Services/KPrototype/wip/stop.txt',
         'runButtonTitle' => 'Run K-Prototype',
-        'outputInterval' => 10, // seconds
+        'outputInterval' => 1, // seconds
         'maxIterations' => 10,
+        'k' => 2,
     ],
     'dbscan' => [
         'serviceOutput' => '/Services/DBScan/wip/status.htm',
         'servicePidFile' => '/Services/DBScan/wip/pid.txt',
         'serviceStopFile' => '/Services/DBScan/wip/stop.txt',
         'runButtonTitle' => 'Run DBSCAN',
-        'outputInterval' => 10, // seconds
+        'outputInterval' => 1, // seconds
         'radius' => 6,
         'minPoints' => 0.1, // percentage
     ],

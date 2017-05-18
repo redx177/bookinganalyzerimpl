@@ -25,7 +25,10 @@ class DistanceMeasurement
      */
     public function measure(Booking $from, Booking $to): float
     {
-        $fromNumericFields = $from->getFieldsByType(IntegerField::Type());
+        $fromNumericFields = array_merge(
+            $from->getFieldsByType(IntegerField::Type()),
+            $from->getFieldsByType(FloatField::Type())
+        );
         $numericDistance = 0;
         foreach ($fromNumericFields as $fromNumericField) {
             if (in_array($fromNumericField->getName(), $this->ignoreFields)) {

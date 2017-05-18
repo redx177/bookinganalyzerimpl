@@ -77,13 +77,13 @@ class DataCache
             $filterName = $filter->getName();
 
             $field = $booking->getFieldByName($filterName);
-            $bookingValue = $field->getValue();
             if (in_array($filterName, $this->atLeastFilterFields)) {
-                if ($bookingValue < $filterFieldValue) {
+                if ($field->getDisplayValue() < $filterFieldValue) {
                     return false;
                 }
                 continue;
             }
+            $bookingValue = $field->getValue();
             if (is_array($filterFieldValue)) {
                 if (!in_array($bookingValue, $filterFieldValue)) {
                     return false;

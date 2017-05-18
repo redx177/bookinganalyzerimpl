@@ -12,6 +12,7 @@ class SettingsController implements Controller
     private $fieldNames;
     private $ignoreFields;
     private $fieldNameMapping;
+    private $k;
 
     /**
      * @var Twig_Environment
@@ -51,6 +52,9 @@ class SettingsController implements Controller
         $apriori = $config->get('apriori');
         $this->minSup = $apriori['minSup'];
 
+        $kprototype = $config->get('kprototype');
+        $this->k = $kprototype['k'];
+
         $dbscan = $config->get('dbscan');
         $this->radius = $dbscan['radius'];
         $this->minPoints = $dbscan['minPoints'];
@@ -77,6 +81,7 @@ class SettingsController implements Controller
             'bookingsCountCap' => $this->bookingsCountCap,
             'pageSize' => $this->pageSize,
             'gamma' => $this->gamma,
+            'k' => $this->k,
             'minSup' => $this->minSup,
             'radius' => $this->radius,
             'minPoints' => $this->minPoints,

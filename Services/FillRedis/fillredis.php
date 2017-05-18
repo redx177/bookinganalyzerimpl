@@ -30,7 +30,15 @@ while (!$bookingsProvider->hasEndBeenReached()) {
         $id = $booking->getId();
         $redis->hSet($id, 'id', $id);
         foreach ($booking->getFields() as $field) {
-            $redis->hSet($id, $field->getName(), $field->getValue());
+            $value = null;
+            if ($field->getType() == DistanceField::class) {
+                $value = getParamsForEnums($field, Distance::class);
+            } else if ($field->getType() == PriceField::class) {
+                $value = getParamsForEnums($field, Price::class);
+            } else {
+                $value = $field->getValue();
+            }
+            $redis->hSet($id, $field->getName(), $value);
         }
         $i++;
     }
@@ -41,3 +49,16 @@ echo "Setting bookings count to: {$i}\n";
 $endtime = microtime(TRUE);
 $runtime = $endtime - $startTime;
 echo "Runtime: {$runtime}\n";
+
+function getParamsForEnums($field, $className)
+{
+    $rawValue = $field->getValue();
+    $class = new ReflectionClass($className);
+    foreach ($class->getConstants() as $name => $value) {
+        if ($value > 0 && $value === $rawValue) {
+            return strtolower($name);
+        }
+    }
+
+    return '';
+}

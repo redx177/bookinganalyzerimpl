@@ -5,6 +5,7 @@ class KPrototypeAlgorithm
     private $bookingsCount;
     private $bookingsCountCap;
     private $maxIterations;
+    private $k;
 
     /**
      * @var DistanceMeasurement
@@ -56,6 +57,7 @@ class KPrototypeAlgorithm
         $kprototypeConfig = $config->get('kprototype');
         $this->stopFile = $kprototypeConfig['serviceStopFile'];
         $this->maxIterations = $kprototypeConfig['maxIterations'];
+        $this->k = $kprototypeConfig['k'];
 
         $this->bookingsCount = $this->bookingDataIterator->count();
         if ($this->bookingsCountCap) {
@@ -69,11 +71,10 @@ class KPrototypeAlgorithm
      */
     public function run(): ClusteringResult
     {
-        $k = 2;
         $iteration = 1;
 
         // Initialization
-        $clusters = $this->getInitialEmptyClusters($k);
+        $clusters = $this->getInitialEmptyClusters($this->k);
         $this->storeState($clusters, 0);
 
         $this->assignBookingsToClusters($clusters);
@@ -137,7 +138,7 @@ class KPrototypeAlgorithm
         $clusters = new KPrototypeResult(1);
         $clusterCenterIndices = [];
         for ($i = 0; $i < $k; $i++) {
-            $clusterCenterIndex = $this->random->generate(100);
+            $clusterCenterIndex = $this->random->generate($this->bookingsCount);
 
             // If index is already set, rerun generation.
             if (in_array($clusterCenterIndex, $clusterCenterIndices)) {

@@ -22,6 +22,7 @@ class KPrototypeCluster implements Cluster
     public function __construct(Booking $booking = null)
     {
         $this->center = $booking;
+        $this->addClusterPoint(new DistanceClusterPoint($booking, 0));
         $this->totalCosts = 0;
     }
 
@@ -49,7 +50,7 @@ class KPrototypeCluster implements Cluster
         return $this->center;
     }
 
-    public function getTotalCosts(): int
+    public function getTotalCosts(): float
     {
         return $this->totalCosts;
     }

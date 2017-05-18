@@ -36,6 +36,9 @@ class ConfigProvider
             if (isset($editableConfig->minSup)) {
                 $this->configs['apriori']['minSup'] = (float)$editableConfig->minSup;
             }
+            if (isset($editableConfig->k)) {
+                $this->configs['kprototype']['k'] = (int)$editableConfig->k;
+            }
             if (isset($editableConfig->radius)) {
                 $this->configs['dbscan']['radius'] = (float)$editableConfig->radius;
             }

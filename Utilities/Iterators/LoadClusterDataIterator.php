@@ -56,7 +56,7 @@ class LoadClusterDataIterator implements DataIterator
 
     public function rewind()
     {
-        $this->currentRowNumber = 0;
+        $this->currentRowNumber = -1;
         $this->next();
     }
 

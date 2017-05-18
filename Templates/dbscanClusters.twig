@@ -38,7 +38,7 @@
             {% endif %}
             Runtime: {{ runtimeInSeconds }} seconds<br />
             Items count: {{ bookingsCount }}<br />
-            Noise points: {{ clusters.noise|length }}
+            Noise points: {{ clusters.noise|length }}<br />
             Best candidate{% if status == 0 %} so far{% endif %}:
             {% if status == 2 %}
                 <ul>
