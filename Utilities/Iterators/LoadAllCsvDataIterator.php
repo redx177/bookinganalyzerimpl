@@ -24,7 +24,6 @@ class LoadAllCsvDataIterator implements DataIterator
      */
     public function __construct(ConfigProvider $config, $dataFile, $delimiter = ';', $enclosure = '"')
     {
-        echo "all\n";
         if (!file_exists($dataFile)) {
             throw new Exception('File [' . $dataFile . '] not found');
         }

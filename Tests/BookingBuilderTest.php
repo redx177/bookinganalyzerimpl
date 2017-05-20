@@ -14,6 +14,10 @@ require_once dirname(__DIR__) . "/Models/PriceField.php";
 require_once dirname(__DIR__) . "/Models/DistanceField.php";
 require_once dirname(__DIR__) . "/Models/Price.php";
 require_once dirname(__DIR__) . "/Models/Distance.php";
+require_once dirname(__DIR__) . '/Models/DayOfWeekField.php';
+require_once dirname(__DIR__) . '/Models/MonthOfYearField.php';
+require_once dirname(__DIR__) . '/Models/DayOfWeek.php';
+require_once dirname(__DIR__) . '/Models/MonthOfYear.php';
 
 class BookingBuilderTest extends TestCase
 {
@@ -24,7 +28,7 @@ class BookingBuilderTest extends TestCase
         $id = 99;
         $integerField = new IntegerField('1', 1);
         $booleanField = new BooleanField('2', true);
-        $floatField = new FloatField('3', 1.1);
+        $floatField = new FloatField('3', 1.1, 1.1);
         $stringField = new StringField('4', '1');
         $priceField = new PriceField('5', Price::Budget);
         $distanceField = new DistanceField('6', Distance::Close);
@@ -34,7 +38,7 @@ class BookingBuilderTest extends TestCase
             [$floatField],
             [$stringField],
             [$priceField],
-            [$distanceField]);
+            [$distanceField],[],[]);
 
         $map = [
             ['idField', 'id'],

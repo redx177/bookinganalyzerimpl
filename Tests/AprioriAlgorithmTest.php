@@ -17,6 +17,10 @@ require_once dirname(__DIR__) . '/Models/FloatField.php';
 require_once dirname(__DIR__) . '/Models/StringField.php';
 require_once dirname(__DIR__) . '/Models/PriceField.php';
 require_once dirname(__DIR__) . '/Models/DistanceField.php';
+require_once dirname(__DIR__) . '/Models/DayOfWeekField.php';
+require_once dirname(__DIR__) . '/Models/MonthOfYearField.php';
+require_once dirname(__DIR__) . '/Models/DayOfWeek.php';
+require_once dirname(__DIR__) . '/Models/MonthOfYear.php';
 require_once dirname(__DIR__) . '/Utilities/ConfigProvider.php';
 require_once __DIR__ . '/BookingDataIteratorMock.php';
 
@@ -27,6 +31,7 @@ class AprioriAlgorithmTest extends TestCase
     private $configMock;
     private $aprioriProgressMock;
     private $factoryMock;
+    private $filtersMock;
 
     private function GetBooking($intRooms, $intBedrooms, $intStars, $boolTv, $boolBbq, $boolPets,
                                 $boolBalcony, $boolSauna, $floatLong, $floatLat, $price, $diSea, $diLake, $diSki)
@@ -40,13 +45,13 @@ class AprioriAlgorithmTest extends TestCase
                 'PETS' => new BooleanField('PETS', $boolPets),
                 'BALCONY' => new BooleanField('BALCONY', $boolBalcony),
                 'SAUNA' => new BooleanField('SAUNA', $boolSauna)],
-            ['long' => new FloatField('long', $floatLong),
-                'lat' => new FloatField('lat', $floatLat)],
+            ['long' => new FloatField('long', $floatLong, $floatLong),
+                'lat' => new FloatField('lat', $floatLat, $floatLat)],
             [],
             ['PRICE' => new PriceField('PRICE', $price)],
             ['SEA' => new DistanceField('SEA', $diSea),
                 'LAKE' => new DistanceField('LAKE', $diLake),
-                'SKI' => new DistanceField('SKI', $diSki)]));
+                'SKI' => new DistanceField('SKI', $diSki)],[],[]));
     }
 
     protected function setUp()
@@ -58,6 +63,7 @@ class AprioriAlgorithmTest extends TestCase
                 'outputInterval' => '',
                 'serviceOutput' => '',
             ]],
+            ['ignoreFields', []],
         ];
         $this->configMock = $this->createMock(ConfigProvider::class);
         $this->configMock->method('get')
@@ -65,6 +71,7 @@ class AprioriAlgorithmTest extends TestCase
 
         $this->aprioriProgressMock = $this->createMock(AprioriProgress::class);
         $this->factoryMock = $this->createMock(\DI\FactoryInterface::class);
+        $this->filtersMock = $this->createMock(Filters::class);
     }
 
     /**
@@ -83,17 +90,17 @@ class AprioriAlgorithmTest extends TestCase
             $this->GetBooking(
                 $rooms, 2, 2,
                 false, false, false, false, false,
-                40.45538, -3.79278,
+                41.45538, -3.79278,
                 Price::Empty,
                 Distance::Close, Distance::Empty, Distance::Empty),
             $this->GetBooking(
                 $rooms, 3, 3,
                 false, false, false, false, false,
-                40.45538, -3.79278,
+                42.45538, -3.79278,
                 Price::Empty,
                 Distance::Empty, Distance::Empty, Distance::Empty)]);
 
-        $sut = new AprioriAlgorithm($bookingDataIteratorMock, $this->configMock, $this->aprioriProgressMock, $this->factoryMock);
+        $sut = new AprioriAlgorithm($bookingDataIteratorMock, $this->configMock, $this->aprioriProgressMock, $this->factoryMock, $this->filtersMock);
         $histograms = $sut->run();
         $histogram = $histograms->getHistogram(1);
         $histogramBins = $histogram->getHistogramBins();
@@ -120,17 +127,17 @@ class AprioriAlgorithmTest extends TestCase
                 $this->GetBooking(
                     2, 2, 2,
                     $tv, false, false, false, false,
-                    40.45538, -3.79278,
+                    41.45538, -3.79278,
                     Price::Empty,
                     Distance::Empty, Distance::Empty, Distance::Empty),
                 $this->GetBooking(
                     3, 3, 3,
                     $tv, false, false, false, false,
-                    40.45538, -3.79278,
+                    42.45538, -3.79278,
                     Price::Empty,
                     Distance::Empty, Distance::Empty, Distance::Empty)]);
 
-        $sut = new AprioriAlgorithm($bookingDataIteratorMock, $this->configMock, $this->aprioriProgressMock, $this->factoryMock);
+        $sut = new AprioriAlgorithm($bookingDataIteratorMock, $this->configMock, $this->aprioriProgressMock, $this->factoryMock, $this->filtersMock);
         $histograms = $sut->run();
         $histogram = $histograms->getHistogram(1);
         $histogramBins = $histogram->getHistogramBins();
@@ -156,17 +163,17 @@ class AprioriAlgorithmTest extends TestCase
                 $this->GetBooking(
                     2, 2, 2,
                     false, false, false, false, false,
-                    40.45538, -3.79278,
+                    41.45538, -3.79278,
                     $price,
                     Distance::Empty, Distance::Empty, Distance::Empty),
                 $this->GetBooking(
                     3, 3, 3,
                     false, false, false, false, false,
-                    40.45538, -3.79278,
+                    42.45538, -3.79278,
                     $price,
                     Distance::Empty, Distance::Empty, Distance::Empty)]);
 
-        $sut = new AprioriAlgorithm($bookingDataIteratorMock, $this->configMock, $this->aprioriProgressMock, $this->factoryMock);
+        $sut = new AprioriAlgorithm($bookingDataIteratorMock, $this->configMock, $this->aprioriProgressMock, $this->factoryMock, $this->filtersMock);
         $histograms = $sut->run();
         $histogram = $histograms->getHistogram(1);
         $histogramBins = $histogram->getHistogramBins();
@@ -186,23 +193,23 @@ class AprioriAlgorithmTest extends TestCase
                 $this->GetBooking(
                     1, 1, 1,
                     false, false, false, false, false,
-                    40.45538, -3.79278,
+                    41.45538, -3.79278,
                     Price::Empty,
                     $diSea, Distance::Empty, Distance::Empty),
                 $this->GetBooking(
                     2, 2, 2,
                     false, false, false, false, false,
-                    40.45538, -3.79278,
+                    42.45538, -3.79278,
                     Price::Empty,
                     $diSea, Distance::Empty, Distance::Empty),
                 $this->GetBooking(
                     3, 3, 3,
                     false, false, false, false, false,
-                    40.45538, -3.79278,
+                    43.45538, -3.79278,
                     Price::Empty,
                     $diSea, Distance::Empty, Distance::Empty)]);
 
-        $sut = new AprioriAlgorithm($bookingDataIteratorMock, $this->configMock, $this->aprioriProgressMock, $this->factoryMock);
+        $sut = new AprioriAlgorithm($bookingDataIteratorMock, $this->configMock, $this->aprioriProgressMock, $this->factoryMock, $this->filtersMock);
         $histograms = $sut->run();
         $histogram = $histograms->getHistogram(1);
         $histogramBins = $histogram->getHistogramBins();
@@ -226,17 +233,17 @@ class AprioriAlgorithmTest extends TestCase
                 $this->GetBooking(
                     7, 8, 2,
                     false, false, false, false, false,
-                    40.45538, -3.79278,
+                    41.45538, -3.79278,
                     Price::Empty,
                     Distance::Close, Distance::Empty, Distance::Empty),
                 $this->GetBooking(
                     7, 8, 3,
                     false, false, false, false, false,
-                    40.45538, -3.79278,
+                    42.45538, -3.79278,
                     Price::Empty,
                     Distance::Empty, Distance::Empty, Distance::Empty)]);
 
-        $sut = new AprioriAlgorithm($bookingDataIteratorMock, $this->configMock, $this->aprioriProgressMock, $this->factoryMock);
+        $sut = new AprioriAlgorithm($bookingDataIteratorMock, $this->configMock, $this->aprioriProgressMock, $this->factoryMock, $this->filtersMock);
         $histograms = $sut->run();
         $histogram = $histograms->getHistogram(2);
         $histogramBins = $histogram->getHistogramBins();
@@ -261,17 +268,17 @@ class AprioriAlgorithmTest extends TestCase
                 $this->GetBooking(
                     7, 8, 9,
                     false, false, false, false, false,
-                    40.45538, -3.79278,
+                    41.45538, -3.79278,
                     Price::Empty,
                     Distance::Close, Distance::Empty, Distance::Empty),
                 $this->GetBooking(
                     7, 8, 9,
                     false, false, false, false, false,
-                    40.45538, -3.79278,
+                    42.45538, -3.79278,
                     Price::Empty,
                     Distance::Empty, Distance::Empty, Distance::Empty)]);
 
-        $sut = new AprioriAlgorithm($bookingDataIteratorMock, $this->configMock, $this->aprioriProgressMock, $this->factoryMock);
+        $sut = new AprioriAlgorithm($bookingDataIteratorMock, $this->configMock, $this->aprioriProgressMock, $this->factoryMock, $this->filtersMock);
         $histograms = $sut->run();
 
         $this->assertEquals(3, count($histograms->getAll()));
@@ -326,17 +333,17 @@ class AprioriAlgorithmTest extends TestCase
             $this->GetBooking(
                 $rooms, 2, 2,
                 false, false, false, false, false,
-                40.45538, -3.79278,
+                41.45538, -3.79278,
                 $price,
                 Distance::Close, Distance::Empty, Distance::Empty),
             $this->GetBooking(
                 $rooms, 3, 3,
                 false, false, false, false, false,
-                40.45538, -3.79278,
+                42.45538, -3.79278,
                 $price,
                 Distance::Empty, Distance::Empty, Distance::Empty)]);
 
-        $sut = new AprioriAlgorithm($bookingDataIteratorMock, $this->configMock, $this->aprioriProgressMock, $this->factoryMock);
+        $sut = new AprioriAlgorithm($bookingDataIteratorMock, $this->configMock, $this->aprioriProgressMock, $this->factoryMock, $this->filtersMock);
         $histograms = $sut->run();
         $histogram = $histograms->getHistogram(1);
         $histogramBins = $histogram->getHistogramBins();

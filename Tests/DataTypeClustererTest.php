@@ -10,6 +10,10 @@ require_once dirname(__DIR__) . "/Models/BooleanField.php";
 require_once dirname(__DIR__) . "/Models/IntegerField.php";
 require_once dirname(__DIR__) . "/Models/DistanceField.php";
 require_once dirname(__DIR__) . "/Models/PriceField.php";
+require_once dirname(__DIR__) . '/Models/DayOfWeekField.php';
+require_once dirname(__DIR__) . '/Models/MonthOfYearField.php';
+require_once dirname(__DIR__) . '/Models/DayOfWeek.php';
+require_once dirname(__DIR__) . '/Models/MonthOfYear.php';
 require_once dirname(__DIR__) . "/Utilities/ConfigProvider.php";
 
 use PHPUnit\Framework\TestCase;
@@ -37,6 +41,12 @@ class DataTypeClustererTest extends TestCase
             ['integerFields',['id','intA','intB','intC','intD','intE']],
             ['distanceFields',['distA','distB','distC']],
             ['priceFields',['priA','priB','priC','priD']],
+            ['dayOfWeekFields',[]],
+            ['monthOfYearFields',[]],
+            ['floatFieldsBoundaries', [
+                'floatA' => ['increment' => 1, 'lowest' => 1],
+                'floatB' => ['increment' => 1, 'lowest' => 1]
+            ]],
         ];
         $configMock = $this->createMock(ConfigProvider::class);
         $configMock->expects($this->any())
@@ -53,7 +63,7 @@ class DataTypeClustererTest extends TestCase
         $this->assertEquals(22.33, array_values($data->getFloatFields())[1]->getValue());
 
         $this->assertEquals('strA', array_values($data->getStringFields())[0]->getName());
-        $this->assertEquals('CH12.12.12', array_values($data->getStringFields())[0]->getValue());
+        $this->assertEquals('ch12.12.12', array_values($data->getStringFields())[0]->getValue());
         $this->assertEquals('strB', array_values($data->getStringFields())[1]->getName());
         $this->assertEquals('aaabbbccc', array_values($data->getStringFields())[1]->getValue());
         $this->assertEquals('strC', array_values($data->getStringFields())[2]->getName());

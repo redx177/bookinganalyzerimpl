@@ -1,9 +1,22 @@
 <?php
+require_once dirname(__DIR__) . '/Interfaces/Field.php';
 require_once dirname(__DIR__) . "/Business/FiltersProvider.php";
 require_once dirname(__DIR__) . "/Business/DataTypeClusterer.php";
 require_once dirname(__DIR__) . "/Models/DataTypeCluster.php";
 require_once dirname(__DIR__) . "/Models/Filters.php";
 require_once dirname(__DIR__) . "/Models/Filter.php";
+require_once dirname(__DIR__) . '/Models/IntegerField.php';
+require_once dirname(__DIR__) . '/Models/BooleanField.php';
+require_once dirname(__DIR__) . '/Models/FloatField.php';
+require_once dirname(__DIR__) . '/Models/StringField.php';
+require_once dirname(__DIR__) . '/Models/DistanceField.php';
+require_once dirname(__DIR__) . '/Models/PriceField.php';
+require_once dirname(__DIR__) . '/Models/Price.php';
+require_once dirname(__DIR__) . '/Models/Distance.php';
+require_once dirname(__DIR__) . '/Models/DayOfWeekField.php';
+require_once dirname(__DIR__) . '/Models/MonthOfYearField.php';
+require_once dirname(__DIR__) . '/Models/DayOfWeek.php';
+require_once dirname(__DIR__) . '/Models/MonthOfYear.php';
 
 use \PHPUnit\Framework\TestCase,
     org\bovigo\vfs\vfsStream;
@@ -18,12 +31,12 @@ class FiltersProviderTest extends TestCase
         $this->dataTypeClustererMock->method('get')
             ->will($this->returnCallback(function () {
                 return new DataTypeCluster(
-                        ['a1' => new IntegerField('a1', 'a1a'), 'a2' => new IntegerField('a2', ['a2a', 'a2b'])],
+                        ['a1' => new IntegerField('a1', '1'), 'a2' => new IntegerField('a2', ['2', '3'])],
                         ['b' => new BooleanField('b', true)],
-                        ['c' => new FloatField('c', 2.2)],
+                        ['c' => new FloatField('c', 2.2, 2.2)],
                         ['d' => new StringField('d', 'd')],
                         ['e' => new PriceField('e', Price::Budget)],
-                        ['f' => new DistanceField('f', Distance::Close)]);
+                        ['f' => new DistanceField('f', Distance::Close)],[],[]);
             }));
     }
 
@@ -33,18 +46,18 @@ class FiltersProviderTest extends TestCase
     public function filtersDataShouldBeMappedToCorrectDataTypes() {
         $rawData = ['action' => 'actionValue'];
 
-        $sut = new FiltersProvider($this->dataTypeClustererMock, '');
+        $sut = new FiltersProvider($this->dataTypeClustererMock, '', '');
 
         $filters = $sut->get($rawData);
         $filterSet = $filters->getFilters();
         $this->assertEquals('actionValue', $filters->getAction());
         $this->assertEquals(7, count($filterSet));
         $this->assertEquals('a1', $filterSet[0]->getName());
-        $this->assertEquals('a1a', $filterSet[0]->getValue());
+        $this->assertEquals('1', $filterSet[0]->getValue());
         $this->assertEquals('int', $filterSet[0]->getType());
         $this->assertEquals('a2', $filterSet[1]->getName());
-        $this->assertEquals('a2a', $filterSet[1]->getValue()[0]);
-        $this->assertEquals('a2b', $filterSet[1]->getValue()[1]);
+        $this->assertEquals('2', $filterSet[1]->getValue()[0]);
+        $this->assertEquals('3', $filterSet[1]->getValue()[1]);
         $this->assertEquals('int', $filterSet[1]->getType());
         $this->assertEquals('b', $filterSet[2]->getName());
         $this->assertEquals(true, $filterSet[2]->getValue());
@@ -74,7 +87,7 @@ class FiltersProviderTest extends TestCase
 2;3;4
 3;4;5');
 
-        $sut = new FiltersProvider($this->dataTypeClustererMock, $testfile);
+        $sut = new FiltersProvider($this->dataTypeClustererMock, $testfile, '');
         $destinations = $sut->getDestinations();
 
         $this->assertEquals(3, count($destinations));
@@ -99,7 +112,7 @@ class FiltersProviderTest extends TestCase
      * @test
      */
     public function invalidDestinationFileShouldReturnEmptyArrayWhenGettingDestinations() {
-        $sut = new FiltersProvider($this->dataTypeClustererMock, 'invalid file');
+        $sut = new FiltersProvider($this->dataTypeClustererMock, 'invalid file', '');
         $destinations = $sut->getDestinations();
 
         $this->assertEquals([], $destinations);

@@ -1,7 +1,7 @@
 <?php
 $configContent = array(
-    //'dataSource' => 'rapidminerdata.csv',
-    'dataSource' => 'IntegrationTests/data-cluster-minor-differences-2-entries--2-clusters--5-and-5--0-distance.csv',
+    'dataSource' => 'rapidminerdata.csv',
+    //'dataSource' => 'IntegrationTests/data-cluster-minor-differences-2-entries--2-clusters--5-and-5--0-distance.csv',
     'pageSize' => 10,
     'paginationWindow' => 3,
     'booleanFields' => ['CAIRCOND','CPOOL','CBBQ','CSAUNA','CJACUZZI','CWASHMACHI','CPARKING','CDISHWASHE','CFIREPLACE','SCTV','SCBALCONY','PETS','SCNOSMOKE','INTERNET'],

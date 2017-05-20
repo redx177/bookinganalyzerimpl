@@ -60,7 +60,6 @@ class DBScanAlgorithm
         $j = 0;
         foreach ($this->bookingDataIterator as $booking) {
             $j++;
-            echo "1\n";
 
             // If the point is already visited, skip it.
             if ($this->isVisited($booking, $visitedIds)) {
@@ -79,13 +78,11 @@ class DBScanAlgorithm
                     if ($i % 50 == 0) {
                         $this->storeState($clusters, 0);
                     }
-                    echo 2;
                     $neighbour = $neighbours[$i];
                     if (!$this->isVisited($neighbour, $visitedIds)) {
                         $visitedIds[] = $neighbour->getId();
                         $neighbourCandidates = $this->getNeighbours($neighbour);
                         if (count($neighbourCandidates) >= $this->minPoints) {
-                            echo 3;
                             $neighbours = array_merge($neighbours, $neighbourCandidates);
                             $neighboursCount += count($neighbourCandidates);
                         }

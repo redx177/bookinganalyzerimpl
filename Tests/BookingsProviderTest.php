@@ -15,6 +15,10 @@ require_once dirname(__DIR__) . "/Models/FloatField.php";
 require_once dirname(__DIR__) . "/Models/StringField.php";
 require_once dirname(__DIR__) . "/Models/PriceField.php";
 require_once dirname(__DIR__) . "/Models/DistanceField.php";
+require_once dirname(__DIR__) . '/Models/DayOfWeekField.php';
+require_once dirname(__DIR__) . '/Models/MonthOfYearField.php';
+require_once dirname(__DIR__) . '/Models/DayOfWeek.php';
+require_once dirname(__DIR__) . '/Models/MonthOfYear.php';
 require_once dirname(__DIR__) . "/Utilities/Iterators/LoadIncrementalCsvDataIterator.php";
 require_once dirname(__DIR__) . "/Utilities/ConfigProvider.php";
 require_once __DIR__ . "/BookingDataIteratorMock.php";
@@ -34,26 +38,26 @@ class BookingsProviderTest extends TestCase
                 $cluster = new DataTypeCluster(
                     ['int'=>new IntegerField('int', 4), 'int2' => new IntegerField('int2', 5)],
                     ['bool' => new BooleanField('bool', false)],
-                    ['float' => new FloatField('float', 2.20)],
+                    ['float' => new FloatField('float', 2.20, 2.20)],
                     ['str' => new StringField('str', 'd')],
                     ['pri' => new PriceField('pri', Price::Empty)],
-                    ['dist' => new DistanceField('dist', Distance::Empty)]);
+                    ['dist' => new DistanceField('dist', Distance::Empty)],[],[]);
             elseif ($id % 3 == 2)
                 $cluster =  new DataTypeCluster(
                     ['int' => new IntegerField('int', 15), 'int2' => new IntegerField('int2', 17)],
                     ['bool' => new BooleanField('bool', true)],
-                    ['float' => new FloatField('float', 2.21)],
+                    ['float' => new FloatField('float', 2.21, 2.21)],
                     ['str' => new StringField('str', 'd1')],
                     ['pri' => new PriceField('pri', Price::Luxury)],
-                    ['dist' => new DistanceField('dist', Distance::Close)]);
+                    ['dist' => new DistanceField('dist', Distance::Close)],[],[]);
             else
                 $cluster = new DataTypeCluster(
                     ['int' => new IntegerField('int', 20), 'int2' => new IntegerField('int2', 21)],
                     ['bool' => new BooleanField('bool', false)],
-                    ['float' => new FloatField('float', 2.22)],
+                    ['float' => new FloatField('float', 2.22, 2.22)],
                     ['str' => new StringField('str', 'd2')],
                     ['pri' => new PriceField('pri', Price::Budget)],
-                    ['dist' => new DistanceField('dist', Distance::Empty)]);
+                    ['dist' => new DistanceField('dist', Distance::Empty)],[],[]);
             $mockData[] = new Booking($id, $cluster);
         }
         $this->csvIteratorMock = BookingDataIteratorMock::get($this, $mockData);

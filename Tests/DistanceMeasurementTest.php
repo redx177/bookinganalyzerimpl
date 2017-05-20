@@ -13,6 +13,10 @@ require_once dirname(__DIR__) . '/Models/DistanceField.php';
 require_once dirname(__DIR__) . '/Models/PriceField.php';
 require_once dirname(__DIR__) . '/Models/Price.php';
 require_once dirname(__DIR__) . '/Models/Distance.php';
+require_once dirname(__DIR__) . '/Models/DayOfWeekField.php';
+require_once dirname(__DIR__) . '/Models/MonthOfYearField.php';
+require_once dirname(__DIR__) . '/Models/DayOfWeek.php';
+require_once dirname(__DIR__) . '/Models/MonthOfYear.php';
 require_once dirname(__DIR__) . '/Utilities/ConfigProvider.php';
 
 use PHPUnit\Framework\TestCase;
@@ -34,6 +38,7 @@ class DistanceMeasurementTest extends TestCase
 
         $map = [
             ['gamma', 1],
+            ['ignoreFields', []],
         ];
         $this->configMock = $this->createMock(ConfigProvider::class);
         $this->configMock->method('get')->will($this->returnValueMap($map));
@@ -44,10 +49,10 @@ class DistanceMeasurementTest extends TestCase
         return new DataTypeCluster(
             ['int' => new IntegerField('int', $int1), 'int2' => new IntegerField('int2', $int2)],
             ['bool1' => new BooleanField('bool1', $bool1), 'bool2' => new BooleanField('bool2', $bool2)],
-            ['float' => new FloatField('float', 2.20)],
+            ['float' => new FloatField('float', 2.20, 2.20)],
             ['str' => new StringField('str', 'd')],
             ['pri' => new PriceField('pri', $pri1)],
-            ['dist' => new DistanceField('dist', $dist1)]);
+            ['dist' => new DistanceField('dist', $dist1)],[],[]);
     }
 
     /**
@@ -143,6 +148,7 @@ class DistanceMeasurementTest extends TestCase
         $gamma = 0.5;
         $map = [
             ['gamma', $gamma],
+            ['ignoreFields', []],
         ];
         $configMock = $this->createMock(ConfigProvider::class);
         $configMock->method('get')
@@ -164,6 +170,7 @@ class DistanceMeasurementTest extends TestCase
         $gamma = 2;
         $map = [
             ['gamma', $gamma],
+            ['ignoreFields', []],
         ];
         $configMock = $this->createMock(ConfigProvider::class);
         $configMock->method('get')

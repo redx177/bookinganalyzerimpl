@@ -20,7 +20,6 @@ class LoadRedisDataIterator implements DataIterator
     {
         $this->redis = $redis;
         $this->rewind();
-        echo "Woho redis!{$this->count()}\n";
     }
 
     /**

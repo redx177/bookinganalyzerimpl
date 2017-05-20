@@ -14,6 +14,10 @@ require_once dirname(__DIR__) . "/Models/PriceField.php";
 require_once dirname(__DIR__) . "/Models/DistanceField.php";
 require_once dirname(__DIR__) . "/Models/Price.php";
 require_once dirname(__DIR__) . "/Models/Distance.php";
+require_once dirname(__DIR__) . '/Models/DayOfWeekField.php';
+require_once dirname(__DIR__) . '/Models/MonthOfYearField.php';
+require_once dirname(__DIR__) . '/Models/DayOfWeek.php';
+require_once dirname(__DIR__) . '/Models/MonthOfYear.php';
 
 class BookingDataIteratorTest extends TestCase
 {
@@ -24,7 +28,7 @@ class BookingDataIteratorTest extends TestCase
         $expectedCount = 99;
         $expectedKey = 199;
         $expectedValid = true;
-        $expectedCurrent = new Booking(1, new DataTypeCluster([],[],[],[],[],[]));
+        $expectedCurrent = new Booking(1, new DataTypeCluster([],[],[],[],[],[],[],[]));
 
         $dataIteratorMock = $this->createMock(DataIterator::class);
         $dataIteratorMock
